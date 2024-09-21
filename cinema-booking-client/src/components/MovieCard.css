@@ -1,0 +1,42 @@
+.movie-card {
+  position: relative;
+  width: 200px; /* Adjust as needed */
+  height: 300px; /* Adjust as needed */
+  overflow: hidden;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s;
+}
+
+.movie-card:hover img {
+  transform: scale(1.1);
+}
+
+.movie-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center buttons vertically */
+  align-items: center; /* Center buttons horizontally */
+  position: absolute; /* Position it inside the card */
+  bottom: 10px; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
+}
+
+.movie-title {
+  text-align: center; /* Center the title */
+  margin-top: 5px; /* Space between card and title */
+  font-weight: bold; /* Optional: Make the title bold */
+}
+
+.movie-rating {
+  text-align: center; /* Center the text */
+  margin-top: 5px; /* Space between title and rating */
+  color: #555; /* Change the color to ensure visibility */
+}

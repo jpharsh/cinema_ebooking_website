@@ -1,38 +1,68 @@
 .movie-card {
-  position: relative;
-  width: 200px; /* Adjust as needed */
-  height: 300px; /* Adjust as needed */
+  /* position: relative;
+  width: 200px; 
+  height: 300px; 
   overflow: hidden;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  margin: 10px;
+  border-radius: 8px;*/
+  margin: 10px; 
+  scroll-snap-align: start;
+  min-width: 200px;
+  border-radius: 5px;
+  /* padding: 15px;  */
+  width: 200px;
+  height: 300px;
+  transition: transform 0.2s;
+  position: relative;
 }
 
 .movie-card img {
   width: 100%;
   height: auto;
   transition: transform 0.3s;
+  
 }
 
 .movie-card:hover img {
   transform: scale(1.1);
 }
 
+.movie-card:hover {
+  transform: scale(1.05);
+  
+}
+
+.movie-card h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.movie-card p {
+  font-size: 16px;
+} 
+
 .movie-info {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center buttons vertically */
-  align-items: center; /* Center buttons horizontally */
-  position: absolute; /* Position it inside the card */
-  bottom: 10px; /* Adjust as needed */
-  left: 50%;
-  transform: translateX(-50%); /* Center horizontally */
+  gap: 15px;
+  justify-content: center; 
+  /* height: 100%;  */
+  position: relative;
+  top: -353.5px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  height: 300px;
+  width: 200px;
+  border-radius: 5px;
 }
 
 .movie-title {
   text-align: center; /* Center the title */
   margin-top: 5px; /* Space between card and title */
   font-weight: bold; /* Optional: Make the title bold */
+  /* position: relative;
+  top: -300px; */
+
 }
 
 .movie-rating {

@@ -16,7 +16,7 @@
     margin-left: 750px;
   }
   
-  .nav-links {
+  /* .nav-links {
     list-style-type: none;
     display: flex;
     gap: 20px;
@@ -34,4 +34,4 @@
   
   .nav-links a:hover {
     text-decoration: underline;
-  }
+  } */

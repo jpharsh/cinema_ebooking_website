@@ -26,6 +26,11 @@ header {
   padding: 10px;
 }
 
+.advertisement-pic {
+  width: 100%;
+  height: 100%;
+}
+
 /* Buttons */
 .btn {
   border: none;
@@ -50,6 +55,12 @@ header {
   color: #ce0000;
 }
 
+.btn-container {
+  display: flex;
+  justify-content: right;
+  gap: 20px;
+}
+
 /* Search */
 .App input[type=text] {
   width: 40%;
@@ -57,6 +68,13 @@ header {
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 16px;
+}
+
+.input-box {
+  background-color: #d9d9d937; 
+  padding: 5px; 
+  border-radius: 0 !important; 
+  color: white; 
 }
 
 .trailer-popup {

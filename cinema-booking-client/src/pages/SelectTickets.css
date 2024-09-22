@@ -1,3 +1,5 @@
+/* REMOVE COMMENTED OUT CODE */
+
 .select-tickets-container {
     display: flex;
     align-items: flex-start;
@@ -8,7 +10,7 @@
     border-radius: 10px; */
 }
 
-.poster-section {
+/* .poster-section {
     flex: 1;
     text-align: center;
 }
@@ -17,16 +19,16 @@
     width: 300px;
     height: auto;
     border-radius: 10px;
-}
+} */
 
 .ticket-selection-section {
     flex: 2;
     margin-left: 40px;
 }
 
-.ticket-selection-section h2 {
+/* .ticket-selection-section h2 {
     margin-bottom: 20px;
-}
+} */
 
 .ticket-type {
     display: flex;
@@ -35,7 +37,7 @@
     justify-content: space-between;
 }
 
-.ticket-type label {
+/* .ticket-type label {
     width: 120px;
     font-weight: bold;
 }
@@ -60,4 +62,4 @@
 
 .purchase-btn:hover {
     background-color: #0056b3;
-}
+} */

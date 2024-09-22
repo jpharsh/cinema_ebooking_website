@@ -1,0 +1,72 @@
+h3 {
+    margin: 0px;
+    display: flex;
+    justify-content: left;
+}
+
+.saved-cards-container {
+    border: 1px solid white;
+    padding: 10px; 
+}
+
+.card {
+    display: flex;
+    justify-content: space-between;
+    background-color: #353535;
+    width: 100%;
+    border-width: 0;
+    line-height: 0px;
+}
+
+.card :hover {
+    background-color: #555;
+    line-height: 0px;
+}
+
+.card-type {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.card-info {
+    display: flex;
+    color: white;
+    font-size: medium;
+    width: 100%;
+    align-items: baseline;
+    gap: 10px;
+    justify-content: space-between;
+    
+}
+
+.card-logo {
+    width: 40px; 
+    height: auto; 
+    align-self: center;
+}
+
+.first-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.small-text {
+    font-size: small;
+    color: lightgray;
+}
+
+.payment-info-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    gap: 20px;
+}
+
+.payment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}

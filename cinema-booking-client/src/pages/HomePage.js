@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import MovieList from '../components/MovieList';
-import Navbar from '../components/Navbar';
 import axios from 'axios';
 import '../App.css';
 import './HomePage.css'

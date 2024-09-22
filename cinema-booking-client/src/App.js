@@ -4,6 +4,8 @@ import MovieList from './components/MovieList';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage.js';
 import SelectTickets from './pages/SelectTickets.js';
+// import PaymentInfo from './pages/PaymentInfo.js';
+// import SelectSeats from './pages/SelectSeats.js';
 import axios from 'axios';
 import './App.css';
 
@@ -64,6 +66,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/select-tickets" element={<SelectTickets />} />
+          {/* <Route path="/select-seats" element={<SelectSeats />} />
+          <Route path="/payment-info" element={<PaymentInfo />} /> */}
         </Routes>
       </div>
     </Router>

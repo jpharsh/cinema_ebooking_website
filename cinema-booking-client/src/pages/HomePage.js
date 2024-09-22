@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import axios from 'axios';
 import '../App.css';
 import './HomePage.css'
+import Advertisement from '../images/Advertisement1.png';
 
 const HomePage = () => {
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -66,7 +67,6 @@ const HomePage = () => {
 
     return (
         <div className="App">
-
             <div style={{ padding: '20px', position: 'relative' }}>
                 <input
                     type="text"
@@ -105,11 +105,15 @@ const HomePage = () => {
                 )}
             </div>
 
+            <div className="movie-section" style={{ padding: '0px', height: '400px' }}>
+                <img src={Advertisement} alt="Advertisement" className="advertisement-pic" />
+            </div>
+
             {/* Movie Lists */}
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Now Playing</h2>
                 <MovieList 
-                    movies={nowPlayingMovies} 
+                    movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().includes(searchTerm.toLowerCase()))} 
                     isNowPlaying={true}
                     onWatchTrailer={watchTrailer}
                 />
@@ -118,7 +122,7 @@ const HomePage = () => {
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Coming Soon</h2>
                 <MovieList 
-                    movies={comingSoonMovies}
+                    movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().includes(searchTerm.toLowerCase()))}
                     isNowPlaying={false}
                     onWatchTrailer={watchTrailer} 
                 />

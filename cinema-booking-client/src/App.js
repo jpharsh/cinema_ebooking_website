@@ -11,8 +11,10 @@ import EditProfile from './pages/EditProfile.js';
 import OrderSummary from './pages/OrderSummary.js';
 import Registration from './pages/Registration.js';
 import RegistrationConfirmation from './pages/RegistrationConfirmation.js';
+import OrderConfirmation from './pages/OrderConfirmation.js';
 import axios from 'axios';
 import './App.css';
+
 
 
 
@@ -32,6 +34,7 @@ return (
         <Route path="/order-summary" element={<OrderSummary />} />
         <Route path="/registration" element={<Registration />} />
         <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
       </Routes>
     </div>
   </Router>

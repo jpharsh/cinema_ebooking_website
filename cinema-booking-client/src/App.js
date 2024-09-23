@@ -12,10 +12,9 @@ import OrderSummary from './pages/OrderSummary.js';
 import Registration from './pages/Registration.js';
 import RegistrationConfirmation from './pages/RegistrationConfirmation.js';
 import OrderConfirmation from './pages/OrderConfirmation.js';
+import ManageMovies from './pages/ManageMovies.js';
 import axios from 'axios';
 import './App.css';
-
-
 
 
 
@@ -35,13 +34,12 @@ return (
         <Route path="/registration" element={<Registration />} />
         <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
         <Route path="/order-confirmation" element={<OrderConfirmation />} />
+        <Route path="/manage-movies" element={<ManageMovies />} />
       </Routes>
     </div>
   </Router>
 );
 }
-
-
 
 
 export default App;

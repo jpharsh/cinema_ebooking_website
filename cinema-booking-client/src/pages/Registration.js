@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import './Registration.css'; // Import your CSS file for styling
-import Header from '../components/Header'; // Import the Header component
+import './EditProfile.css'; // Import your CSS file for styling
+// import Header from '../components/Header'; // Import the Header component
 
 
 const Registration = () => {
@@ -18,7 +18,7 @@ const Registration = () => {
 
     return (
         <div className="registration-container">
-           <Header />
+           {/* <Header /> */}
             <h1>Create Profile</h1>
 
             {/* Required Information */}
@@ -84,11 +84,15 @@ const Registration = () => {
                                     <input type="text"/>
                                     <p>Zip Code</p>
                                     <input type="text"/>
-                                    <button className="save-button">Save Card</button>
-                                    <button className="remove-button">Remove Card</button>
+                                    <div className="center-btn">
+                                        <button className="btn red">Save Card</button>
+                                        <button className="btn white">Remove Card</button>
+                                    </div>
                                 </div>
                             )}
-                            <button className="add-card-button">+ Add New Card</button>
+                            <div className="center-btn">
+                                <button className="btn red">+ Add New Card</button>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -114,7 +118,9 @@ const Registration = () => {
                 )}
             </div>
 
-            <button className="create-account-button">Save Changes</button>
+            <div className="center-btn">
+            <button className="btn red">Save Changes</button>
+            </div>
         </div>
     );
 };

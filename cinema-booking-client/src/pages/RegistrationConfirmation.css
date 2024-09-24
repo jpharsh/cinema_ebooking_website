@@ -21,7 +21,8 @@
     margin-top: 20px;
     padding: 15px;
     border-radius: 8px;
-    width: 90%; /* Adjust the width as needed */
+    /* width: 90%; Adjust the width as needed */
+    width: 30%;
     text-align: center; /* Align text to the left */
 }
 
@@ -34,17 +35,18 @@
 .verification-input {
     background-color: #ccc;
     width: 50px;
-    height: 50px;
+    height: 80px;
     text-align: center;
     font-size: 24px;
     margin: 0 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px !important; 
+    margin: 5px !important;
 }
 
 .verification-input:focus {
     outline: none;
-    background-color: #e0e0e0;
+    background-color: #898989;
 }
 
 .confirm-button {

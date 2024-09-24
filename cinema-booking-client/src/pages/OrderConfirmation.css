@@ -1,4 +1,4 @@
-body {
+.order-body {
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -18,7 +18,7 @@ body {
     overflow: hidden;
   }
   
-  .header {
+  .order-header {
     background-color: #e50914;
     width: 100vw;
     position: fixed;
@@ -94,11 +94,13 @@ body {
     line-height: 1.8;
   }
   
-  .movie-title {
+  .order-movie-title {
     font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 15px;
-    color: #fff;
+    color: white;
+    display: flex;
+    justify-content: center;
   }
   
   .order-details p {

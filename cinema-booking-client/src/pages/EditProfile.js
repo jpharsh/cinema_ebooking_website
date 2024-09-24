@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
-import Header from '../components/Header'; // Import the Header component
+// import Header from '../components/Header'; // Import the Header component
 
 
 const EditProfile = () => {
@@ -84,11 +84,15 @@ const EditProfile = () => {
                                     <input type="text"/>
                                     <p>Zip Code</p>
                                     <input type="text"/>
-                                    <button className="save-button">Save Card</button>
-                                    <button className="remove-button">Remove Card</button>
+                                    <div className="center-btn">
+                                    <button className="edit-profile-btn">Save Card</button>
+                                    <button className="btn white">Remove Card</button>
+                                    </div>
                                 </div>
                             )}
-                            <button className="add-card-button">+ Add New Card</button>
+                            <div className="center-btn">
+                            <button className="edit-profile-btn">+ Add New Card</button>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -114,7 +118,9 @@ const EditProfile = () => {
                 )}
             </div>
 
-            <button className="create-account-button">Save Changes</button>
+            <div className="center-btn">
+            <button className="edit-profile-btn">Save Changes</button>
+            </div>
         </div>
     );
 };

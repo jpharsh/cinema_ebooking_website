@@ -5,7 +5,7 @@
     padding: 20px;
     background-color: #222;
     color: #fff;
-    margin-top: 100px;
+    /* margin-top: 10px; */
 } /* registration-containter*/
 
 h1 {
@@ -47,8 +47,6 @@ body {
     margin-left: auto; /* Ensures the arrow moves to the far right */
 }
 
-
-
 .section-toggle:hover {
     background-color: #555;
 }
@@ -56,7 +54,6 @@ body {
 .section-content {
     padding: 10px;
     background-color: #333;
-
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
@@ -69,22 +66,30 @@ input[type="text"], input[type="email"], input[type="password"] {
     border-radius: 3px;
 }
 
-button {
+/* button {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
     cursor: pointer;
-}
+} */
 
-.save-button, .remove-button, .add-card-button, .create-account-button {
+.edit-profile-btn {
     background-color: #E50914;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-.save-button:hover, .remove-button:hover, .add-card-button:hover, .create-account-button:hover {
+.edit-profile-btn:hover {
     background-color: #ff3333;
+}
+
+.center-btn {
+    display: flex;
+    justify-content: center;
 }
 
 .section-content p {
@@ -107,6 +112,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     display: flex;
     justify-content: space-between;
     gap: 10px; /* Adjust the gap between fields as needed */
+    width: 98%;
 }
 
 .name-field {
@@ -114,7 +120,7 @@ input[type="text"], input[type="email"], input[type="password"] {
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
-    width: 98%;
+    width: 96%;
     padding: 10px;
     margin: 5px 0;
     background-color: #555;

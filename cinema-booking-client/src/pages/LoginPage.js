@@ -2,17 +2,18 @@
 
 import React from 'react';
 import './LoginPage.css'; // Ensure the styles are imported
-import Header from '../components/Header'; // Import the Header component
+import popcorn from '../images/popcorn.jpg'; 
+// import Header from '../components/Header'; // Import the Header component
 
 const LoginPage = () => {
   return (
     <div className="login-container">
-      <Header /> {/* This line adds the Header component here */}
+      {/* <Header /> This line adds the Header component here */}
       <div className="login-left">
         <img
-          src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
-          alt="Netflix Logo"
-          className="netflix-logo"
+          src={popcorn}
+          alt="Theater"
+          className="theater-img"
         />
       </div>
       <div className="login-right">

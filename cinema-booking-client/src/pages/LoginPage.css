@@ -14,8 +14,8 @@
     align-items: center;
   }
   
-  .netflix-logo {
-    width: 70%;
+  .theater-img {
+    width: 100%;
   }
   
   .login-right {
@@ -42,7 +42,7 @@
   }
   
   .input-field {
-    width: 100%;
+    width: 93% !important;
     padding: 10px;
     margin: 10px 0;
     border: none;

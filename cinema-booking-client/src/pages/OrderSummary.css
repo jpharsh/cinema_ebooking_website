@@ -1,14 +1,14 @@
 /* src/pages/OrderSummary.css */
 
-.order-summary-container {
+/* .order-summary-container {
     padding: 20px;
-    background-color: #141414; /* Match the background color of your app */
+    background-color: #141414; 
     color: white;
-    min-height: 100vh; /* Ensure it covers the full height */
+    min-height: 100vh; 
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+} */
 
 .order-title {
     margin-top: 100px;
@@ -19,23 +19,24 @@
 
 .ticket-details {
     margin-top: 20px;
-    background-color: #222; /* Slightly lighter background for contrast */
     padding: 15px;
     border-radius: 8px;
-    width: 90%; /* Adjust the width as needed */
-    text-align: center; /* Align text to the left */
+    width: 90%; 
+    /* text-align: left;  */
+    margin-left: 15%;
+    
 }
 
 .edit-button {
-    background-color: #ffffff; /* Edit button in red */
+    background-color: #ffffff; 
     color: rgb(188, 0, 0);
     border: none;
     border-radius: 4px;
     padding: 10px;
     cursor: pointer;
     margin-top: 10px;
-    margin-right: 10px; /* Add some space between buttons */
-    margin-left: 20px;
+    margin-right: 12%; /* 60px also works */
+    width: 90px;
 }
 
 .edit-button:hover {
@@ -67,4 +68,28 @@
 
 .confirm-button:hover {
     background-color: #850000; /* Slightly darker green on hover */
+}
+
+.summary-container {
+    color: #fff;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.container2 {
+    background: #2d2d2d;
+    padding: 40px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; /* Ensures both image and text align properly */
+    width: 90%;
+    max-width: 670px;
+    min-height: 450px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

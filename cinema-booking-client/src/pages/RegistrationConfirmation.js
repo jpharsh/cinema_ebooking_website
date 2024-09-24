@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './RegistrationConfirmation.css'; // Ensure the styles are imported
-import Header from '../components/Header'; // Import the Header component
+// import Header from '../components/Header'; // Import the Header component
 
 const RegistrationConfirmation = () => {
   // State to manage the verification code input fields
@@ -42,7 +42,7 @@ const RegistrationConfirmation = () => {
 
   return (
     <div className="order-summary-container">
-      <Header />
+      {/* <Header /> */}
       <h2 className="verification-title">Verify Your Account</h2>
       <div className="verification-details">
         <p>

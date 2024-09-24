@@ -56,7 +56,7 @@
   border-radius: 5px;
 }
 
-.movie-title {
+.movie-card-title {
   text-align: center; /* Center the title */
   margin-top: 5px; /* Space between card and title */
   font-weight: bold; /* Optional: Make the title bold */

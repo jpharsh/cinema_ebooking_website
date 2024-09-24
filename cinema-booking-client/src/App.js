@@ -13,6 +13,7 @@ import EditProfile from './pages/EditProfile.js';
 import LoginPage from './pages/LoginPage.js';
 import OrderConfirmation from './pages/OrderConfirmation.js';
 import OrderSummary from './pages/OrderSummary.js';
+import ManageMovies from './pages/ManageMovies.js';
 import axios from 'axios';
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
+          <Route path="/manage-movies" element={<ManageMovies />} />
         </Routes>
 
     </Router>

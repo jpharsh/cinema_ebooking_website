@@ -1,6 +1,7 @@
 // src/App.js
 import React, { useState } from "react";
 import "./ManageMovies.css";
+import "../App.css";
 import searchIcon from "../images/search-icon.png"; // Import the search icon image
 
 function ManageMovies() {
@@ -128,11 +129,11 @@ function ManageMovies() {
 
   return (
     <div className="admin-panel">
-      <header className="header">
+      {/* <header className="header">
         <h1>Admin</h1>
         <div className="logo">Cinema Movies</div>
         <div className="user-icon">👤</div>
-      </header>
+      </header> */}
       <aside className="sidebar">
         <ul>
           <li>Home Page</li>
@@ -146,19 +147,22 @@ function ManageMovies() {
         <button onClick={() => openModal()} className="add-movie-button">
           Add Movie
         </button>
-        <input
-          type="text"
-          className="search-bar"
-          style={{
-            width: "80%",
-            padding: "12px",
-            margin: "10px auto",
-            border: "1px solid #444",
-          }}
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div>
+          <input
+            type="text"
+            className="search-bar"
+            style={{
+              width: "80%",
+              padding: "12px",
+              margin: "10px auto",
+              border: "1px solid #444",
+            }}
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
         <div className="movie-grid">
           {filteredMovies.map((movie) => (
             <div className="movie-card" key={movie.id}>
@@ -172,13 +176,13 @@ function ManageMovies() {
               <div className="button-group">
                 <button
                   onClick={() => openModal(movie)}
-                  className="button edit"
+                  className="manage-button edit"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(movie.id)}
-                  className="button delete"
+                  className="manage-button delete"
                 >
                   Delete
                 </button>

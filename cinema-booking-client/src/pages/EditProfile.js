@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
+import LoggedInNavbar from '../components/LoggedInNavbar';
 // import Header from '../components/Header'; // Import the Header component
 
 
@@ -17,6 +18,8 @@ const EditProfile = () => {
     const toggleCard1 = () => setShowCard1(!showCard1);
 
     return (
+        <div>
+            <LoggedInNavbar />
         <div className="registration-container">
            {/* <Header /> */}
             <h1>Edit Profile</h1>
@@ -121,6 +124,7 @@ const EditProfile = () => {
             <div className="center-btn">
             <button className="edit-profile-btn">Save Changes</button>
             </div>
+        </div>
         </div>
     );
 };

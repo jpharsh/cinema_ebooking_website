@@ -1,0 +1,100 @@
+/* Global Styles */
+.showtime-body {
+    background-color: #100d0d;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Header */
+  /* .header {
+    width: 100%;
+    text-align: center;
+    background-color: #E50914;
+    color: white;
+    padding: 20px ;
+    font-size: 24px;
+    margin-bottom: 50px;
+    border-radius: 0px;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+  } */
+  
+  /* App Container */
+  .app-container {
+    text-align: center;
+    background-color: #333;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 50px;
+    margin-top: 100px;
+    width: 100%;
+    min-width: 500px;
+    
+  }
+  
+  
+  /* Day Schedule */
+  .day-container {
+    background-color: #444;
+    padding: 50px;
+    margin-bottom: 15px;
+    margin-right: 250px;
+    margin-left: 250px;
+    border-radius: 5px;
+  
+  }
+  .day-header-container {
+    background-color: #921111;
+    padding: 15px;
+    margin-top: -30;
+    margin-bottom: 50px;
+    border-radius: 5px;
+  }
+  
+  .day-header {
+    font-size: 18px;
+    color: white;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+  
+  /* Showtime Button */
+  .time-button {
+    background-color: #c9c6c6;
+    color: rgb(12, 11, 11);
+    border: none;
+    margin: 5px;
+    padding: 25px 25px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .time-button:hover {
+    background-color: #f4efef;
+  }
+  
+  /* Cancel Button */
+  .cancel-button {
+    background-color: #f2ebeb;
+    color: rgb(232, 13, 13);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    border-radius: 50px;
+  }
+  
+  .cancel-button:hover {
+    background-color: #9c9c9c;
+  }

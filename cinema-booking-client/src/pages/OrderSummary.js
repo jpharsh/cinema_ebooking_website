@@ -2,10 +2,13 @@
 
 import React from 'react';
 import './OrderSummary.css'; // Import the CSS file
+import LoggedInNavbar from '../components/LoggedInNavbar'; 
 // import Header from '../components/Header'; // Import the Header component
 
 const OrderSummary = () => {
   return (
+    <div>
+      <LoggedInNavbar />
    <div className="summary-container">
       {/* <Header /> */}
       <h1>Order Summary</h1>
@@ -37,10 +40,11 @@ const OrderSummary = () => {
         </div>
         
         <div style={{margin: '40px', paddingLeft: '15%'}}>
-          <p></p><button className="cancel-button">Cancel</button>
+          <p></p><button className="order-cancel-button">Cancel</button>
           <button className="confirm-button">Confirm Payment</button>
         </div>
 
+      </div>
       </div>
       </div>
     </div>

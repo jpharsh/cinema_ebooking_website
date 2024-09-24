@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './RegistrationConfirmation.css'; // Ensure the styles are imported
+import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
 
 const RegistrationConfirmation = () => {
@@ -41,30 +42,33 @@ const RegistrationConfirmation = () => {
   };
 
   return (
-    <div className="order-summary-container">
-      {/* <Header /> */}
-      <h2 className="verification-title">Verify Your Account</h2>
-      <div className="verification-details">
-        <p>
-          A verification code was sent to your email. Please verify your
-          <p>account to finish registering your account.</p>
-        </p>
-        <div className="verification-code-inputs">
-          {code.map((num, index) => (
-            <input
-              key={index}
-              id={`code-input-${index}`}
-              type="text"
-              maxLength="1"
-              className="verification-input"
-              value={num}
-              onChange={(e) => handleChange(e, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)} // Handle backspace key press
-            />
-          ))}
+    <div>
+      <Navbar />
+      <div className="order-summary-container">
+        {/* <Header /> */}
+        <h2 className="verification-title">Verify Your Account</h2>
+        <div className="verification-details">
+          <p>
+            A verification code was sent to your email. Please verify your
+            <p>account to finish registering your account.</p>
+          </p>
+          <div className="verification-code-inputs">
+            {code.map((num, index) => (
+              <input
+                key={index}
+                id={`code-input-${index}`}
+                type="text"
+                maxLength="1"
+                className="verification-input"
+                value={num}
+                onChange={(e) => handleChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)} // Handle backspace key press
+              />
+            ))}
+          </div>
+          <button className="confirm-button">Confirm</button>
+          <p>*Login Failed/LoginSuccessful*</p>
         </div>
-        <button className="confirm-button">Confirm</button>
-        <p>*Login Failed/LoginSuccessful*</p>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import '../components/MovieCard.css';
 import './SelectTickets.css';
 import '../App.css';
 import exampleMoviePoster from '../images/exampleMoviePoster.jpeg';
+import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const SelectTickets = ( {movie} ) => {
 
@@ -72,6 +73,9 @@ const handleIncreaseButton = (number) => {
   };
 
   return (
+    <div>
+        <LoggedInNavbar />
+    
     <div className="App">
     <div className="movie-section" style={{ width: '40%', alignContent: 'center', padding: '30px'}}>
         <h2 style={{ textAlign: 'left' }}>Select Tickets</h2>
@@ -166,6 +170,7 @@ const handleIncreaseButton = (number) => {
             <button className="btn white">Cancel</button>
             <button className="btn red">Confirm Tickets</button>
         </div>
+    </div>
     </div>
     </div>
   );

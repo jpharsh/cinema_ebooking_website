@@ -1,0 +1,15 @@
+/* src/components/Header.css */
+
+.header {
+    background-color: #e50914; /* Red color */
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    font-size: 12px;
+    width: 100%; /* Ensure it spans the full width */
+    position: fixed; /* Optional: Keeps it fixed at the top */
+    top: 0; /* Position it at the top */
+    left: 0; /* Position it at the left edge */
+    z-index: 1000; /* Ensure it sits above other content */
+  }
+  

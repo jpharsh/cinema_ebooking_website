@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../App.css';
 import './HomePage.css'
 import Advertisement from '../images/Advertisement1.png';
+import Navbar from '../components/Navbar';
 
 const HomePage = () => {
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -65,8 +66,9 @@ const HomePage = () => {
     };
 
     return (
-        <div className="App">
-            <div style={{ padding: '20px', position: 'relative' }}>
+        <div>
+            <Navbar />
+            <div className="App" style={{ padding: '20px', position: 'relative' }}>
                 <input
                     type="text"
                     placeholder="Search for a movie..."

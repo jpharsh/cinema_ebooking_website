@@ -1,8 +1,12 @@
 import React from 'react';
 import './OrderConfirmation.css';
+import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const OrderConfirmation = () => {
   return (
+    <div>
+      <LoggedInNavbar />
+    
     <div className="confirmation-container">
       {/* <header className="header">
         <span className="cinema-text">Cinema Movies</span>
@@ -26,6 +30,7 @@ const OrderConfirmation = () => {
         </div>
       </div>
       <footer className="footer">Enjoy The Movie!</footer>
+    </div>
     </div>
   );
 };

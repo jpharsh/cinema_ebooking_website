@@ -1,0 +1,150 @@
+/* Global Styles */
+.promo-body {
+    background-color: #222;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .promo-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .header {
+    width: 100%;
+    background-color: #E50914;
+    color: white;
+    padding: 20px;
+    font-size: 24px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+    width:55%;
+  }
+  
+  .admin-logo {
+    font-size: 18px;
+    margin-right: auto;
+    margin-left: 20px;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 200px;
+    background-color: #333;
+    padding-top: 50px; /* Offset for the header */
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    padding: 15px;
+    cursor: pointer;
+    color: #fff;
+  }
+  
+  .sidebar li.active {
+    background-color: #444;
+  }
+  
+  /* Main Content */
+  .promo-main-content {
+    flex-grow: 1;
+    padding: 80px 40px; /* Offset for the header */
+  }
+  
+  .promo-search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .promo-search-bar {
+    padding: 10px;
+    font-size: 16px;
+    width: 70%;
+    border-radius: 5px;
+    border: 1px solid #555;
+  }
+  
+  .add-promo-button {
+    background-color: #E50914;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 10%;
+  }
+  .add-promo-button:hover {
+    background-color: #7b070c;
+  }
+  
+  .promo-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #333;
+  }
+  
+  .promo-table th, .promo-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #555;
+  }
+  
+  .promo-table th {
+    background-color: #444;
+  }
+  
+  .delete-button {
+    background-color: #E50914;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .delete-button:hover {
+    background-color: #b20710;
+  }
+  
+  
+  .add-promo-form {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .add-promo-form input {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #555;
+  }

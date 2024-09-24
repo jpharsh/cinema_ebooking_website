@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "./ManageMovies.css";
 import "../App.css";
+import AdminNavbar from "../components/AdminNavbar";
 import searchIcon from "../images/search-icon.png"; // Import the search icon image
 
 function ManageMovies() {
@@ -128,203 +129,208 @@ function ManageMovies() {
   );
 
   return (
-    <div className="admin-panel">
-      {/* <header className="header">
-        <h1>Admin</h1>
-        <div className="logo">Cinema Movies</div>
-        <div className="user-icon">👤</div>
-      </header> */}
-      <aside className="sidebar">
-        <ul>
-          <li>Home Page</li>
-          <li>Manage Movies</li>
-          <li>Promo Codes</li>
-          <li>Manage Users</li>
-        </ul>
-      </aside>
-      <main className="main-content">
-        <h2>MOVIES</h2>
-        <button onClick={() => openModal()} className="add-movie-button">
-          Add Movie
-        </button>
-        <div>
-          <input
-            type="text"
-            className="search-bar"
-            style={{
-              width: "80%",
-              padding: "12px",
-              margin: "10px auto",
-              border: "1px solid #444",
-            }}
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+    <div> 
+      <AdminNavbar />
+   
+      <div className="admin-panel">
+        {/* <header className="header">
+          <h1>Admin</h1>
+          <div className="logo">Cinema Movies</div>
+          <div className="user-icon">👤</div>
+        </header> */}
         
-        <div className="movie-grid">
-          {filteredMovies.map((movie) => (
-            <div className="movie-card" key={movie.id}>
-              <img
-                src={movie.trailerPicture || "https://via.placeholder.com/150"}
-                alt={movie.title}
-                className="movie-poster"
-              />
-              <p>{movie.title}</p>
-              <p>Rating: {movie.rating}</p> {/* Display rating separately */}
-              <div className="button-group">
-                <button
-                  onClick={() => openModal(movie)}
-                  className="manage-button edit"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(movie.id)}
-                  className="manage-button delete"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-
-      {/* Modal Component */}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>{isEditing ? "Edit Movie" : "Add Movie"}</h3>
-            <label>Title</label>
+        <aside className="sidebar">
+          <ul>
+            <li>Home Page</li>
+            <li>Manage Movies</li>
+            <li>Promo Codes</li>
+            <li>Manage Users</li>
+          </ul>
+        </aside>
+        <main className="main-content">
+          <h2>MOVIES</h2>
+          <button onClick={() => openModal()} className="add-movie-button">
+            Add Movie
+          </button>
+          <div>
             <input
               type="text"
-              placeholder="Title"
-              value={currentMovie?.title || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, title: e.target.value })
-              }
+              className="search-bar"
+              style={{
+                width: "80%",
+                padding: "12px",
+                margin: "10px auto",
+                border: "1px solid #444",
+              }}
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-
-            <label>Category</label>
-            <input
-              type="text"
-              placeholder="Category"
-              value={currentMovie?.category || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, category: e.target.value })
-              }
-            />
-
-            <label>Cast</label>
-            <input
-              type="text"
-              placeholder="Cast"
-              value={currentMovie?.cast || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, cast: e.target.value })
-              }
-            />
-
-            <label>Synopsis</label>
-            <textarea
-              placeholder="Synopsis"
-              value={currentMovie?.synopsis || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, synopsis: e.target.value })
-              }
-            />
-
-            <label>Reviews</label>
-            <input
-              type="text"
-              placeholder="Reviews"
-              value={currentMovie?.reviews || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, reviews: e.target.value })
-              }
-            />
-
-            <label>Trailer Picture URL</label>
-            <input
-              type="text"
-              placeholder="Trailer Picture URL"
-              value={currentMovie?.trailerPicture || ""}
-              onChange={(e) =>
-                setCurrentMovie({
-                  ...currentMovie,
-                  trailerPicture: e.target.value,
-                })
-              }
-            />
-
-            <label>Trailer Video URL</label>
-            <input
-              type="text"
-              placeholder="Trailer Video URL"
-              value={currentMovie?.trailerVideo || ""}
-              onChange={(e) =>
-                setCurrentMovie({
-                  ...currentMovie,
-                  trailerVideo: e.target.value,
-                })
-              }
-            />
-
-            <label>MPAA Rating</label>
-            <input
-              type="text"
-              placeholder="MPAA Rating"
-              value={currentMovie?.rating || ""}
-              onChange={(e) =>
-                setCurrentMovie({ ...currentMovie, rating: e.target.value })
-              }
-            />
-
-            <div className="show-dates">
-              <label>Show Dates:</label>
-              <input
-                type="date"
-                value={tempDate}
-                onChange={(e) => setTempDate(e.target.value)}
-              />
-              <button onClick={handleAddShowDate} className="button">
-                Add Date
-              </button>
-              <ul>
-                {currentMovie?.showDates.map((date, index) => (
-                  <li key={index}>{date}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="show-times">
-              <label>Show Times:</label>
-              <input
-                type="time"
-                value={tempTime}
-                onChange={(e) => setTempTime(e.target.value)}
-              />
-              <button onClick={handleAddShowTime} className="button">
-                Add Time
-              </button>
-              <ul>
-                {currentMovie?.showTimes.map((time, index) => (
-                  <li key={index}>{time}</li>
-                ))}
-              </ul>
-            </div>
-
-            <button onClick={handleSave} className="button">
-              Save
-            </button>
-            <button onClick={closeModal} className="button">
-              Cancel
-            </button>
           </div>
-        </div>
-      )}
+          
+          <div className="movie-grid">
+            {filteredMovies.map((movie) => (
+              <div className="movie-card" key={movie.id}>
+                <img
+                  src={movie.trailerPicture || "https://via.placeholder.com/150"}
+                  alt={movie.title}
+                  className="movie-poster"
+                />
+                <p>{movie.title}</p>
+                <p>Rating: {movie.rating}</p> {/* Display rating separately */}
+                <div className="manage-button-group">
+                  <button
+                    onClick={() => openModal(movie)}
+                    className="manage-button edit"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(movie.id)}
+                    className="manage-button delete"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+
+        {/* Modal Component */}
+        {showModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>{isEditing ? "Edit Movie" : "Add Movie"}</h3>
+              <label>Title</label>
+              <input
+                type="text"
+                placeholder="Title"
+                value={currentMovie?.title || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, title: e.target.value })
+                }
+              />
+
+              <label>Category</label>
+              <input
+                type="text"
+                placeholder="Category"
+                value={currentMovie?.category || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, category: e.target.value })
+                }
+              />
+
+              <label>Cast</label>
+              <input
+                type="text"
+                placeholder="Cast"
+                value={currentMovie?.cast || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, cast: e.target.value })
+                }
+              />
+
+              <label>Synopsis</label>
+              <textarea
+                placeholder="Synopsis"
+                value={currentMovie?.synopsis || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, synopsis: e.target.value })
+                }
+              />
+
+              <label>Reviews</label>
+              <input
+                type="text"
+                placeholder="Reviews"
+                value={currentMovie?.reviews || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, reviews: e.target.value })
+                }
+              />
+
+              <label>Trailer Picture URL</label>
+              <input
+                type="text"
+                placeholder="Trailer Picture URL"
+                value={currentMovie?.trailerPicture || ""}
+                onChange={(e) =>
+                  setCurrentMovie({
+                    ...currentMovie,
+                    trailerPicture: e.target.value,
+                  })
+                }
+              />
+
+              <label>Trailer Video URL</label>
+              <input
+                type="text"
+                placeholder="Trailer Video URL"
+                value={currentMovie?.trailerVideo || ""}
+                onChange={(e) =>
+                  setCurrentMovie({
+                    ...currentMovie,
+                    trailerVideo: e.target.value,
+                  })
+                }
+              />
+
+              <label>MPAA Rating</label>
+              <input
+                type="text"
+                placeholder="MPAA Rating"
+                value={currentMovie?.rating || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, rating: e.target.value })
+                }
+              />
+
+              <div className="show-dates">
+                <label>Show Dates:</label>
+                <input
+                  type="date"
+                  value={tempDate}
+                  onChange={(e) => setTempDate(e.target.value)}
+                />
+                <button onClick={handleAddShowDate} className="button">
+                  Add Date
+                </button>
+                <ul>
+                  {currentMovie?.showDates.map((date, index) => (
+                    <li key={index}>{date}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="show-times">
+                <label>Show Times:</label>
+                <input
+                  type="time"
+                  value={tempTime}
+                  onChange={(e) => setTempTime(e.target.value)}
+                />
+                <button onClick={handleAddShowTime} className="manage-button">
+                  Add Time
+                </button>
+                <ul>
+                  {currentMovie?.showTimes.map((time, index) => (
+                    <li key={index}>{time}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <button onClick={handleSave} className="manage-button">
+                Save
+              </button>
+              <button onClick={closeModal} className="manage-button">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+       </div>
     </div>
   );
 }

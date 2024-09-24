@@ -14,16 +14,18 @@ import LoginPage from './pages/LoginPage.js';
 import OrderConfirmation from './pages/OrderConfirmation.js';
 import OrderSummary from './pages/OrderSummary.js';
 import ManageMovies from './pages/ManageMovies.js';
+import AdminPage from './pages/AdminPage.js';
+import Showtimes from './pages/Showtimes.js';
+import Promo from './pages/Promo.js';
 import axios from 'axios';
 import './App.css';
-
 
 
 function App() {
   return (
     <Router>
       
-        <Navbar />
+        {/* <Navbar /> */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/select-tickets" element={<SelectTickets />} />
@@ -37,6 +39,9 @@ function App() {
           <Route path="/registration" element={<Registration />} />
           <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
           <Route path="/manage-movies" element={<ManageMovies />} />
+          <Route path="/admin-home" element={<AdminPage />} />
+          <Route path="/showtimes" element={<Showtimes />} />
+          <Route path="/promo" element={<Promo />} />
         </Routes>
 
     </Router>

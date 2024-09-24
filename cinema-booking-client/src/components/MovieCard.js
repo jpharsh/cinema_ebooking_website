@@ -13,7 +13,7 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
         >
             
             <img src={movie.poster_url} className="movie-card" alt={`${movie.title} poster`} />
-            <p className="movie-title">{movie.title} | {movie.mpaa_rating}</p>
+            <p className="movie-card-title">{movie.title} | {movie.mpaa_rating}</p>
             {isHovered && (
                 <div className="movie-info">
                     <button 

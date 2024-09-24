@@ -1,0 +1,130 @@
+.registration-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #222;
+    color: #fff;
+    /* margin-top: 10px; */
+} /* registration-containter*/
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #222; /* or any color of your choice */
+    font-family: Arial, sans-serif;
+}
+
+
+.section {
+    margin-bottom: 20px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.section-toggle {
+    display: flex;
+    justify-content: space-between;  /* Aligns text and arrow at opposite ends */
+    align-items: center;  /* Vertically centers the content */
+    width: 100%;          /* Full width of the button */
+    padding: 10px;
+    background-color: #222;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.section-toggle span {
+    margin-left: auto; /* Ensures the arrow moves to the far right */
+}
+
+.section-toggle:hover {
+    background-color: #555;
+}
+
+.section-content {
+    padding: 10px;
+    background-color: #333;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #555;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 3px;
+}
+
+/* button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
+} */
+
+.edit-profile-btn {
+    background-color: #E50914;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.edit-profile-btn:hover {
+    background-color: #ff3333;
+}
+
+.center-btn {
+    display: flex;
+    justify-content: center;
+}
+
+.section-content p {
+    margin: 0; /* Remove default margin */
+    padding: 5px 0; /* Add a small padding for spacing */
+    font-size: 16px; /* Optional: reduce font size if needed */
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 1px 0 15px 0; /* Adjust margin: 5px on top, 15px on bottom */
+    background-color: #555;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 3px;
+}
+
+.name-fields {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Adjust the gap between fields as needed */
+    width: 98%;
+}
+
+.name-field {
+    flex-basis: 48%; /* Adjust this percentage for width */
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+    width: 96%;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #555;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 3px;
+}

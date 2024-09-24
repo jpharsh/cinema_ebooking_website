@@ -72,6 +72,7 @@ const handleIncreaseButton = (number) => {
   };
 
   return (
+    <div className="App">
     <div className="movie-section" style={{ width: '40%', alignContent: 'center', padding: '30px'}}>
         <h2 style={{ textAlign: 'left' }}>Select Tickets</h2>
         <div className="select-tickets-container"> 
@@ -165,6 +166,7 @@ const handleIncreaseButton = (number) => {
             <button className="btn white">Cancel</button>
             <button className="btn red">Confirm Tickets</button>
         </div>
+    </div>
     </div>
   );
 };

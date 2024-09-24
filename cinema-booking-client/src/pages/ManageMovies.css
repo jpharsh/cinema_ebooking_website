@@ -1,5 +1,5 @@
 /* Base styles */
-body {
+.manage-body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #000; /* Set the overall background to black */
@@ -11,7 +11,7 @@ body {
     flex-direction: row;
   }
   
-  .header {
+  /* .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,13 +24,13 @@ body {
     left: 0;
     height: 50px;
     z-index: 100;
-  }
+  } 
 
   .header h1 {
     margin: 0;
-    padding-left: 10px; /* Adjust this value to align properly */
-    font-size: 24px; /* Adjust font size if needed */
-  }
+    padding-left: 10px; 
+    font-size: 24px; 
+  } */
   
   .sidebar {
     background-color: #1c1c1c; /* Dark sidebar to match the black theme */
@@ -60,7 +60,7 @@ body {
   .main-content {
     flex-grow: 1;
     margin-left: 220px;
-    padding: 60px 20px;
+    padding: 20px;
   }
   
   .search-bar  {
@@ -72,7 +72,6 @@ body {
     border: 1px solid #444;
     color: #fff;
   }
-  
 
   .search-bar-container {
     position: relative;
@@ -96,8 +95,8 @@ body {
     gap: 20px;
   }
   
-  .movie-card {
-    background-color: #1e1e1e; /* Dark background for movie cards */
+  /* .movie-card {
+    background-color: #1e1e1e; /
     color: white;
     border-radius: 5px;
     padding: 10px;
@@ -105,7 +104,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
+  } */
   
   .movie-poster {
     width: 145px;
@@ -126,7 +125,7 @@ body {
   }
   
   /* Button styles to match theme and quality */
-  .button {
+  .manage-button {
     background-color: #b71c1c; /* Red color matching the theme */
     color: white;
     border: none;
@@ -138,23 +137,23 @@ body {
     transition: background-color 0.3s;
   }
   
-  .button:hover {
+  .manage-button:hover {
     background-color: #a50f0f; /* Darker red on hover */
   }
   
-  .button.edit {
+  .manage-button.edit {
     background-color: #1565c0; /* Blue for edit button */
   }
   
-  .button.edit:hover {
+  .manage-button.edit:hover {
     background-color: #0d47a1; /* Darker blue on hover */
   }
   
-  .button.delete {
+  .manage-button.delete {
     background-color: #e53935; /* Red for delete button */
   }
   
-  .button.delete:hover {
+  .manage-button.delete:hover {
     background-color: #c62828; /* Darker red on hover */
   }
   

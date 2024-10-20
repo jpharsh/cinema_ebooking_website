@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './EditProfile.css';
 import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
@@ -17,6 +17,9 @@ const Registration = () => {
    const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
    const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
    const toggleCard1 = () => setShowCard1(!showCard1);
+
+   const [showPopup, setShowPopup] = useState(false);
+   const [continueWithoutAddress, setContinueWithoutAddress] = useState(false); 
 
    const [formData, setFormData] = useState({
         firstName: '',
@@ -46,14 +49,32 @@ const Registration = () => {
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
 
+    let formErrors = {};
     // Form validation logic
     const validateForm = () => {
-        let formErrors = {};
         if (!formData.firstName) formErrors.firstName = "First Name is required";
         if (!formData.lastName) formErrors.lastName = "Last Name is required";
         if (!formData.phoneNumber) formErrors.phoneNumber = "Phone Number is required";
         if (!formData.email) formErrors.email = "Email is required";
         if (!formData.password) formErrors.password = "Password is required";
+
+        if (showPaymentInfo) {
+            if (!formData.cardInfo.nameOnCard) formErrors.nameOnCard = "Name on Card is required";
+            if (!formData.cardInfo.cardNumber) formErrors.cardNumber = "Card Number is required";
+            if (!formData.cardInfo.expirationDate) formErrors.expirationDate = "Expiration Date is required";
+            if (!formData.cardInfo.CVC) formErrors.CVC = "CVC is required";
+            if (!formData.cardInfo.streetAddress) formErrors.billingStreetAddress = "Street Address is required";
+            if (!formData.cardInfo.city) formErrors.billingCity = "City is required";
+            if (!formData.cardInfo.state) formErrors.billingState = "State is required";
+            if (!formData.cardInfo.zipCode) formErrors.billingZipCode = "Zip Code is required";
+        }
+
+        // if (showHomeAddress) {
+        //     if (!formData.addressInfo.streetAddress) formErrors.homeStreetAddress = "Street Address is required";
+        //     if (!formData.addressInfo.city) formErrors.homeCity = "City is required";
+        //     if (!formData.addressInfo.state) formErrors.homeState = "State is required";
+        //     if (!formData.addressInfo.zipCode) formErrors.homeZipCode = "Zip Code is required";
+        // }
         return formErrors;
     };
 
@@ -74,12 +95,41 @@ const Registration = () => {
 
     // Handle form submission
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         const formErrors = validateForm();
-        if (!formData.email || !validateEmail(formData.email)) {
+        if (formData.email && !validateEmail(formData.email)) {
             formErrors.email = 'Please enter a valid email address';
         }
+
+        // if (showPaymentInfo) {
+        //     if (formData.cardInfo.cardNumber && isNaN(formData.cardInfo.cardNumber)) {
+        //         formErrors.cardNumber = 'Card Number must be a number';
+        //     }
+        //     if (formData.cardInfo.CVC && isNaN(formData.cardInfo.CVC)) {
+        //         formErrors.CVC = 'CVC must be a number';
+        //     }
+        //     if (formData.cardInfo.zipCode && isNaN(formData.cardInfo.zipCode)) {
+        //         formErrors.billingZipCode = 'Zip Code must be a number';
+        //     }
+        // }
+
+        // if (showHomeAddress) {
+        //     if (formData.addressInfo.zipCode && isNaN(formData.addressInfo.zipCode)) {
+        //         formErrors.homeZipCode = 'Zip Code must be a number';
+        //     }
+        // }
+
+        setErrors(formErrors);
         if (Object.keys(formErrors).length === 0) {
+            // setErrors(formErrors);
+            if (formData.addressInfo.streetAddress || formData.addressInfo.city || formData.addressInfo.state || formData.addressInfo.zipCode) {
+                if (!formData.addressInfo.streetAddress || !formData.addressInfo.city || !formData.addressInfo.state || !formData.addressInfo.zipCode) {
+                    setShowPopup(true);  // Show popup if the address is incomplete
+                    return;
+                }
+            }
             try {
                 // Send data to the server
                 const response = await axios.post('http://127.0.0.1:5000/api/register', formData)
@@ -95,10 +145,40 @@ const Registration = () => {
                 setErrors({ api: "Registration failed. Please try again later." });
             }
         } else {
+            // setErrors(formErrors);
+        }
+    };
+
+    const handleClosePopup = (continueWithoutAddress) => {
+        setShowPopup(false);
+        setContinueWithoutAddress(continueWithoutAddress);
+
+        if (continueWithoutAddress) {
+            // Clear the address info in the formData
+            setFormData((prevState) => ({
+                ...prevState,
+                addressInfo: {
+                    streetAddress: '',
+                    city: '',
+                    state: '',
+                    zipCode: ''
+                }
+            }));
+        } else {
+            if (!formData.addressInfo.streetAddress) formErrors.homeStreetAddress = "Street Address is required";
+            if (!formData.addressInfo.city) formErrors.homeCity = "City is required";
+            if (!formData.addressInfo.state) formErrors.homeState = "State is required";
+            if (!formData.addressInfo.zipCode) formErrors.homeZipCode = "Zip Code is required";
             setErrors(formErrors);
         }
     };
 
+    useEffect(() => {
+        if (continueWithoutAddress) {
+            handleSubmit(); // Now that address info is cleared, submit the form
+            setContinueWithoutAddress(false); // Reset after submission
+        }
+    }, [continueWithoutAddress, formData]); // Listen for changes in formData and continueWithoutAddress
 
    return (
     <div>
@@ -323,13 +403,57 @@ const Registration = () => {
                 {showHomeAddress && (
                     <div className="section-content">
                         <p>Street Address</p>
-                        <input type="text"/>
+                        <input 
+                            type="text"
+                            name="streetAddress"
+                            value={formData.addressInfo.streetAddress}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    addressInfo: { ...formData.addressInfo, streetAddress: e.target.value }
+                                })
+                            }
+                        />
+                        {errors.homeStreetAddress && <p className="error-message">{errors.homeStreetAddress}</p>}
                         <p>City</p>
-                        <input type="text"/>
+                        <input 
+                            type="text"
+                            name="city"
+                            value={formData.addressInfo.city}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    addressInfo: { ...formData.addressInfo, city: e.target.value }
+                                })
+                            }
+                        />
+                        {errors.homeCity && <p className="error-message">{errors.homeCity}</p>}
                         <p>State</p>
-                        <input type="text"/>
+                        <input 
+                            type="text"
+                            name="state"
+                            value={formData.addressInfo.state}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    addressInfo: { ...formData.addressInfo, state: e.target.value }
+                                })
+                            }
+                        />
+                        {errors.homeState && <p className="error-message">{errors.homeState}</p>}
                         <p>Zip Code</p>
-                        <input type="text"/>
+                        <input 
+                            type="text"
+                            name="zipCode"
+                            value={formData.addressInfo.zipCode}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    addressInfo: { ...formData.addressInfo, zipCode: e.target.value }
+                                })
+                            }
+                        />
+                        {errors.homeZipCode && <p className="error-message">{errors.homeZipCode}</p>}
                     </div>
                 )}
             </div>
@@ -341,6 +465,15 @@ const Registration = () => {
             {successMessage && <p className="success">{successMessage}</p>}
             {errors.api && <p className="error">{errors.api}</p>}
             </form>
+            {showPopup && (
+                <div className="popup-overlay">
+                    <div className="popup">
+                        <p>Your home address information is incomplete. Would you like to continue editing or create account without address information?</p>
+                        <button className="btn white" onClick={() => handleClosePopup(false)}>Go Back</button>
+                        <button className="btn red" onClick={() => { handleClosePopup(true) }}>Create Account</button>
+                    </div>
+                </div>
+            )}
         </div>
     </div>
    );

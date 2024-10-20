@@ -67,13 +67,13 @@ def register_user():
 
         first_name = data.get('firstName')
         last_name = data.get('lastName')
-        phone = data.get('phone')
+        phone_number = data.get('phoneNumber')
         email = data.get('email')
         password = data.get('password')
         promo_subscription = data.get('subscribeToPromo', False)
 
         # Basic input validation
-        if not first_name or not last_name or not email or not password:
+        if not first_name or not last_name or not phone_number or not email or not password:
             return jsonify({'error': 'Please provide all required fields.'}), 400
 
         # Validate email format
@@ -89,9 +89,9 @@ def register_user():
         with connect_db() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO Users (user_type, f_name, l_name, email, u_password)
-                VALUES (%s, %s, %s, %s, %s)
-            ''', ('1', first_name, last_name, email, hashed_password))
+                INSERT INTO Users (user_type, f_name, l_name, email, u_password, phone_num, promo_sub)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ''', ('1', first_name, last_name, email, hashed_password, phone_number, promo_subscription))
             conn.commit()
 
         print('after connect_db')

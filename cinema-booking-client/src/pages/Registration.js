@@ -123,7 +123,6 @@ const Registration = () => {
 
         setErrors(formErrors);
         if (Object.keys(formErrors).length === 0) {
-            // setErrors(formErrors);
             if (formData.addressInfo.streetAddress || formData.addressInfo.city || formData.addressInfo.state || formData.addressInfo.zipCode) {
                 if (!formData.addressInfo.streetAddress || !formData.addressInfo.city || !formData.addressInfo.state || !formData.addressInfo.zipCode) {
                     setShowPopup(true);  // Show popup if the address is incomplete
@@ -132,7 +131,7 @@ const Registration = () => {
             }
             try {
                 // Send data to the server
-                const response = await axios.post('http://127.0.0.1:5000/api/register', formData)
+                await axios.post('http://127.0.0.1:5000/api/register', formData)
                 .then(response => {
                     console.log('Response:', response.data);
                     if (response.status === 200) {
@@ -140,13 +139,21 @@ const Registration = () => {
                     }
                 })
                     
-            } catch (error) {
-                console.error("Error registering the user:", error);
-                setErrors({ api: "Registration failed. Please try again later." });
+            } catch (e) {
+                console.error("Error registering the user:", e);
+                // setErrors({ api: "Registration failed. Please try again later." });
+                if (e.response && e.response.data && e.response.data.error) {
+                    
+                    if (e.response.data.error === "Email already exists.") {
+                        const newFormErrors = { ...formErrors }; 
+                        newFormErrors.email = "Email already exists";
+                        setErrors(newFormErrors); // Update state properly
+                    }
+                    
+                }
+                // setErrors({ api: "Registration failed. Please try again later." });
             }
-        } else {
-            // setErrors(formErrors);
-        }
+        } 
     };
 
     const handleClosePopup = (continueWithoutAddress) => {

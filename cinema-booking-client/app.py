@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 import sqlite3
 import re
 import mysql.connector
+from mysql.connector.errors import IntegrityError
 
 app = Flask(__name__)
 CORS(app)
@@ -65,12 +66,20 @@ def register_user():
     try:
         data = request.get_json()
 
+        # required information
         first_name = data.get('firstName')
         last_name = data.get('lastName')
         phone_number = data.get('phoneNumber')
         email = data.get('email')
         password = data.get('password')
         promo_subscription = data.get('subscribeToPromo', False)
+
+        # home address information
+        home_address = data.get('addressInfo')
+        street_address = home_address.get('streetAddress')
+        city = home_address.get('city')
+        state = home_address.get('state')
+        zip_code = home_address.get('zipCode')
 
         # Basic input validation
         if not first_name or not last_name or not phone_number or not email or not password:
@@ -89,21 +98,27 @@ def register_user():
         with connect_db() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO Users (user_type, f_name, l_name, email, u_password, phone_num, promo_sub)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ''', ('1', first_name, last_name, email, hashed_password, phone_number, promo_subscription))
+                INSERT INTO Users (user_type, f_name, l_name, email, u_password, phone_num, promo_sub, street_address, city, state, zip_code)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', ('1', first_name, last_name, email, hashed_password, phone_number, promo_subscription, street_address, city, state, zip_code))
             conn.commit()
 
         print('after connect_db')
         # Send success response (you can send a confirmation email here)
         return jsonify({'message': 'User registered successfully. Please check your email for confirmation.'}), 200
 
-    except sqlite3.IntegrityError:
-        return jsonify({'error': 'Email already exists.'}), 409
-
     except Exception as e:
+        # If the error is caused by a duplicate email entry, catch it here
         print(e)
-        return jsonify({'error': 'An error occurred during registration.'}), 500
+        if "Duplicate entry" in str(e):
+            return jsonify({'error': 'Email already exists.'}), 409
+        else:
+            # return jsonify({'error': 'Database error occurred.'}), 500
+            return jsonify({'error': 'An error occurred during registration.'}), 500
+
+    # except Exception as e:
+    #     print(e)
+    #     return jsonify({'error': 'An error occurred during registration.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

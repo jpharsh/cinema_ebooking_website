@@ -11,15 +11,16 @@ const Registration = () => {
    const [showHomeAddress, setShowHomeAddress] = useState(false);
    const [showCard1, setShowCard1] = useState(false); // For Card 1 toggle
 
-
    // Functions to toggle sections
    const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
    const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
    const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
    const toggleCard1 = () => setShowCard1(!showCard1);
 
-   const [showPopup, setShowPopup] = useState(false);
-   const [continueWithoutAddress, setContinueWithoutAddress] = useState(false); 
+   const [showAddressPopup, setShowAddressPopup] = useState(false);
+   const [showCardPopup, setShowCardPopup] = useState(false);
+//    const [showPopup, setShowPopup] = useState(false);
+   const [continueWithoutInfo, setContinueWithoutInfo] = useState(false); 
 
    const [formData, setFormData] = useState({
         firstName: '',
@@ -33,10 +34,10 @@ const Registration = () => {
             cardNumber: '',
             expirationDate: '',
             cvc: '',
-            address: '',
+            streetAddress: '',
             city: '',
             state: '',
-            zip: ''
+            zipCode: ''
         },
         addressInfo: {
             streetAddress: '',
@@ -58,23 +59,6 @@ const Registration = () => {
         if (!formData.email) formErrors.email = "Email is required";
         if (!formData.password) formErrors.password = "Password is required";
 
-        if (showPaymentInfo) {
-            if (!formData.cardInfo.nameOnCard) formErrors.nameOnCard = "Name on Card is required";
-            if (!formData.cardInfo.cardNumber) formErrors.cardNumber = "Card Number is required";
-            if (!formData.cardInfo.expirationDate) formErrors.expirationDate = "Expiration Date is required";
-            if (!formData.cardInfo.CVC) formErrors.CVC = "CVC is required";
-            if (!formData.cardInfo.streetAddress) formErrors.billingStreetAddress = "Street Address is required";
-            if (!formData.cardInfo.city) formErrors.billingCity = "City is required";
-            if (!formData.cardInfo.state) formErrors.billingState = "State is required";
-            if (!formData.cardInfo.zipCode) formErrors.billingZipCode = "Zip Code is required";
-        }
-
-        // if (showHomeAddress) {
-        //     if (!formData.addressInfo.streetAddress) formErrors.homeStreetAddress = "Street Address is required";
-        //     if (!formData.addressInfo.city) formErrors.homeCity = "City is required";
-        //     if (!formData.addressInfo.state) formErrors.homeState = "State is required";
-        //     if (!formData.addressInfo.zipCode) formErrors.homeZipCode = "Zip Code is required";
-        // }
         return formErrors;
     };
 
@@ -82,6 +66,24 @@ const Registration = () => {
         // Simple regex for email validation
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailPattern.test(email);
+    };
+
+    const validateCardNumber = (cardNumber) => {
+        // Simple regex for card number validation
+        const cardNumberPattern = /^[0-9]{16}$/;
+        return cardNumberPattern.test(cardNumber);
+    };
+
+    const validateExpirationDate = (expirationDate) => {
+        // Simple regex for expiration date validation
+        const expirationDatePattern = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
+        return expirationDatePattern.test(expirationDate);
+    };
+
+    const validateCVC = (cvc) => {
+        // Simple regex for cvc validation
+        const cvcPattern = /^[0-9]{3}$/;
+        return cvcPattern.test(cvc);
     };
 
     // Handle input change
@@ -103,17 +105,20 @@ const Registration = () => {
             formErrors.email = 'Please enter a valid email address';
         }
 
-        // if (showPaymentInfo) {
-        //     if (formData.cardInfo.cardNumber && isNaN(formData.cardInfo.cardNumber)) {
-        //         formErrors.cardNumber = 'Card Number must be a number';
-        //     }
-        //     if (formData.cardInfo.CVC && isNaN(formData.cardInfo.CVC)) {
-        //         formErrors.CVC = 'CVC must be a number';
-        //     }
-        //     if (formData.cardInfo.zipCode && isNaN(formData.cardInfo.zipCode)) {
-        //         formErrors.billingZipCode = 'Zip Code must be a number';
-        //     }
-        // }
+        if (showPaymentInfo) {
+            if (formData.cardInfo.cardNumber && !validateCardNumber(formData.cardInfo.cardNumber)) {
+                formErrors.cardNumber = 'Card Number must be a 16-digit number';
+            }
+            if (formData.cardInfo.expirationDate && !validateExpirationDate(formData.cardInfo.expirationDate)) {
+                formErrors.expirationDate = 'Expiration Date must be in MM/YY format';
+            }
+            if (formData.cardInfo.cvc && !validateCVC(formData.cardInfo.cvc)) {
+                formErrors.cvc = 'CVC must be a 3-digit number';
+            }
+            if (formData.cardInfo.zipCode && isNaN(formData.cardInfo.zipCode)) {
+                formErrors.billingZipCode = 'Zip Code must be a number';
+            }
+        }
 
         // if (showHomeAddress) {
         //     if (formData.addressInfo.zipCode && isNaN(formData.addressInfo.zipCode)) {
@@ -123,12 +128,20 @@ const Registration = () => {
 
         setErrors(formErrors);
         if (Object.keys(formErrors).length === 0) {
-            if (formData.addressInfo.streetAddress || formData.addressInfo.city || formData.addressInfo.state || formData.addressInfo.zipCode) {
-                if (!formData.addressInfo.streetAddress || !formData.addressInfo.city || !formData.addressInfo.state || !formData.addressInfo.zipCode) {
-                    setShowPopup(true);  // Show popup if the address is incomplete
+            if (formData.cardInfo.nameOnCard || formData.cardInfo.cardNumber || formData.cardInfo.expirationDate || formData.cardInfo.cvc || formData.cardInfo.streetAddress || formData.cardInfo.city || formData.cardInfo.state || formData.cardInfo.zipCode) {
+                if (!formData.cardInfo.nameOnCard || !formData.cardInfo.cardNumber || !formData.cardInfo.expirationDate || !formData.cardInfo.cvc || !formData.cardInfo.streetAddress || !formData.cardInfo.city || !formData.cardInfo.state || !formData.cardInfo.zipCode) {
+                    setShowCardPopup(true);  // Show popup if the card info is incomplete
                     return;
                 }
             }
+            
+            if (formData.addressInfo.streetAddress || formData.addressInfo.city || formData.addressInfo.state || formData.addressInfo.zipCode) {
+                if (!formData.addressInfo.streetAddress || !formData.addressInfo.city || !formData.addressInfo.state || !formData.addressInfo.zipCode) {
+                    setShowAddressPopup(true);  // Show popup if the address is incomplete
+                    return;
+                }
+            }
+
             try {
                 // Send data to the server
                 await axios.post('http://127.0.0.1:5000/api/register', formData)
@@ -156,11 +169,11 @@ const Registration = () => {
         } 
     };
 
-    const handleClosePopup = (continueWithoutAddress) => {
-        setShowPopup(false);
-        setContinueWithoutAddress(continueWithoutAddress);
+    const handleCloseAddressPopup = (continueWithoutInfo) => {
+        setShowAddressPopup(false);
+        setContinueWithoutInfo(continueWithoutInfo);
 
-        if (continueWithoutAddress) {
+        if (continueWithoutInfo) {
             // Clear the address info in the formData
             setFormData((prevState) => ({
                 ...prevState,
@@ -180,12 +193,45 @@ const Registration = () => {
         }
     };
 
-    useEffect(() => {
-        if (continueWithoutAddress) {
-            handleSubmit(); // Now that address info is cleared, submit the form
-            setContinueWithoutAddress(false); // Reset after submission
+    const handleCloseCardPopup = (continueWithoutInfo) => {
+        setShowCardPopup(false);
+        setContinueWithoutInfo(continueWithoutInfo);
+
+        if (continueWithoutInfo) {
+            // Clear the address info in the formData
+            setFormData((prevState) => ({
+                ...prevState,
+                cardInfo: {
+                    nameOnCard: '',
+                    cardNumber: '',
+                    expirationDate: '',
+                    cvc: '',
+                    streetAddress: '',
+                    city: '',
+                    state: '',
+                    zipCode: ''
+                }
+            }));
+        } else {
+            if (!formData.cardInfo.nameOnCard) formErrors.nameOnCard = "Name on Card is required";
+            if (!formData.cardInfo.cardNumber) formErrors.cardNumber = "Card Number is required";
+            if (!formData.cardInfo.expirationDate) formErrors.expirationDate = "Expiration Date is required";
+            if (!formData.cardInfo.cvc) formErrors.cvc = "CVC is required";
+            if (!formData.cardInfo.streetAddress) formErrors.billingStreetAddress = "Street Address is required";
+            if (!formData.cardInfo.city) formErrors.billingCity = "City is required";
+            if (!formData.cardInfo.state) formErrors.billingState = "State is required";
+            if (!formData.cardInfo.zipCode) formErrors.billingZipCode = "Zip Code is required"
+            setErrors(formErrors);
         }
-    }, [continueWithoutAddress, formData]); // Listen for changes in formData and continueWithoutAddress
+    };
+
+    useEffect(() => {
+        if (continueWithoutInfo) {
+            handleSubmit(); // Now that address info is cleared, submit the form
+            setContinueWithoutInfo(false); // Reset after submission
+        }
+    }, [continueWithoutInfo, formData]); // Listen for changes in formData and continueWithoutInfo
+
 
    return (
     <div>
@@ -301,7 +347,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, nameOnCard: e.target.value }
                                             })
                                         }
+                                        className={errors.nameOnCard ? 'error' : ''} 
                                     />
+                                    {errors.nameOnCard && <p className="error-message">{errors.nameOnCard}</p>}
                                     <p>Card Number</p>
                                     <input 
                                         type="text"
@@ -313,7 +361,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, cardNumber: e.target.value }
                                             })
                                         }
+                                        className={errors.cardNumber ? 'error' : ''} 
                                     />
+                                    {errors.cardNumber && <p className="error-message">{errors.cardNumber}</p>}
                                     <p>Expiration Date</p>
                                     <input 
                                         type="text"
@@ -325,19 +375,23 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, expirationDate: e.target.value }
                                             })
                                         }
+                                        className={errors.expirationDate ? 'error' : ''} 
                                     />
+                                    {errors.expirationDate && <p className="error-message">{errors.expirationDate}</p>}
                                     <p>CVC</p>
                                     <input 
                                         type="text"
-                                        name="CVC"
-                                        value={formData.cardInfo.CVC}
+                                        name="cvc"
+                                        value={formData.cardInfo.cvc}
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                cardInfo: { ...formData.cardInfo, CVC: e.target.value }
+                                                cardInfo: { ...formData.cardInfo, cvc: e.target.value }
                                             })
                                         }
+                                        className={errors.cvc ? 'error' : ''} 
                                     />
+                                    {errors.cvc && <p className="error-message">{errors.cvc}</p>}
                                     <p>Street Address</p>
                                     <input 
                                         type="text"
@@ -349,7 +403,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, streetAddress: e.target.value }
                                             })
                                         }
+                                        className={errors.billingStreetAddress ? 'error' : ''} 
                                     />
+                                    {errors.billingStreetAddress && <p className="error-message">{errors.billingStreetAddress}</p>}
                                     <p>City</p>
                                     <input 
                                         type="text"
@@ -361,7 +417,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, city: e.target.value }
                                             })
                                         }
+                                        className={errors.billingCity ? 'error' : ''}
                                     />
+                                    {errors.billingCity && <p className="error-message">{errors.billingCity}</p>}
                                     <p>State</p>
                                     <input 
                                         type="text"
@@ -373,7 +431,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, state: e.target.value }
                                             })
                                         }
+                                        className={errors.billingState ? 'error' : ''}
                                     />
+                                    {errors.billingState && <p className="error-message">{errors.billingState}</p>}
                                     <p>Zip Code</p>
                                     <input 
                                         type="text"
@@ -385,7 +445,9 @@ const Registration = () => {
                                                 cardInfo: { ...formData.cardInfo, zipCode: e.target.value }
                                             })
                                         }
+                                        className={errors.billingZipCode ? 'error' : ''}
                                     />
+                                    {errors.billingZipCode && <p className="error-message">{errors.billingZipCode}</p>}
                                     <div className="center-btn">
                                         <button type="button" className="btn red">Save Card</button>
                                         <button type="button" className="btn white">Remove Card</button>
@@ -420,6 +482,7 @@ const Registration = () => {
                                     addressInfo: { ...formData.addressInfo, streetAddress: e.target.value }
                                 })
                             }
+                            className={errors.homeStreetAddress ? 'error' : ''} 
                         />
                         {errors.homeStreetAddress && <p className="error-message">{errors.homeStreetAddress}</p>}
                         <p>City</p>
@@ -433,6 +496,7 @@ const Registration = () => {
                                     addressInfo: { ...formData.addressInfo, city: e.target.value }
                                 })
                             }
+                            className={errors.homeCity ? 'error' : ''}
                         />
                         {errors.homeCity && <p className="error-message">{errors.homeCity}</p>}
                         <p>State</p>
@@ -446,6 +510,7 @@ const Registration = () => {
                                     addressInfo: { ...formData.addressInfo, state: e.target.value }
                                 })
                             }
+                            className={errors.homeState ? 'error' : ''}
                         />
                         {errors.homeState && <p className="error-message">{errors.homeState}</p>}
                         <p>Zip Code</p>
@@ -459,6 +524,7 @@ const Registration = () => {
                                     addressInfo: { ...formData.addressInfo, zipCode: e.target.value }
                                 })
                             }
+                            className={errors.homeZipCode ? 'error' : ''}
                         />
                         {errors.homeZipCode && <p className="error-message">{errors.homeZipCode}</p>}
                     </div>
@@ -472,12 +538,21 @@ const Registration = () => {
             {successMessage && <p className="success">{successMessage}</p>}
             {errors.api && <p className="error">{errors.api}</p>}
             </form>
-            {showPopup && (
+            {showAddressPopup && (
                 <div className="popup-overlay">
                     <div className="popup">
                         <p>Your home address information is incomplete. Would you like to continue editing or create account without address information?</p>
-                        <button className="btn white" onClick={() => handleClosePopup(false)}>Go Back</button>
-                        <button className="btn red" onClick={() => { handleClosePopup(true) }}>Create Account</button>
+                        <button className="btn white" onClick={() => handleCloseAddressPopup(false)}>Go Back</button>
+                        <button className="btn red" onClick={() => { handleCloseAddressPopup(true) }}>Create Account</button>
+                    </div>
+                </div>
+            )}
+            {showCardPopup && (
+                <div className="popup-overlay">
+                    <div className="popup">
+                        <p>Your payment card information is incomplete. Would you like to continue editing or create account without card information?</p>
+                        <button className="btn white" onClick={() => handleCloseCardPopup(false)}>Go Back</button>
+                        <button className="btn red" onClick={() => { handleCloseCardPopup(true) }}>Create Account</button>
                     </div>
                 </div>
             )}

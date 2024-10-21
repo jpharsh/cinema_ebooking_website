@@ -9,13 +9,17 @@ const Registration = () => {
    const [showRequiredInfo, setShowRequiredInfo] = useState(true);
    const [showPaymentInfo, setShowPaymentInfo] = useState(false);
    const [showHomeAddress, setShowHomeAddress] = useState(false);
-   const [showCard1, setShowCard1] = useState(false); // For Card 1 toggle
+   const [showCard, setShowCard] = useState([false, false, false]);
+   const [cards, setCards] = useState([{ id: 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
+   
 
    // Functions to toggle sections
    const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
    const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
    const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
-   const toggleCard1 = () => setShowCard1(!showCard1);
+   const toggleCard = (index) => {
+    setShowCard(showCard.map((card, i) => (i === index ? !card : card))); // Toggle only the selected card
+    };
 
    const [showAddressPopup, setShowAddressPopup] = useState(false);
    const [showCardPopup, setShowCardPopup] = useState(false);
@@ -144,7 +148,11 @@ const Registration = () => {
 
             try {
                 // Send data to the server
-                await axios.post('http://127.0.0.1:5000/api/register', formData)
+                const dataToSend = {
+                    ...formData,
+                    cards: cards // Include the array of cards
+                };
+                await axios.post('http://127.0.0.1:5000/api/register', dataToSend)
                 .then(response => {
                     console.log('Response:', response.data);
                     if (response.status === 200) {
@@ -232,6 +240,44 @@ const Registration = () => {
         }
     }, [continueWithoutInfo, formData]); // Listen for changes in formData and continueWithoutInfo
 
+    const addNewCard = () => {
+        if (cards.length < 3) {
+            setCards([...cards, { id: cards.length + 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
+        }
+    };
+    
+    const handleCardChange = (index, field, value) => {
+        // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
+        const updatedCards = [...cards];
+        updatedCards[index][field] = value;
+        
+        setCards(updatedCards);
+        setFormData({
+            ...formData,
+            cardInfo: { ...formData.cardInfo, field: value }
+        })
+
+    };
+
+    const handleRemoveCard = (index) => {
+        if (cards.length > 1) {
+            const updatedCards = cards.filter((_, i) => i !== index);
+            setCards(updatedCards);
+        }
+        setFormData((prevState) => ({
+            ...prevState,
+            cardInfo: {
+                nameOnCard: '',
+                cardNumber: '',
+                expirationDate: '',
+                cvc: '',
+                streetAddress: '',
+                city: '',
+                state: '',
+                zipCode: ''
+            }
+        }));
+    }  
 
    return (
     <div>
@@ -328,25 +374,22 @@ const Registration = () => {
                 {showPaymentInfo && (
                     <div className="section-content">
                         {/* Toggle for Card 1 */}
-                        <div className="section">
-                            <button type="button" onClick={toggleCard1} className="section-toggle">
-                                <span>Card 1</span>
-                                <span>{showCard1 ? '▲' : '▼'}</span>
+                        {cards.map((card, index) => (
+                        <div key={index} className="section">
+                            <button type="button" onClick={() => toggleCard(index)} className="section-toggle">
+                                <span>Card {index + 1}</span>
+                                <span>{showCard[index] ? '▲' : '▼'}</span>
                             </button>
 
-                            {showCard1 && (
+                            {showCard[index] && (
                                 <div className="section-content">
                                     <p>Name on Card</p>
                                     <input 
                                         type="text"
                                         name="nameOnCard"
-                                        value={formData.cardInfo.nameOnCard}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, nameOnCard: e.target.value }
-                                            })
-                                        }
+                                        // value={formData.cardInfo.nameOnCard}
+                                        value={card.nameOnCard}
+                                        onChange={(e) => handleCardChange(index, 'nameOnCard', e.target.value)}
                                         className={errors.nameOnCard ? 'error' : ''} 
                                     />
                                     {errors.nameOnCard && <p className="error-message">{errors.nameOnCard}</p>}
@@ -354,13 +397,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="cardNumber"
-                                        value={formData.cardInfo.cardNumber}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, cardNumber: e.target.value }
-                                            })
-                                        }
+                                        // value={formData.cardInfo.cardNumber}
+                                        value={card.cardNumber}
+                                        onChange={(e) => handleCardChange(index, 'cardNumber', e.target.value)}
                                         className={errors.cardNumber ? 'error' : ''} 
                                     />
                                     {errors.cardNumber && <p className="error-message">{errors.cardNumber}</p>}
@@ -368,13 +407,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="expirationDate"
-                                        value={formData.cardInfo.expirationDate}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, expirationDate: e.target.value }
-                                            })
-                                        }
+                                        // value={formData.cardInfo.expirationDate}
+                                        value={card.expirationDate}
+                                        onChange={(e) => handleCardChange(index, 'expirationDate', e.target.value)}
                                         className={errors.expirationDate ? 'error' : ''} 
                                     />
                                     {errors.expirationDate && <p className="error-message">{errors.expirationDate}</p>}
@@ -382,13 +417,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="cvc"
-                                        value={formData.cardInfo.cvc}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, cvc: e.target.value }
-                                            })
-                                        }
+                                        //value={formData.cardInfo.cvc}
+                                        value={card.cvc}
+                                        onChange={(e) => handleCardChange(index, 'cvc', e.target.value)}
                                         className={errors.cvc ? 'error' : ''} 
                                     />
                                     {errors.cvc && <p className="error-message">{errors.cvc}</p>}
@@ -396,13 +427,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="streetAddress"
-                                        value={formData.cardInfo.streetAddress}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, streetAddress: e.target.value }
-                                            })
-                                        }
+                                        //value={formData.cardInfo.streetAddress}
+                                        value={card.streetAddress}
+                                        onChange={(e) => handleCardChange(index, 'streetAddress', e.target.value)}
                                         className={errors.billingStreetAddress ? 'error' : ''} 
                                     />
                                     {errors.billingStreetAddress && <p className="error-message">{errors.billingStreetAddress}</p>}
@@ -410,13 +437,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="city"
-                                        value={formData.cardInfo.city}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, city: e.target.value }
-                                            })
-                                        }
+                                        //value={formData.cardInfo.city}
+                                        value={card.city}
+                                        onChange={(e) => handleCardChange(index, 'city', e.target.value)}
                                         className={errors.billingCity ? 'error' : ''}
                                     />
                                     {errors.billingCity && <p className="error-message">{errors.billingCity}</p>}
@@ -424,13 +447,9 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="state"
-                                        value={formData.cardInfo.state}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, state: e.target.value }
-                                            })
-                                        }
+                                        //value={formData.cardInfo.state}
+                                        value={card.state}
+                                        onChange={(e) => handleCardChange(index, 'state', e.target.value)}
                                         className={errors.billingState ? 'error' : ''}
                                     />
                                     {errors.billingState && <p className="error-message">{errors.billingState}</p>}
@@ -438,27 +457,32 @@ const Registration = () => {
                                     <input 
                                         type="text"
                                         name="zipCode"
-                                        value={formData.cardInfo.zipCode}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                cardInfo: { ...formData.cardInfo, zipCode: e.target.value }
-                                            })
-                                        }
+                                        //value={formData.cardInfo.zipCode}
+                                        value={card.zipCode}
+                                        onChange={(e) => handleCardChange(index, 'zipCode', e.target.value)}
                                         className={errors.billingZipCode ? 'error' : ''}
                                     />
                                     {errors.billingZipCode && <p className="error-message">{errors.billingZipCode}</p>}
                                     <div className="center-btn">
-                                        <button type="button" className="btn red">Save Card</button>
-                                        <button type="button" className="btn white">Remove Card</button>
+                                        {/* <button type="button" className="btn red">Save Card</button> */}
+                                        <button type="button" className="btn white" onClick={() => handleRemoveCard(index)}>Remove Card</button>
                                     </div>
                                 </div>
                             )}
-                            <div className="center-btn">
-                                <button type="button" className="btn red">+ Add New Card</button>
-                            </div>
+                        </div>
+                        ))}
+                        <div className="center-btn">
+                            <button 
+                                type="button" 
+                                className="btn red" 
+                                onClick={addNewCard} 
+                                disabled={cards.length >= 3} // disable if 3 cards are already added
+                            >
+                                + Add New Card
+                            </button>
                         </div>
                     </div>
+                    
                 )}
             </div>
 

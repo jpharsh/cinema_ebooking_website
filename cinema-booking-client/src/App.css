@@ -42,6 +42,12 @@ header {
   display: inline-block
 }
 
+.btn:disabled {
+  background-color: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed;
+}
+
 .btn.black {
   background-color: black;
   color: white;

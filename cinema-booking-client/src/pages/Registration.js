@@ -131,6 +131,8 @@ const Registration = () => {
         // }
 
         setErrors(formErrors);
+        console.log('Form Errors:', formErrors);
+        console.log('Form Data:', formData);
         if (Object.keys(formErrors).length === 0) {
             if (formData.cardInfo.nameOnCard || formData.cardInfo.cardNumber || formData.cardInfo.expirationDate || formData.cardInfo.cvc || formData.cardInfo.streetAddress || formData.cardInfo.city || formData.cardInfo.state || formData.cardInfo.zipCode) {
                 if (!formData.cardInfo.nameOnCard || !formData.cardInfo.cardNumber || !formData.cardInfo.expirationDate || !formData.cardInfo.cvc || !formData.cardInfo.streetAddress || !formData.cardInfo.city || !formData.cardInfo.state || !formData.cardInfo.zipCode) {
@@ -247,16 +249,29 @@ const Registration = () => {
     };
     
     const handleCardChange = (index, field, value) => {
-        // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
+        // // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
+        // const updatedCards = [...cards];
+        // updatedCards[index][field] = value;
+        
+        // setCards(updatedCards);
+        // setFormData({
+        //     ...formData,
+        //     cardInfo: { ...formData.cardInfo, [field]: value }
+        // })
+
+        // Update the cards array based on the index
         const updatedCards = [...cards];
         updatedCards[index][field] = value;
-        
         setCards(updatedCards);
-        setFormData({
-            ...formData,
-            cardInfo: { ...formData.cardInfo, field: value }
-        })
 
+        // Dynamically update the correct field in formData.cardInfo
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            cardInfo: {
+                ...prevFormData.cardInfo,
+                [field]: value
+            }
+        }));
     };
 
     const handleRemoveCard = (index) => {

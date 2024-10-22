@@ -228,3 +228,9 @@ button.remove-btn:hover {
     color: #FF6347;
     font-weight: bold;
 }
+
+input[readonly] {
+    background-color: #333; 
+    color: #bbb; 
+    cursor: not-allowed; 
+}

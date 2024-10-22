@@ -68,7 +68,7 @@ const EditProfile = () => {
                             <p>Phone Number</p>
                             <input type="text" placeholder="Enter Phone Number" />
                             <p>Email</p>
-                            <input type="email" placeholder="Enter Email" />
+                            <input type="email" placeholder="jamesbond@gmail.com" readOnly />
                             <p>Password</p>
                             <input type="password" placeholder="Enter Password" />
                         </div>

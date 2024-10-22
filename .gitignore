@@ -1,6 +1,14 @@
 cinema_ebooking_website/cinema-booking-client/node_modules
-
 /cinema-booking-client/node_modules/.cache/
+/cinema-booking-client/node_modules/
 /node_modules/
 /.cache/
+# Ignore all node_modules (commonly ignored in Node.js projects)
+node_modules/
+
+# OR specifically ignore only the .cache folder within node_modules
+node_modules/.cache/
+
+# Alternatively, you can ignore the specific default-development folder inside .cache
+node_modules/.cache/default-development/
 

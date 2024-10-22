@@ -6,14 +6,36 @@ const EditProfile = () => {
     const [showRequiredInfo, setShowRequiredInfo] = useState(true);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
     const [showHomeAddress, setShowHomeAddress] = useState(false);
-    const [showCard1, setShowCard1] = useState(false); // For Card 1 toggle
+    const [cards, setCards] = useState([{ id: 1, name: '', cardNumber: '', expirationMonth: '', expirationYear: '', cvc: '' }]); // Initialize with one empty card
     const [isOptedInForPromotions, setIsOptedInForPromotions] = useState(false); // Promotion state
 
     const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
     const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
     const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
-    const toggleCard1 = () => setShowCard1(!showCard1);
 
+    // Function to handle the change in card inputs
+    const handleCardChange = (index, field, value) => {
+        const newCards = [...cards];
+        newCards[index][field] = value;
+        setCards(newCards);
+    };
+
+    // Function to add a new card
+    const addCard = () => {
+        if (cards.length < 4) {
+            setCards([...cards, { id: cards.length + 1, name: '', cardNumber: '', expirationMonth: '', expirationYear: '', cvc: '' }]);
+        } else {
+            alert("You can only add up to 4 cards.");
+        }
+    };
+
+    // Function to remove a card
+    const removeCard = (index) => {
+        const newCards = cards.filter((_, i) => i !== index);
+        setCards(newCards);
+    };
+
+    // Promotion toggle
     const handlePromotionsChange = (e) => {
         setIsOptedInForPromotions(e.target.checked);
     };
@@ -61,31 +83,61 @@ const EditProfile = () => {
                     </button>
                     {showPaymentInfo && (
                         <div className="section-content">
-                            <button onClick={toggleCard1} className="section-toggle">
-                                <span>Card 1</span>
-                                <span>{showCard1 ? '▲' : '▼'}</span>
-                            </button>
-                            {showCard1 && (
-                                <div className="section-content">
+                            {cards.map((card, index) => (
+                                <div key={card.id} className="card-section">
+                                    <h4>Card {index + 1}</h4>
                                     <p>Name on Card</p>
-                                    <input type="text" placeholder="Enter Name on Card" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Name on Card"
+                                        value={card.name}
+                                        onChange={(e) => handleCardChange(index, 'name', e.target.value)}
+                                    />
                                     <p>Card Number</p>
-                                    <input type="text" placeholder="Enter Card Number" />
-                                    <p>Expiration Date</p>
-                                    <input type="text" placeholder="MM/YY" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter Card Number"
+                                        value={card.cardNumber}
+                                        onChange={(e) => handleCardChange(index, 'cardNumber', e.target.value)}
+                                    />
+                                    {/* Separate inputs for month and year */}
+                                    <div className="name-fields">
+                                        <div className="name-field">
+                                            <p>Expiration Month</p>
+                                            <input
+                                                type="text"
+                                                placeholder="MM"
+                                                maxLength="2"
+                                                value={card.expirationMonth}
+                                                onChange={(e) => handleCardChange(index, 'expirationMonth', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="name-field">
+                                            <p>Expiration Year</p>
+                                            <input
+                                                type="text"
+                                                placeholder="YY"
+                                                maxLength="2"
+                                                value={card.expirationYear}
+                                                onChange={(e) => handleCardChange(index, 'expirationYear', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                     <p>CVC</p>
-                                    <input type="text" placeholder="Enter CVC" />
-                                    <p>Billing Address</p>
-                                    <input type="text" placeholder="Street Address" />
-                                    <input type="text" placeholder="City" />
-                                    <input type="text" placeholder="State" />
-                                    <input type="text" placeholder="Zip Code" />
+                                    <input
+                                        type="text"
+                                        placeholder="Enter CVC"
+                                        value={card.cvc}
+                                        onChange={(e) => handleCardChange(index, 'cvc', e.target.value)}
+                                    />
                                     <div className="center-btn">
-                                        <button className="edit-profile-btn">Save Card</button>
-                                        <button className="remove-btn">Remove Card</button>
+                                        <button className="remove-btn" onClick={() => removeCard(index)}>Remove Card</button>
                                     </div>
                                 </div>
-                            )}
+                            ))}
+                            <div className="center-btn">
+                                <button className="edit-profile-btn" onClick={addCard}>Add Another Card</button>
+                            </div>
                         </div>
                     )}
                 </div>

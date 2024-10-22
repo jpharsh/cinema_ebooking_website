@@ -1,86 +1,100 @@
 .registration-container {
     width: 100%;
     max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 20px auto;
+    padding: 30px;
     background-color: #222;
     color: #fff;
-    /* margin-top: 10px; */
-} /* registration-containter*/
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
 
-h1 {
+.registration-container h1 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #fcfcfc;
+    border-bottom: 2px solid #E50914;
+    padding-bottom: 10px;
 }
 
 body {
     margin: 0;
     padding: 0;
-    background-color: #222; /* or any color of your choice */
+    background-color: #1a1a1a; /* Slightly darker background */
     font-family: Arial, sans-serif;
+    color: #fff;
 }
 
 
 .section {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     border: 1px solid #444;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .section-toggle {
     display: flex;
-    justify-content: space-between;  /* Aligns text and arrow at opposite ends */
-    align-items: center;  /* Vertically centers the content */
-    width: 100%;          /* Full width of the button */
-    padding: 10px;
-    background-color: #222;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    background-color: #333;
     color: white;
     border: none;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.section-toggle span {
-    margin-left: auto; /* Ensures the arrow moves to the far right */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-transform: uppercase;
 }
 
 .section-toggle:hover {
-    background-color: #555;
+    background-color: #444;
+    color: #E50914;
+}
+
+.section-toggle span:last-child {
+    font-size: 14px;
 }
 
 .section-content {
-    padding: 10px;
+    padding: 15px;
     background-color: #333;
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
+    width: calc(100% - 20px); /* Subtract 20px for the left and right margins */
+    padding: 12px;
+    margin: 8px 10px 20px 10px; /* Add margin on both left and right */
     background-color: #555;
     color: white;
     border: 1px solid #444;
-    border-radius: 3px;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* Ensures padding is included in the width */
 }
 
-/* button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    cursor: pointer;
-} */
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    border-color: #E50914;
+}
 
 .edit-profile-btn {
     background-color: #E50914;
     color: white;
     border: none;
     border-radius: 30px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .edit-profile-btn:hover {
@@ -90,109 +104,127 @@ input[type="text"], input[type="email"], input[type="password"] {
 .center-btn {
     display: flex;
     justify-content: center;
-}
-
-.section-content p {
-    margin: 0; /* Remove default margin */
-    padding: 5px 0; /* Add a small padding for spacing */
-    font-size: 16px; /* Optional: reduce font size if needed */
-}
-
-input {
-    font-size: 16px;
-}
-input[type="text"], input[type="email"], input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin: 1px 0 15px 0; /* Adjust margin: 5px on top, 15px on bottom */
-    background-color: #555;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 3px;
+    margin-top: 20px;
 }
 
 .name-fields {
     display: flex;
     justify-content: space-between;
-    gap: 10px; /* Adjust the gap between fields as needed */
-    width: 98%;
+    gap: 12px;
 }
 
 .name-field {
-    flex-basis: 48%; /* Adjust this percentage for width */
+    flex-basis: 48%;
 }
 
-input[type="text"], input[type="email"], input[type="password"] {
-    width: 96%;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #555;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 3px;
-}
-
-.error-message {
-    color: #ff4d4d;         /* Red color for the error message */
-    padding: 10px;            /* Add some padding around the message */
-    margin-top: 10px;         /* Add space between the message and other elements */
-    font-size: 14px !important;         /* Adjust font size for readability */
-    font-style: italic;      /* Make the message italic */
-}
-
-input.error {
-    border: 2px solid #ff4d4d; /* Red border around the input field itself */
-}
-
-/* Styles for the popup and overlay */
-.popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Ensure it is above other content */
-}
-
-.popup {
-    background-color: black;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    text-align: center;
-}
-
-.popup p {
+.section-content p {
+    margin: 0;
+    padding: 5px 0;
     font-size: 16px;
-    margin-bottom: 20px;
 }
 
-/* .popup button {
-    margin: 5px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
+button.remove-btn {
+    background-color: #555;
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    padding: 10px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
 }
 
-.popup button:hover {
-    background-color: #0056b3;
+button.remove-btn:hover {
+    background-color: #777;
 }
 
-.popup button:focus {
-    outline: none;
-} */
+/* Promotion Section */
+.promotion-section {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #444;
+}
 
-/* Ensure the page content behind the popup cannot be scrolled */
-/* body.popup-active {
-    overflow: hidden;
-} */
+.promotion-section label {
+    font-size: 18px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
 
+/* Promotion Toggle Section */
+.promotion-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #222;
+    border-radius: 8px;
+    border: 1px solid #444;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-grow: 1; /* Allow the label to take up the remaining space */
+}
+
+.slider {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color 0.4s;
+    margin-left: 15px;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: white;
+    left: 2px;
+    top: 2px;
+    transition: transform 0.4s;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-input:checked + .slider {
+    background-color: #E50914;
+}
+
+.toggle-input:checked + .slider::before {
+    transform: translateX(26px);
+}
+
+/* Status Message */
+.promotion-status {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.opted-in {
+    color: #00FF7F;
+    font-weight: bold;
+}
+
+.opted-out {
+    color: #FF6347;
+    font-weight: bold;
+}

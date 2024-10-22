@@ -1,3 +1,6 @@
 cinema_ebooking_website/cinema-booking-client/node_modules
 
 /cinema-booking-client/node_modules/.cache/
+/node_modules/
+/.cache/
+

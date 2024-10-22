@@ -12,3 +12,9 @@ node_modules/.cache/
 # Alternatively, you can ignore the specific default-development folder inside .cache
 node_modules/.cache/default-development/
 
+# Ignore all node_modules (commonly ignored in Node.js projects)
+node_modules/
+
+# Specifically ignore cache and pack files
+node_modules/.cache/
+node_modules/.cache/default-development/*.pack

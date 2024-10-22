@@ -249,7 +249,7 @@ const Registration = () => {
     };
     
     const handleCardChange = (index, field, value) => {
-        // // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
+        // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
         // const updatedCards = [...cards];
         // updatedCards[index][field] = value;
         

@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import './RegistrationConfirmation.css'; // Ensure the styles are imported
 // import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const RegistrationConfirmation = () => {
+  const navigate = useNavigate();
+
   // State to manage the verification code input fields
   const [code, setCode] = useState(new Array(5).fill(""));
 
@@ -41,6 +45,31 @@ const RegistrationConfirmation = () => {
     }
   };
 
+  const handleConfirm = async() => {
+    // const verificationCode = code.join(''); // Join the code array into a string
+
+    // try {
+    //   // Send the code and email to the backend for verification
+    //   // const response = await axios.post('/verify-account', {
+    //   //   email: userEmail,
+    //   //   verificationCode,
+    //   // });
+    //   const response = await axios.post('/verify-account', { code: code.join('') });
+
+    //   if (response.data.success) {
+    //     // CHANGE USER STATUS TO ACTIVE
+
+    //     navigate('/registration-checkmark');
+    //   } else {
+    //     alert('Invalid verification code. Please try again. ', response.data.message);
+    //   }
+    // } catch (error) {
+    //   console.error('Error verifying code', error);
+    //   alert('An error occurred. Please try again later.');
+    // }
+      navigate('/registration-checkmark');
+  };
+
   return (
     <div>
       {/*<Navbar />*/}
@@ -50,7 +79,7 @@ const RegistrationConfirmation = () => {
         <div className="verification-details">
           <p>
             A verification code was sent to your email. Please verify your
-            <p>account to finish registering your account.</p>
+            account to finish registering your account.
           </p>
           <div className="verification-code-inputs">
             {code.map((num, index) => (
@@ -66,8 +95,7 @@ const RegistrationConfirmation = () => {
               />
             ))}
           </div>
-          <button className="confirm-button">Confirm</button>
-          <p>*Login Failed/LoginSuccessful*</p>
+          <button onClick={handleConfirm} className="confirm-button">Confirm</button>
         </div>
       </div>
     </div>

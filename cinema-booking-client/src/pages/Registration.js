@@ -3,6 +3,7 @@ import './EditProfile.css';
 // import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
 import axios from 'axios'; // Axios for sending data to the server
+import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
    // States to control the visibility of sections
@@ -12,7 +13,6 @@ const Registration = () => {
    const [showCard, setShowCard] = useState([false, false, false]);
    const [cards, setCards] = useState([{ id: 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
    
-
    // Functions to toggle sections
    const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
    const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
@@ -25,6 +25,7 @@ const Registration = () => {
    const [showCardPopup, setShowCardPopup] = useState(false);
 //    const [showPopup, setShowPopup] = useState(false);
    const [continueWithoutInfo, setContinueWithoutInfo] = useState(false); 
+   const navigate = useNavigate();
 
    const [formData, setFormData] = useState({
         firstName: '',
@@ -159,8 +160,11 @@ const Registration = () => {
                     console.log('Response:', response.data);
                     if (response.status === 200) {
                         setSuccessMessage("Registration successful! Please check your email for confirmation.");
+                        navigate('/registration-confirmation');
                     }
                 })
+                // await axios.post('/send-verification-code', { email: formData.email });
+                // navigate('/registration-confirmation');
                     
             } catch (e) {
                 console.error("Error registering the user:", e);
@@ -237,13 +241,13 @@ const Registration = () => {
 
     useEffect(() => {
         if (continueWithoutInfo) {
-            handleSubmit(); // Now that address info is cleared, submit the form
-            setContinueWithoutInfo(false); // Reset after submission
+            handleSubmit(); 
+            setContinueWithoutInfo(false); 
         }
-    }, [continueWithoutInfo, formData]); // Listen for changes in formData and continueWithoutInfo
+    }, [continueWithoutInfo, formData]); 
 
     const addNewCard = () => {
-        if (cards.length < 3) {
+        if (cards.length < 4) {
             setCards([...cards, { id: cards.length + 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
         }
     };
@@ -491,7 +495,7 @@ const Registration = () => {
                                 type="button" 
                                 className="btn red" 
                                 onClick={addNewCard} 
-                                disabled={cards.length >= 3} // disable if 3 cards are already added
+                                disabled={cards.length >= 4} // disable if 3 cards are already added
                             >
                                 + Add New Card
                             </button>

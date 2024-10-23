@@ -37,7 +37,7 @@ db_user = 'admin'
 db_password = 'kyqtov-narha3-nEcpif'
 db_name = 'mywebsite'
 
-encryption_key = b'EcxldqJv4puPs5cRA3vv5So_-wcZNquUvohJyplob_M='  # DO NOT PUBLISH THIS KEY !!!!!
+encryption_key = b'EcxldqJv4puPs5cRA3vv5So_-wcZNquUvohJyplob_M='  # DO NOT PUBLISH THIS KEY !
 cipher_suite = Fernet(encryption_key)
 
 # Google OAuth Configuration

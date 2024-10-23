@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import './RegistrationConfirmation.css'; // Ensure the styles are imported
+import axios from 'axios';  // Import Axios to send requests
+import { useNavigate, useLocation } from 'react-router-dom'; // Import hooks for navigation and getting passed data
 // import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+
 
 const RegistrationConfirmation = () => {
-  const navigate = useNavigate();
-
   // State to manage the verification code input fields
   const [code, setCode] = useState(new Array(5).fill(""));
+  const [errorMessage, setErrorMessage] = useState('');  // For handling error messages
+  const navigate = useNavigate();  // Hook to navigate after successful verification
+  const location = useLocation();  // Hook to get the email passed from the registration page
+  const email = location.state?.email;  // Access the passed email
 
   // Handle input change
   const handleChange = (e, index) => {
@@ -45,29 +48,25 @@ const RegistrationConfirmation = () => {
     }
   };
 
-  const handleConfirm = async() => {
-    // const verificationCode = code.join(''); // Join the code array into a string
+  // Handle form submission and send verification code to the backend ####!!!!!!!!!!!!
+  const handleSubmit = async () => {
+    try {
+      const verificationCode = code.join("");  // Combine the array into a single string
+      console.log("Email:", email);
+      console.log("Verification code:", verificationCode); 
+      const response = await axios.post('http://127.0.0.1:5000/api/verify-account', {
+        email,  // Email passed from the registration page
+        verificationCode
+      });
 
-    // try {
-    //   // Send the code and email to the backend for verification
-    //   // const response = await axios.post('/verify-account', {
-    //   //   email: userEmail,
-    //   //   verificationCode,
-    //   // });
-    //   const response = await axios.post('/verify-account', { code: code.join('') });
-
-    //   if (response.data.success) {
-    //     // CHANGE USER STATUS TO ACTIVE
-
-    //     navigate('/registration-checkmark');
-    //   } else {
-    //     alert('Invalid verification code. Please try again. ', response.data.message);
-    //   }
-    // } catch (error) {
-    //   console.error('Error verifying code', error);
-    //   alert('An error occurred. Please try again later.');
-    // }
-      navigate('/registration-checkmark');
+      if (response.status === 200) {
+        // Verification successful, navigate to the success page or login page
+        navigate('/registration-checkmark');
+      }
+    } catch (error) {
+      // Handle error if verification fails
+      setErrorMessage('Verification failed. Please check the code and try again.');
+    }
   };
 
   return (
@@ -95,7 +94,11 @@ const RegistrationConfirmation = () => {
               />
             ))}
           </div>
-          <button onClick={handleConfirm} className="confirm-button">Confirm</button>
+          <button className="confirm-button" onClick={handleSubmit}>Confirm</button>
+          {/* Display error message if verification fails */}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          
+          {/* You can also conditionally show a success message if needed */}
         </div>
       </div>
     </div>

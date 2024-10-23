@@ -3,7 +3,7 @@ import './EditProfile.css';
 // import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
 import axios from 'axios'; // Axios for sending data to the server
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Hook for navigation
 
 const Registration = () => {
    // States to control the visibility of sections
@@ -12,7 +12,8 @@ const Registration = () => {
    const [showHomeAddress, setShowHomeAddress] = useState(false);
    const [showCard, setShowCard] = useState([false, false, false]);
    const [cards, setCards] = useState([{ id: 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
-   
+   const navigate = useNavigate(); // Hook for navigation
+
    // Functions to toggle sections
    const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
    const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
@@ -25,7 +26,6 @@ const Registration = () => {
    const [showCardPopup, setShowCardPopup] = useState(false);
 //    const [showPopup, setShowPopup] = useState(false);
    const [continueWithoutInfo, setContinueWithoutInfo] = useState(false); 
-   const navigate = useNavigate();
 
    const [formData, setFormData] = useState({
         firstName: '',
@@ -73,6 +73,12 @@ const Registration = () => {
         return emailPattern.test(email);
     };
 
+    const validatePhoneNumber = (phoneNumber) => {
+        // Simple regex for phone number validation
+        const phoneNumberPattern = /^[0-9]{10}$/;
+        return phoneNumberPattern.test(phoneNumber);
+    };
+
     const validateCardNumber = (cardNumber) => {
         // Simple regex for card number validation
         const cardNumberPattern = /^[0-9]{16}$/;
@@ -108,6 +114,10 @@ const Registration = () => {
         const formErrors = validateForm();
         if (formData.email && !validateEmail(formData.email)) {
             formErrors.email = 'Please enter a valid email address';
+        }
+
+        if (formData.phoneNumber && !validatePhoneNumber(formData.phoneNumber)) {
+            formErrors.phoneNumber = 'Phone Number must be a 10-digit number (no spaces or dashes)';
         }
 
         if (showPaymentInfo) {
@@ -148,29 +158,29 @@ const Registration = () => {
                     return;
                 }
             }
-
+            ///// ADDED STUFF DOWN HERE 
             try {
                 // Send data to the server
                 const dataToSend = {
                     ...formData,
                     cards: cards // Include the array of cards
                 };
+           
                 await axios.post('http://127.0.0.1:5000/api/register', dataToSend)
                 .then(response => {
                     console.log('Response:', response.data);
                     if (response.status === 200) {
                         setSuccessMessage("Registration successful! Please check your email for confirmation.");
-                        navigate('/registration-confirmation');
+                        let email = formData.email;
+                        console.log('Email in registration.js:', email);
+                        navigate('/registration-confirmation', { state: { email } });
                     }
                 })
-                // await axios.post('/send-verification-code', { email: formData.email });
-                // navigate('/registration-confirmation');
-                    
+            
             } catch (e) {
                 console.error("Error registering the user:", e);
-                // setErrors({ api: "Registration failed. Please try again later." });
+            
                 if (e.response && e.response.data && e.response.data.error) {
-                    
                     if (e.response.data.error === "Email already exists.") {
                         const newFormErrors = { ...formErrors }; 
                         newFormErrors.email = "Email already exists";
@@ -241,19 +251,19 @@ const Registration = () => {
 
     useEffect(() => {
         if (continueWithoutInfo) {
-            handleSubmit(); 
-            setContinueWithoutInfo(false); 
+            handleSubmit(); // Now that address info is cleared, submit the form
+            setContinueWithoutInfo(false); // Reset after submission
         }
-    }, [continueWithoutInfo, formData]); 
+    }, [continueWithoutInfo, formData]); // Listen for changes in formData and continueWithoutInfo
 
     const addNewCard = () => {
-        if (cards.length < 4) {
+        if (cards.length < 3) {
             setCards([...cards, { id: cards.length + 1, nameOnCard: '', cardNumber: '', expirationDate: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: '' }]);
         }
     };
     
     const handleCardChange = (index, field, value) => {
-        // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
+        // // const updatedCards = cards.map((card, i) => (i === index ? { ...card, [field]: value } : card));
         // const updatedCards = [...cards];
         // updatedCards[index][field] = value;
         
@@ -495,7 +505,7 @@ const Registration = () => {
                                 type="button" 
                                 className="btn red" 
                                 onClick={addNewCard} 
-                                disabled={cards.length >= 4} // disable if 3 cards are already added
+                                disabled={cards.length >= 3 } // disable if 3 cards are already added 
                             >
                                 + Add New Card
                             </button>

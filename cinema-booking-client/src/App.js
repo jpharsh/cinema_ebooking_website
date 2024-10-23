@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './AuthContext'; 
 import Navbar from './components/Navbar';
 import LoggedInNavbar from './components/LoggedInNavbar';
+import AdminNavbar from './components/AdminNavbar';
 import HomePage from './pages/HomePage.js';
 import SelectTickets from './pages/SelectTickets.js';
 import PaymentInfo from './pages/PaymentInfo.js';
@@ -20,13 +21,16 @@ import Showtimes from './pages/Showtimes.js';
 import Promo from './pages/Promo.js';
 import './App.css';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
-  const { loggedIn, logout } = useContext(AuthContext);
+  const { loggedIn, isAdmin, logout } = useContext(AuthContext);
 
   return (
     <>
-      {loggedIn ? <LoggedInNavbar onLogout={logout} /> : <Navbar />}
+      {isAdmin ? <AdminNavbar onLogout={logout} /> 
+         : loggedIn ? <LoggedInNavbar onLogout={logout} /> 
+                    : <Navbar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/select-tickets" element={<SelectTickets />} />
@@ -44,6 +48,7 @@ function App() {
         <Route path="/showtimes" element={<Showtimes />} />
         <Route path="/promo" element={<Promo />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </>
   );

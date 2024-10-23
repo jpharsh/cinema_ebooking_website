@@ -1,7 +1,7 @@
 // src/App.js
 import React from 'react';
 import './Showtimes.css';
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 
 function ShowtimeCard({ time }) {
   return <button className="time-button">{time}</button>;
@@ -28,7 +28,7 @@ function showtimes() {
   return (
     <div>
       {/* <header className="header">Cinema Movies</header> */}
-      <LoggedInNavbar/>
+      {/*<LoggedInNavbar/>*/}
         <div>
           <div className="app-container">
             <h2>Showtimes:</h2>

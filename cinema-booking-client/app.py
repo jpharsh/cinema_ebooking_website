@@ -1,15 +1,35 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 import pymysql
 from flask_cors import CORS
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import re
 import mysql.connector
 from mysql.connector.errors import IntegrityError
 from cryptography.fernet import Fernet
+from flask_session import Session
+import jwt
+from datetime import datetime, timedelta
+import random  # For generating a reset token
+import string  # For generating a random string
+import os  # To set environment variables
+import base64
+import smtplib
+from email.mime.text import MIMEText
+import google_auth_oauthlib.flow
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
+app.secret_key = 'supersecretkey'  # Replace with your actual secret key for production
+app.config['SESSION_TYPE'] = 'filesystem'  # Store session data on the server-side
+Session(app)
+
+JWT_SECRET = 'another_super_secret_key'  # Replace with a production key
+JWT_ALGORITHM = 'HS256'
+JWT_EXPIRATION_MINUTES = 30
 
 # Database connection parameters
 db_host = 'cinema-ebooking-database.cdm6csm20sfl.us-east-2.rds.amazonaws.com'
@@ -19,6 +39,55 @@ db_name = 'mywebsite'
 
 encryption_key = b'EcxldqJv4puPs5cRA3vv5So_-wcZNquUvohJyplob_M='  # DO NOT PUBLISH THIS KEY !!!!!
 cipher_suite = Fernet(encryption_key)
+
+# Google OAuth Configuration
+CLIENT_ID = '543307738148-faodjbvprsud5i9foiun55i9misrm01i.apps.googleusercontent.com'
+CLIENT_SECRET = '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'
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
+# Load credentials from token.json
+def load_credentials():
+    creds = None
+    token_file = 'token.json'
+    
+    if os.path.exists(token_file):
+        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
+    
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
+                {
+                    "installed": {
+                        "client_id": CLIENT_ID,
+                        "client_secret": CLIENT_SECRET,
+                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                        "token_uri": "https://oauth2.googleapis.com/token",
+                        "redirect_uris": ["http://localhost:8080"]
+                    }
+                }, SCOPES
+            )
+            creds = flow.run_local_server(port=8080)
+        
+        with open(token_file, 'w') as token:
+            token.write(creds.to_json())
+    
+    return creds
+
+def create_jwt_token(user_id, email):
+    expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+    token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
+
+def verify_jwt_token(token):
+    try:
+        decoded = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return decoded
+    except jwt.ExpiredSignatureError:
+        return None  # Token has expired
+    except jwt.InvalidTokenError:
+        return None  # Invalid token
 
 def connect_db():
     # return sqlite3.connect('users.db')
@@ -46,6 +115,56 @@ def fetch_movies(table_name):
             return jsonify(movies)
     finally:
         connection.close()
+
+def send_email_via_gmail_api(to, subject, body):
+    creds = load_credentials()
+    service = build('gmail', 'v1', credentials=creds)
+
+    message = MIMEText(body)
+    message['to'] = to
+    message['subject'] = subject
+
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    message = {'raw': raw_message}
+
+    try:
+        service.users().messages().send(userId='me', body=message).execute()
+        print("Email sent successfully.")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+@app.route('/api/forgot-password', methods=['POST'])
+def forgot_password():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+
+        if not email:
+            return jsonify({'error': 'Email is required.'}), 400
+
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT id FROM Users WHERE email = %s', (email,))
+            user = cursor.fetchone()
+
+            if not user:
+                return jsonify({'error': 'Email not found.'}), 404
+
+            user_id = user[0]
+
+        reset_token = create_jwt_token(user_id, email)
+        subject = 'Password Reset Request'
+        body = f'Click the link to reset your password: https://yourapp.com/reset-password?token={reset_token}'
+
+        send_email_via_gmail_api(email, subject, body)
+
+        return jsonify({'message': 'Password reset email sent successfully.'}), 200
+
+    except Exception as e:
+        print(f"Error during password reset: {e}")
+        return jsonify({'error': 'An error occurred during password reset.'}), 500
+
 
 @app.route('/api/now-playing', methods=['GET'])
 def get_now_playing():
@@ -176,6 +295,59 @@ def register_user():
     # except Exception as e:
     #     print(e)
     #     return jsonify({'error': 'An error occurred during registration.'}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+
+        print(f"Login attempt - email: {email}, password: {password}")  # Debugging info
+
+        if not email or not password:
+            print("Missing email or password")  # Debugging info
+            return jsonify({'error': 'Please provide both email and password.'}), 400
+
+        with connect_db() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
+            user = cursor.fetchone()
+
+            if user:
+                print(f"User found - email: {user['email']}")  # Debugging info
+                if check_password_hash(user['u_password'], password):
+                    print("Password correct")  # Debugging info
+                    token = create_jwt_token(user['id'], user['email'])  # Generate JWT
+                    return jsonify({'message': 'Login successful.', 'token': token}), 200
+                else:
+                    print("Password incorrect")  # Debugging info
+                    return jsonify({'error': 'Invalid email or password.'}), 401
+            else:
+                print("User not found")  # Debugging info
+                return jsonify({'error': 'Invalid email or password.'}), 401
+
+    except Exception as e:
+        print(f"Error during login: {e}")  # Debugging info
+        return jsonify({'error': 'An error occurred during login.'}), 500
+
+
+# Logout route
+@app.route('/api/logout', methods=['POST'])
+def logout_user():
+    session.clear()
+    return jsonify({'message': 'Logged out successfully.'}), 200
+
+# Route to check if a user is logged in
+@app.route('/api/check-session', methods=['GET'])
+def check_session():
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        token = auth_header.split(" ")[1]  # Bearer <token>
+        decoded_token = verify_jwt_token(token)
+        if decoded_token:
+            return jsonify({'logged_in': True, 'user_id': decoded_token['id'], 'email': decoded_token['email']}), 200
+    return jsonify({'logged_in': False}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -21,4 +21,5 @@ node_modules/.cache/default-development/*.pack
 cinema-booking-client/node_modules/.DS_Store
 cinema_ebooking_website/cinema-booking-client/node_modules
 cinema_ebooking_website/cinema-booking-client/__pycache__
-
+cinema_ebooking_website/cinema-booking-client/flask_session
+.DS_Store

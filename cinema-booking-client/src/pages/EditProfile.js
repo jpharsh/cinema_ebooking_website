@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
-import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const EditProfile = () => {
     const [showRequiredInfo, setShowRequiredInfo] = useState(true);
@@ -42,8 +41,18 @@ const EditProfile = () => {
 
     return (
         <div>
+            {/*<LoggedInNavbar />*/}
+        <div className="registration-container">
+           {/* <Header /> */}
+            <h1>Edit Profile</h1>
+
+            {/* Required Information */}
+            <div className="section">
+            <button onClick={toggleRequiredInfo} className="section-toggle">
+    <span>Personal Information</span> {/* Wrap the text in a span */}
+    <span>{showRequiredInfo ? '▲' : '▼'}</span> {/* The arrow */}
+</button>
             <div className="header">Cinema Movies</div>
-            <LoggedInNavbar />
             <div className="registration-container">
                 <h1>Edit Profile</h1>
 

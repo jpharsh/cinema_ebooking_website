@@ -488,21 +488,32 @@ def check_session():
 def reset_password():
     try:
         data = request.get_json()
-        token = data.get('token')
+        reset_token = data.get('token')
         new_password = data.get('newPassword')
 
-        if not token or not new_password:
+        # Check if token and new password are provided
+        if not reset_token or not new_password:
             return jsonify({'error': 'Token and new password are required.'}), 400
 
-        # Verify the token
-        decoded = verify_jwt_token(token)
-        if not decoded:
+        # Decode the token
+        decoded_token = verify_jwt_token(reset_token)
+        if not decoded_token:
             return jsonify({'error': 'Invalid or expired token.'}), 400
 
-        user_id = decoded['id']
+        user_id = decoded_token.get('id')  # Safely extract user ID from the token
+
+        # Ensure user_id exists in token
+        if not user_id:
+            return jsonify({'error': 'Invalid token.'}), 400
+
+        # Optional: Add password validation for complexity
+        if len(new_password) < 8:  # Example validation
+            return jsonify({'error': 'Password must be at least 8 characters long.'}), 400
+
+        # Hash the new password
         hashed_password = generate_password_hash(new_password)
 
-        # Update the user's password in the database
+        # Update the password in the database
         with connect_db() as conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE Users SET u_password = %s WHERE id = %s', (hashed_password, user_id))
@@ -511,6 +522,7 @@ def reset_password():
         return jsonify({'message': 'Password has been reset successfully.'}), 200
 
     except Exception as e:
+        # Use a logging library instead of print for better production logging
         print(f"Error during password reset: {e}")
         return jsonify({'error': 'An error occurred during password reset.'}), 500
 

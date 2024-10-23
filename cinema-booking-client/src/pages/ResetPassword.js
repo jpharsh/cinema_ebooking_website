@@ -1,62 +1,67 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom'; // Import useSearchParams to get the token
-import './ResetPassword.css';
 
 const ResetPassword = () => {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [searchParams] = useSearchParams(); // Get the search params from the URL
-  const token = searchParams.get('token'); // Extract the token
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();  // Corrected: call useNavigate as a function
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const resetToken = query.get('token');  // Extract the reset token from the URL
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    try {
-      const response = await axios.post('/api/reset-password', { token, newPassword });
-      setMessage(response.data.message);
-      setError('');
-    } catch (error) {
-      setError(error.response?.data?.error || 'Error resetting password.');
-      setMessage('');
-    }
-  };
+        if (newPassword !== confirmPassword) {
+            setErrorMessage('Passwords do not match');
+            return;
+        }
 
-  return (
-    <div className="reset-password-container">
-      <div className="reset-password-box">
-        <h2 className="reset-password-title">Reset Password</h2>
-        {message && <p className="message success">{message}</p>}
-        {error && <p className="message error">{error}</p>}
-        <form onSubmit={handleResetPassword}>
-          <input
-            type="password"
-            placeholder="New Password"
-            className="input-field"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Confirm New Password"
-            className="input-field"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <button type="submit" className="login-btn">Reset Password</button>
-        </form>
-      </div>
-    </div>
-  );
+        try {
+            const response = await axios.post('http://localhost:5000/api/reset-password', {
+                token: resetToken,
+                newPassword: newPassword
+            });
+
+            if (response.data.message) {
+                alert('Password reset successful');
+                navigate('/login');  // Corrected: use navigate to redirect
+            }
+        } catch (error) {
+            setErrorMessage(error.response?.data?.error || 'An error occurred');
+            console.log(resetToken);  // Add this line to check if token is being extracted
+        }
+    };
+
+    return (
+        <div>
+            <h2>Reset Password</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>New Password:</label>
+                    <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Confirm Password:</label>
+                    <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
+    );
 };
 
 export default ResetPassword;

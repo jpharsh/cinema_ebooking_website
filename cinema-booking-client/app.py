@@ -81,11 +81,16 @@ def load_credentials():
   
    return creds
 
+def create_jwt_token(user_id, email, user_type):
+    expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+    token = jwt.encode({'id': user_id, 'email': email, 'user_type': user_type, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
 
 def create_jwt_token(user_id, email):
-   expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
-   token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
-   return token
+    expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+    # Removed user_type from JWT payload
+    token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
 
 
 def verify_jwt_token(token):
@@ -178,6 +183,10 @@ def forgot_password():
        subject = 'Password Reset Request'
        body = f'Click the link to reset your password: https://yourapp.com/reset-password?token={reset_token}'
 
+        # Generate reset token without user_type
+        reset_token = create_jwt_token(user_id, email)
+        subject = 'Password Reset Request'
+        body = f'Click the link to reset your password: http://localhost:3000/reset-password?token={reset_token}'
 
        send_email_via_gmail_api(email, subject, body)
 
@@ -441,18 +450,18 @@ def login_user():
            user = cursor.fetchone()
 
 
-           if user:
-               print(f"User found - email: {user['email']}")  # Debugging info
-               if check_password_hash(user['u_password'], password):
-                   print("Password correct")  # Debugging info
-                   token = create_jwt_token(user['id'], user['email'])  # Generate JWT
-                   return jsonify({'message': 'Login successful.', 'token': token}), 200
-               else:
-                   print("Password incorrect")  # Debugging info
-                   return jsonify({'error': 'Invalid email or password.'}), 401
-           else:
-               print("User not found")  # Debugging info
-               return jsonify({'error': 'Invalid email or password.'}), 401
+            if user:
+                print(f"User found - email: {user['email']}")  # Debugging info
+                if check_password_hash(user['u_password'], password):
+                    print("Password correct")  # Debugging info
+                    token = create_jwt_token(user['id'], user['email'], user['user_type'])  # Generate JWT
+                    return jsonify({'message': 'Login successful.', 'token': token, 'user_type': user['user_type']}), 200
+                else:
+                    print("Password incorrect")  # Debugging info
+                    return jsonify({'error': 'Invalid email or password.'}), 401
+            else:
+                print("User not found")  # Debugging info
+                return jsonify({'error': 'Invalid email or password.'}), 401
 
 
    except Exception as e:
@@ -472,13 +481,44 @@ def logout_user():
 # Route to check if a user is logged in
 @app.route('/api/check-session', methods=['GET'])
 def check_session():
-   auth_header = request.headers.get('Authorization')
-   if auth_header:
-       token = auth_header.split(" ")[1]  # Bearer <token>
-       decoded_token = verify_jwt_token(token)
-       if decoded_token:
-           return jsonify({'logged_in': True, 'user_id': decoded_token['id'], 'email': decoded_token['email']}), 200
-   return jsonify({'logged_in': False}), 200
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        token = auth_header.split(" ")[1]  # Bearer <token>
+        decoded_token = verify_jwt_token(token)
+        if decoded_token:
+            is_admin = decoded_token.get('user_type') == '2'
+            return jsonify({'logged_in': True, 'user_id': decoded_token['id'], 'email': decoded_token['email'], 'is_admin': is_admin}), 200
+    return jsonify({'logged_in': False}), 200
+
+@app.route('/api/reset-password', methods=['POST'])
+def reset_password():
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        new_password = data.get('newPassword')
+
+        if not token or not new_password:
+            return jsonify({'error': 'Token and new password are required.'}), 400
+
+        # Verify the token
+        decoded = verify_jwt_token(token)
+        if not decoded:
+            return jsonify({'error': 'Invalid or expired token.'}), 400
+
+        user_id = decoded['id']
+        hashed_password = generate_password_hash(new_password)
+
+        # Update the user's password in the database
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('UPDATE Users SET u_password = %s WHERE id = %s', (hashed_password, user_id))
+            conn.commit()
+
+        return jsonify({'message': 'Password has been reset successfully.'}), 200
+
+    except Exception as e:
+        print(f"Error during password reset: {e}")
+        return jsonify({'error': 'An error occurred during password reset.'}), 500
 
 
 if __name__ == '__main__':

@@ -18,9 +18,17 @@ const LoginPage = () => {
       const response = await axios.post('http://127.0.0.1:5000/api/login', { email: trimmedEmail, password: trimmedPassword });
       
       const token = response.data.token;  // Retrieve token
-      console.log("Login successful, token:", token);  // Debugging info
+      const userType = response.data.user_type; // Retrieve user type (1 = regular user, 2 = admin)
+
+      console.log("Login successful, token:", token, "userType:", userType);  // Debugging info
       localStorage.setItem('token', token);  // Store token in localStorage
-      navigate('/');
+      
+      if (userType === 2) {
+        navigate('/admin-home');  // Redirect admin to AdminHomepage.js
+      } else {
+        navigate('/');  // Redirect regular user to the homepage
+      }
+      
       window.location.reload();
 
     } catch (error) {

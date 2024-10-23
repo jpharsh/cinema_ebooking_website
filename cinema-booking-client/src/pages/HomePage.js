@@ -128,8 +128,10 @@ const HomePage = () => {
                 />
             </div>
 
-            <button className="btn red">All Movies</button>
-
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button className="btn red">All Movies</button>
+            </div>
+            
             {/* Trailer Pop-up */}
             {selectedTrailer && (
                 <div className="trailer-popup">

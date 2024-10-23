@@ -2,13 +2,13 @@
 
 import React from 'react';
 import './OrderSummary.css'; // Import the CSS file
-import LoggedInNavbar from '../components/LoggedInNavbar'; 
+// import LoggedInNavbar from '../components/LoggedInNavbar'; 
 // import Header from '../components/Header'; // Import the Header component
 
 const OrderSummary = () => {
   return (
     <div>
-      <LoggedInNavbar />
+      {/*<LoggedInNavbar />*/}
    <div className="summary-container">
       {/* <Header /> */}
       <h1>Order Summary</h1>

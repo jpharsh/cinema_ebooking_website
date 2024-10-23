@@ -2,12 +2,12 @@ import React from 'react';
 import './PaymentInfo.css';
 import MasterCardLogo from '../images/MasterCardLogo.png';
 import VisaLogo from '../images/VisaLogo.png';
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const PaymentInfo = () => {
   return (
     <div>
-        <LoggedInNavbar />
+        {/*<LoggedInNavbar />*/}
     <div className="movie-section" style={{ width: '50%', alignContent: 'center', padding: '30px'}}>
         <h2 style={{ marginTop: '0px', textAlign: 'left' }}>Payment Info</h2>
         <div className="saved-cards-container">

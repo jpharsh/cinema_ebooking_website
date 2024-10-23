@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './EditProfile.css';
-import Navbar from '../components/Navbar';
+// import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
 import axios from 'axios'; // Axios for sending data to the server
 
@@ -296,7 +296,7 @@ const Registration = () => {
 
    return (
     <div>
-        <Navbar />
+        {/*<Navbar />*/}
         <div className="registration-container">
             <h1>Create Profile</h1>
 

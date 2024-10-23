@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 // import Header from '../components/Header'; // Import the Header component
 
 
@@ -19,7 +19,7 @@ const EditProfile = () => {
 
     return (
         <div>
-            <LoggedInNavbar />
+            {/*<LoggedInNavbar />*/}
         <div className="registration-container">
            {/* <Header /> */}
             <h1>Edit Profile</h1>

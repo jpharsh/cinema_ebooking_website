@@ -1,7 +1,7 @@
 // src/App.js
 import React from 'react';
 import './AdminPage.css';
-import AdminNavbar from '../components/AdminNavbar';
+// import AdminNavbar from '../components/AdminNavbar';
 
 function AdminHomePage() {
   return (
@@ -13,8 +13,8 @@ function AdminHomePage() {
           <span className="logo">Cinema Movies</span>
           
         </div>
-      </header> */}
-      <AdminNavbar />
+      </header>
+      <AdminNavbar />*/}
 
       {/* Main Admin Page Content */}
       <div className="admin-container">

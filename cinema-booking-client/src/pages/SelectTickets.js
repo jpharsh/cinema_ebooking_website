@@ -4,7 +4,7 @@ import '../components/MovieCard.css';
 import './SelectTickets.css';
 import '../App.css';
 import exampleMoviePoster from '../images/exampleMoviePoster.jpeg';
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const SelectTickets = ( {movie} ) => {
 
@@ -74,7 +74,7 @@ const handleIncreaseButton = (number) => {
 
   return (
     <div>
-        <LoggedInNavbar />
+        {/*<LoggedInNavbar />*/}
     
     <div className="App">
     <div className="movie-section" style={{ width: '40%', alignContent: 'center', padding: '30px'}}>

@@ -4,7 +4,7 @@ import screen from '../images/screen.png';
 import AvailableSeat from '../images/AvailableSeat.png';
 import SelectedSeat from '../images/SelectedSeat.png';
 import UnavailableSeat from '../images/UnavailableSeat.png';
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const SelectSeats = () => {
     // Sample seat layout (0 = available, 1 = selected, 2 = unavailable)
@@ -36,7 +36,7 @@ const SelectSeats = () => {
 
     return (
         <div>
-            <LoggedInNavbar />
+            {/*<LoggedInNavbar />*/}
         <div className="movie-section" style={{ width: '40%', alignContent: 'center', padding: '20px' }}>
         <h2 style={{ textAlign: 'left' }}>Select Seats</h2>
         <div className="select-seats-container">

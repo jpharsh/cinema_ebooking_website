@@ -1,11 +1,11 @@
 import React from 'react';
 import './OrderConfirmation.css';
-import LoggedInNavbar from '../components/LoggedInNavbar';
+// import LoggedInNavbar from '../components/LoggedInNavbar';
 
 const OrderConfirmation = () => {
   return (
     <div>
-      <LoggedInNavbar />
+      {/*<LoggedInNavbar />*/}
     
     <div className="confirmation-container">
       {/* <header className="header">

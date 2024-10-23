@@ -4,7 +4,7 @@ import axios from 'axios';
 import '../App.css';
 import './HomePage.css'
 import Advertisement from '../images/Advertisement1.png';
-import Navbar from '../components/Navbar';
+// import Navbar from '../components/Navbar';
 
 const HomePage = () => {
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -67,7 +67,6 @@ const HomePage = () => {
 
     return (
         <div>
-            <Navbar />
             <div className="App" style={{ padding: '20px', position: 'relative' }}>
                 <input
                     type="text"

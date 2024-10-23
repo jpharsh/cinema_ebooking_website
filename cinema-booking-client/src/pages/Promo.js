@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Promo.css';
-import AdminNavbar from '../components/AdminNavbar';
+// import AdminNavbar from '../components/AdminNavbar';
 
 function PromoTable({ promos, searchQuery, onDelete }) {
   const filteredPromos = promos.filter(
@@ -67,7 +67,7 @@ function AdminPage() {
         </div>
       </header> */}
     <div>
-        <AdminNavbar />
+        {/*<AdminNavbar />*/}
     </div>
       <div className="promo-container">
         {/* Sidebar */}

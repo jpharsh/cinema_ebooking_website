@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './RegistrationConfirmation.css'; // Ensure the styles are imported
-import Navbar from '../components/Navbar';
+// import Navbar from '../components/Navbar';
 // import Header from '../components/Header'; // Import the Header component
 
 const RegistrationConfirmation = () => {
@@ -43,7 +43,7 @@ const RegistrationConfirmation = () => {
 
   return (
     <div>
-      <Navbar />
+      {/*<Navbar />*/}
       <div className="order-summary-container">
         {/* <Header /> */}
         <h2 className="verification-title">Verify Your Account</h2>

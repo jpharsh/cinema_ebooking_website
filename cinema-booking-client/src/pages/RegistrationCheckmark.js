@@ -1,11 +1,11 @@
 import React from 'react';
 import GreenCheckmark from '../images/GreenCheckmark.png';
-import Navbar from '../components/Navbar';
+// import Navbar from '../components/Navbar';
 
 const RegistrationCheckmark = () => {
   return (
     <div>
-      <Navbar />
+      {/*<Navbar />*/}
       <div style={{ height: '150px', position: 'relative' }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: '90vh', }}>
             <h1>Registration Confirmation</h1>

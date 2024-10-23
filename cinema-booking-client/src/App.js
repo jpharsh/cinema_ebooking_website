@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import MovieList from './components/MovieList';
+import { AuthContext, AuthProvider } from './AuthContext'; 
 import Navbar from './components/Navbar';
+import LoggedInNavbar from './components/LoggedInNavbar';
 import HomePage from './pages/HomePage.js';
 import SelectTickets from './pages/SelectTickets.js';
 import PaymentInfo from './pages/PaymentInfo.js';
@@ -17,36 +18,43 @@ import ManageMovies from './pages/ManageMovies.js';
 import AdminPage from './pages/AdminPage.js';
 import Showtimes from './pages/Showtimes.js';
 import Promo from './pages/Promo.js';
-import axios from 'axios';
 import './App.css';
-
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
-  return (
-    <Router>
-      
-        {/* <Navbar /> */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/select-tickets" element={<SelectTickets />} />
-          <Route path="/select-seats" element={<SelectSeats />} />
-          <Route path="/payment-info" element={<PaymentInfo />} />
-          <Route path="/registration-checkmark" element={<RegistrationCheckmark />} />
-          <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="/order-summary" element={<OrderSummary />} />
-          <Route path="/registration" element={<Registration />} />
-          <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
-          <Route path="/manage-movies" element={<ManageMovies />} />
-          <Route path="/admin-home" element={<AdminPage />} />
-          <Route path="/showtimes" element={<Showtimes />} />
-          <Route path="/promo" element={<Promo />} />
-        </Routes>
+  const { loggedIn, logout } = useContext(AuthContext);
 
-    </Router>
+  return (
+    <>
+      {loggedIn ? <LoggedInNavbar onLogout={logout} /> : <Navbar />}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/select-tickets" element={<SelectTickets />} />
+        <Route path="/select-seats" element={<SelectSeats />} />
+        <Route path="/payment-info" element={<PaymentInfo />} />
+        <Route path="/registration-checkmark" element={<RegistrationCheckmark />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
+        <Route path="/order-summary" element={<OrderSummary />} />
+        <Route path="/registration" element={<Registration />} />
+        <Route path="/registration-confirmation" element={<RegistrationConfirmation />} />
+        <Route path="/manage-movies" element={<ManageMovies />} />
+        <Route path="/admin-home" element={<AdminPage />} />
+        <Route path="/showtimes" element={<Showtimes />} />
+        <Route path="/promo" element={<Promo />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Routes>
+    </>
   );
 }
 
-
-export default App;
+export default function WrappedApp() {
+  return (
+    <AuthProvider>
+      <Router>
+        <App />
+      </Router>
+    </AuthProvider>
+  );
+}

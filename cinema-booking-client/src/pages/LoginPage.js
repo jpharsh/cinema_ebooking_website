@@ -1,40 +1,70 @@
-// src/pages/LoginPage.js
-
-import React from 'react';
-import './LoginPage.css'; // Ensure the styles are imported
-import popcorn from '../images/popcorn.jpg'; 
-import Navbar from '../components/Navbar';
-// import Header from '../components/Header'; // Import the Header component
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import './LoginPage.css'; 
+import axios from 'axios';
 
 const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+  
+    try {
+      console.log("Attempting login with:", trimmedEmail, trimmedPassword);  // Debugging info
+      const response = await axios.post('http://127.0.0.1:5000/api/login', { email: trimmedEmail, password: trimmedPassword });
+      
+      const token = response.data.token;  // Retrieve token
+      console.log("Login successful, token:", token);  // Debugging info
+      localStorage.setItem('token', token);  // Store token in localStorage
+      navigate('/');
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Error during login:", error);  // Debugging info
+      setError('Invalid email or password');
+    }
+  };
+
   return (
     <div>
-      <Navbar />
       <div className="login-container">
-        {/* <Header /> This line adds the Header component here */}
-        <div className="login-left">
-          <img
-            src={popcorn}
-            alt="Theater"
-            className="theater-img"
-          />
-        </div>
         <div className="login-right">
           <div className="login-box">
             <h2 className="login-title">Log In</h2>
-            <input type="text" placeholder="Username" className="input-field" />
-            <input type="password" placeholder="Password" className="input-field" />
-            <button className="login-btn">Log In</button>
+            <input
+              type="text"
+              placeholder="Email"
+              className="input-field"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="input-field"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="login-btn" onClick={handleLogin}>Log In</button>
+            {error && <p className="error-message">{error}</p>}
             <div className="login-footer">
               <p>
                 Don't have an account?{' '}
-                <button className="link-button" onClick={() => alert('Create Account clicked')}>
-                  Create Account
-                </button>
+                <Link to="/registration">
+                  <button className="link-button">
+                    Create Account
+                  </button>
+                </Link>
               </p>
-              <button className="link-button" onClick={() => alert('Forgot Password clicked')}>
-                Forgot Password?
-              </button>
+              <Link to='/forgot-password'>
+                <button className="link-button">
+                  Forgot Password?
+                </button>
+              </Link>
             </div>
           </div>
         </div>

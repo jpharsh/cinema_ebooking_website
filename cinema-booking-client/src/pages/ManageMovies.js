@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./ManageMovies.css";
 import "../App.css";
-import AdminNavbar from "../components/AdminNavbar";
+// import AdminNavbar from "../components/AdminNavbar";
 import searchIcon from "../images/search-icon.png"; // Import the search icon image
 
 function ManageMovies() {
@@ -130,7 +130,7 @@ function ManageMovies() {
 
   return (
     <div> 
-      <AdminNavbar />
+      {/*<AdminNavbar />*/}
    
       <div className="admin-panel">
         {/* <header className="header">

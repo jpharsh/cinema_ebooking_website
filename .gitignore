@@ -23,3 +23,7 @@ cinema_ebooking_website/cinema-booking-client/node_modules
 cinema_ebooking_website/cinema-booking-client/__pycache__
 cinema_ebooking_website/cinema-booking-client/flask_session
 .DS_Store
+*.pyc
+flask_session/
+package-lock.json
+

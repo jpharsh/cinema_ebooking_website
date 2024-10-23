@@ -86,11 +86,11 @@ def create_jwt_token(user_id, email, user_type):
     token = jwt.encode({'id': user_id, 'email': email, 'user_type': user_type, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
-def create_jwt_token(user_id, email):
-    expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
-    # Removed user_type from JWT payload
-    token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return token
+# def create_jwt_token(user_id, email):
+#     expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+#     # Removed user_type from JWT payload
+#     token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+#     return token
 
 
 def verify_jwt_token(token):
@@ -179,14 +179,14 @@ def forgot_password():
            user_id = user[0]
 
 
-       reset_token = create_jwt_token(user_id, email)
-       subject = 'Password Reset Request'
-       body = f'Click the link to reset your password: https://yourapp.com/reset-password?token={reset_token}'
+    #    reset_token = create_jwt_token(user_id, email)
+    #    subject = 'Password Reset Request'
+    #    body = f'Click the link to reset your password: https://yourapp.com/reset-password?token={reset_token}'
 
         # Generate reset token without user_type
-        reset_token = create_jwt_token(user_id, email)
-        subject = 'Password Reset Request'
-        body = f'Click the link to reset your password: http://localhost:3000/reset-password?token={reset_token}'
+       reset_token = create_jwt_token(user_id, email)
+       subject = 'Password Reset Request'
+       body = f'Click the link to reset your password: http://localhost:3000/reset-password?token={reset_token}'
 
        send_email_via_gmail_api(email, subject, body)
 
@@ -448,9 +448,8 @@ def login_user():
            cursor = conn.cursor(dictionary=True)
            cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
            user = cursor.fetchone()
-
-
-            if user:
+           
+           if user:
                 print(f"User found - email: {user['email']}")  # Debugging info
                 if check_password_hash(user['u_password'], password):
                     print("Password correct")  # Debugging info
@@ -459,7 +458,7 @@ def login_user():
                 else:
                     print("Password incorrect")  # Debugging info
                     return jsonify({'error': 'Invalid email or password.'}), 401
-            else:
+           else:
                 print("User not found")  # Debugging info
                 return jsonify({'error': 'Invalid email or password.'}), 401
 

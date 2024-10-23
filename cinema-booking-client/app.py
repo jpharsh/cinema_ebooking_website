@@ -86,11 +86,11 @@ def create_jwt_token(user_id, email, user_type):
     token = jwt.encode({'id': user_id, 'email': email, 'user_type': user_type, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
-# def create_jwt_token(user_id, email):
-#     expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
-#     # Removed user_type from JWT payload
-#     token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
-#     return token
+def create_jwt_token2(user_id, email):
+    expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+    # Removed user_type from JWT payload
+    token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token
 
 
 def verify_jwt_token(token):
@@ -178,13 +178,8 @@ def forgot_password():
 
            user_id = user[0]
 
-
-    #    reset_token = create_jwt_token(user_id, email)
-    #    subject = 'Password Reset Request'
-    #    body = f'Click the link to reset your password: https://yourapp.com/reset-password?token={reset_token}'
-
         # Generate reset token without user_type
-       reset_token = create_jwt_token(user_id, email)
+       reset_token = create_jwt_token2(user_id, email)
        subject = 'Password Reset Request'
        body = f'Click the link to reset your password: http://localhost:3000/reset-password?token={reset_token}'
 

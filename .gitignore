@@ -1,1 +1,25 @@
 cinema_ebooking_website/cinema-booking-client/node_modules
+/cinema-booking-client/node_modules/.cache/
+/cinema-booking-client/node_modules/
+/node_modules/
+/.cache/
+# Ignore all node_modules (commonly ignored in Node.js projects)
+node_modules/
+
+# OR specifically ignore only the .cache folder within node_modules
+node_modules/.cache/
+
+# Alternatively, you can ignore the specific default-development folder inside .cache
+node_modules/.cache/default-development/
+
+# Ignore all node_modules (commonly ignored in Node.js projects)
+node_modules/
+
+# Specifically ignore cache and pack files
+node_modules/.cache/
+node_modules/.cache/default-development/*.pack
+cinema-booking-client/node_modules/.DS_Store
+cinema_ebooking_website/cinema-booking-client/node_modules
+cinema_ebooking_website/cinema-booking-client/__pycache__
+cinema_ebooking_website/cinema-booking-client/flask_session
+.DS_Store

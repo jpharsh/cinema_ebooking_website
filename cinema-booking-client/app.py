@@ -209,7 +209,53 @@ def get_coming_soon():
 # @app.route('/api/register2', methods=['POST'])
 # def register_user2():
 #     return jsonify({'message': 'HELLO'}), 200
+def fetch_userdata(table_name, id):
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        sql = f"SELECT * FROM {table_name} WHERE id = %s"
+        cursor.execute(sql, (id,))
+        result = cursor.fetchone()
+        return result
+    except Exception as e:
+        print(f"Error fetching user data: {str(e)}")  # Debug error
+        return None
+    finally:
+        connection.close()
 
+def fetch_carddata(table_name, user_id):
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        sql = f"SELECT * FROM {table_name} WHERE user_id = %s"
+        cursor.execute(sql, (user_id,))
+        result = cursor.fetchone()
+        return result
+    except Exception as e:
+        print(f"Error fetching user data: {str(e)}")  # Debug error
+        return None
+    finally:
+        connection.close()
+
+@app.route('/api/user-get', methods=['GET'])
+def get_userinfo():
+    id = 107
+    user_data = fetch_userdata('Users', id)
+
+    if user_data:
+        return jsonify(user_data), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+    
+@app.route('/api/card-get', methods=['GET'])
+def get_cardinfo():
+    user_id = 107
+    card_data = fetch_carddata('PaymentCards', user_id)
+
+    if card_data:
+        return jsonify(card_data), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
 
 @app.route('/api/register', methods=['POST'])
 def register_user():

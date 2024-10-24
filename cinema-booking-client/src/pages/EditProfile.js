@@ -22,17 +22,7 @@ const EditProfile = () => {
         phoneNumber: '',
         email: '',
         password: '',
-        cardInfo: {
-            nameOnCard: '',
-            cardNumber: '',
-            expirationMonth: '',
-            expirationYear: '',
-            cvc: '',
-            streetAddress: '',
-            city: '',
-            state: '',
-            zipCode: ''
-        },
+        
         addressInfo: {
             streetAddress: '',
             city: '',
@@ -73,26 +63,24 @@ const EditProfile = () => {
         axios.get('http://127.0.0.1:5000/api/card-get')
             .then(response => {
                 console.log(response.data); // Check what data is returned
-                const data = response.data;
-                setUserData(prevState => ({
-                    ...prevState, // Keep existing state
-                    cardInfo: {
-                        ...prevState.cardInfo, // Spread existing card info if necessary
-                        nameOnCard: data.name_on_card,
-                        cardNumber: data.card_num,
-                        expirationMonth: data.exp_month,
-                        expirationYear: data.exp_year,
-                        cvc: data.cv_num,
-                        streetAddress: data.street_address,
-                        city: data.city,
-                        state: data.state,
-                        zipCode: data.zip_code
-                    }
-                }));
+                const cardData = response.data; // Assuming this is an array of cards
+                setCards(cardData.map(card => ({
+                    id: card.card_id, // Assuming card_id is present in the response
+                    nameOnCard: card.name_on_card,
+                    cardNumber: card.card_num,
+                    expirationMonth: card.exp_month,
+                    expirationYear: card.exp_year,
+                    cvc: card.cv_num,
+                    streetAddress: card.street_address,
+                    city: card.city,
+                    state: card.state,
+                    zipCode: card.zip_code
+                })));
             })
             .catch(error => {
                 console.error('Error fetching card data:', error);
             });
+
     }, []);
 
 
@@ -305,7 +293,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter Name on Card"
-                                        value={userData.cardInfo.nameOnCard}
+                                        value={card.nameOnCard}
                                         onChange={(e) => handleCardChange(index, 'nameOnCard', e.target.value)}
                                         className={errors.nameOnCard ? 'error' : ''}
                                     />
@@ -314,7 +302,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter Card Number"
-                                        value={userData.cardInfo.cardNumber}
+                                        value={card.cardNumber}
                                         onChange={(e) => handleCardChange(index, 'cardNumber', e.target.value)}
                                         className={errors.cardNumber ? 'error' : ''} 
                                     />
@@ -325,7 +313,7 @@ const EditProfile = () => {
                                         type="text"
                                         placeholder="MM"
                                         //maxLength="2"
-                                        value={userData.cardInfo.expirationMonth}
+                                        value={card.expirationMonth}
                                         onChange={(e) => handleCardChange(index, 'expirationMonth', e.target.value)}
                                         className={errors.expirationMonth ? 'error' : ''} 
                                     />
@@ -335,7 +323,7 @@ const EditProfile = () => {
                                         type="text"
                                         placeholder="YY"
                                         //maxLength="2"
-                                        value={userData.cardInfo.expirationYear}
+                                        value={card.expirationYear}
                                         onChange={(e) => handleCardChange(index, 'expirationYear', e.target.value)}
                                         className={errors.expirationYear ? 'error' : ''} 
                                     />
@@ -344,7 +332,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter CVC"
-                                        value={userData.cardInfo.cvc}
+                                        value={card.cvc}
                                         onChange={(e) => handleCardChange(index, 'cvc', e.target.value)}
                                         className={errors.cvc ? 'error' : ''} 
                                     />
@@ -353,7 +341,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         name="streetAddress"
-                                        value={userData.cardInfo.streetAddress}
+                                        value={card.streetAddress}
                                         onChange={(e) => handleCardChange(index, 'streetAddress', e.target.value)}
                                         placeholder="Enter Street Address"
                                         className={errors.streetAddress ? 'error' : ''} 
@@ -362,7 +350,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         name="city"
-                                        value={userData.cardInfo.city}
+                                        value={card.city}
                                         onChange={(e) => handleCardChange(index, 'city', e.target.value)}
                                         placeholder="Enter City"
                                         className={errors.city ? 'error' : ''} 
@@ -371,7 +359,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         name="state"
-                                        value={userData.cardInfo.state}
+                                        value={card.state}
                                         onChange={(e) => handleCardChange(index, 'state', e.target.value)}
                                         placeholder="Enter State"
                                         className={errors.state ? 'error' : ''} 
@@ -380,7 +368,7 @@ const EditProfile = () => {
                                     <input
                                         type="text"
                                         name="zipCode"
-                                        value={userData.cardInfo.zipCode}
+                                        value={card.zipCode}
                                         onChange={(e) => handleCardChange(index, 'zipCode', e.target.value)}
                                         placeholder="Enter Zip Code"
                                         className={errors.zipCode ? 'error' : ''} 

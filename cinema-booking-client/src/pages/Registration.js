@@ -179,7 +179,7 @@ const Registration = () => {
            if (!card.streetAddress) cardError.streetAddress = 'Street Address is required';
            if (!card.city) cardError.city = 'City is required';
            if (!card.state) cardError.state = 'State is required';
-           if (!card.zipCode) cardError.zipCode = 'Zip Code is required';
+           if (!card.zipCode || isNaN(card.zipCode)) cardError.zipCode = 'Zip Code must be a number';
 
 
            // if there are any errors for this card, add them to cardErrors array

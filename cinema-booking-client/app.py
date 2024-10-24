@@ -229,8 +229,10 @@ def fetch_carddata(table_name, user_id):
         cursor = connection.cursor(dictionary=True)
         sql = f"SELECT * FROM {table_name} WHERE user_id = %s"
         cursor.execute(sql, (user_id,))
-        result = cursor.fetchone()
-        return result
+        result = cursor.fetchall()
+        # Transform the result into a list of dictionaries
+        cardFields = [{'id': row['id'], 'name_on_card': row['name_on_card'], 'card_num': row['card_num'], 'exp_month': row['exp_month'], 'exp_year': row['exp_year'], 'cv_num': row['cv_num'], 'street_address': row['street_address'], 'city': row['city'], 'state': row['state'], 'zip_code': row['zip_code']} for row in result]
+        return cardFields
     except Exception as e:
         print(f"Error fetching user data: {str(e)}")  # Debug error
         return None
@@ -239,7 +241,7 @@ def fetch_carddata(table_name, user_id):
 
 @app.route('/api/user-get', methods=['GET'])
 def get_userinfo():
-    id = 107
+    id = 34
     user_data = fetch_userdata('Users', id)
 
     if user_data:
@@ -249,7 +251,7 @@ def get_userinfo():
     
 @app.route('/api/card-get', methods=['GET'])
 def get_cardinfo():
-    user_id = 107
+    user_id = 34
     card_data = fetch_carddata('PaymentCards', user_id)
 
     if card_data:

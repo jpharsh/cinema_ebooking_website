@@ -169,7 +169,34 @@ const Registration = () => {
 
 
       if (showPaymentInfo) {
-          if (formData.cardInfo.cardNumber && !validateCardNumber(formData.cardInfo.cardNumber)) {
+           const cardErrors = [];
+           cards.forEach((card, index)=> {
+               let cardError = {};
+           if (!card.nameOnCard) cardError.nameOnCard = 'Name on Card is required';
+           if (!card.cardNumber || !validateCardNumber(card.cardNumber)) cardError.cardNumber = 'Card Number must be a 16-digit number';
+           if (!card.expirationDate || !validateExpirationDate(card.expirationDate)) cardError.expirationDate = 'Expiration Date must be in MM/YY format';
+           if (!card.cvc || !validateCVC(card.cvc)) cardError.cvc = 'CVC must be a 3-digit number';
+           if (!card.streetAddress) cardError.streetAddress = 'Street Address is required';
+           if (!card.city) cardError.city = 'City is required';
+           if (!card.state) cardError.state = 'State is required';
+           if (!card.zipCode) cardError.zipCode = 'Zip Code is required';
+
+
+           // if there are any errors for this card, add them to cardErrors array
+           cardErrors.push(cardError);
+           });
+           // Check if any card has errors and prevent form submission
+       const hasCardErrors = cardErrors.some(cardError => Object.keys(cardError).length > 0);
+
+
+       if (hasCardErrors) {
+           setErrors(cardErrors); // Set errors for each card
+           return; // Stop the form submission if there are any card errors
+       }
+  
+
+
+         /* if (formData.cardInfo.cardNumber && !validateCardNumber(formData.cardInfo.cardNumber)) {
               formErrors.cardNumber = 'Card Number must be a 16-digit number';
           }
           if (formData.cardInfo.expirationDate && !validateExpirationDate(formData.cardInfo.expirationDate)) {
@@ -180,8 +207,10 @@ const Registration = () => {
           }
           if (formData.cardInfo.zipCode && isNaN(formData.cardInfo.zipCode)) {
               formErrors.billingZipCode = 'Zip Code must be a number';
-          }
-      }
+          }*/
+
+
+      } //if showpaymentinfo
 
 
       setErrors(formErrors);
@@ -217,7 +246,7 @@ const Registration = () => {
                       console.log('Email in registration.js:', email);
                       navigate('/registration-confirmation', { state: { email } });
                   }
-              })
+              });
         
           } catch (e) {
               console.error("Error registering the user:", e);
@@ -234,8 +263,6 @@ const Registration = () => {
           }
       }
   };
-
-
 
 
   const handleCloseAddressPopup = (continueWithoutInfo) => {
@@ -298,6 +325,8 @@ const Registration = () => {
               setErrors([]);  // Clear errors if no errors found
           }
       }
+
+
 
 
   };
@@ -521,6 +550,8 @@ const Registration = () => {
                           {errors[index]?.nameOnCard && <p className="error-message">{errors[index]?.nameOnCard}</p>}
 
 
+
+
                           <p>Card Number</p>
                           <input
                               type="text"
@@ -530,6 +561,8 @@ const Registration = () => {
                               className={errors[index]?.cardNumber ? 'error' : ''}
                           />
                           {errors[index]?.cardNumber && <p className="error-message">{errors[index]?.cardNumber}</p>}
+
+
 
 
                           <p>Expiration Date</p>
@@ -735,5 +768,8 @@ const Registration = () => {
   </div>
  );
 };
+
+
+
 
 export default Registration;

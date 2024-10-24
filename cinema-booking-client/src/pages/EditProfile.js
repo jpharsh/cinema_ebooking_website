@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
-import LoggedInNavbar from '../components/LoggedInNavbar';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const EditProfile = () => {
     const [showRequiredInfo, setShowRequiredInfo] = useState(true);
@@ -10,7 +10,7 @@ const EditProfile = () => {
     const [cards, setCards] = useState([{ id: 1, nameOnCard: '', cardNumber: '', expirationMonth: '', expirationYear: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: ''}]); // Initialize with one empty card
     const [isOptedInForPromotions, setIsOptedInForPromotions] = useState(false); // Promotion state
 
-    const [currentPassword, setCurrentPassword] = useState('stinks'); 
+    const [currentPassword, setCurrentPassword] = useState(''); 
     const [enteredPassword, setEnteredPassword] = useState('');
     const [passwordVerified, setPasswordVerified] = useState(false); // Whether the user entered the correct current password
     const [newPassword, setNewPassword] = useState('');
@@ -31,33 +31,44 @@ const EditProfile = () => {
         }
     });
 
+    const getUserIdFromJWT = () => {
+        const token = localStorage.getItem('jwt'); // Assuming the token is stored in localStorage
+        if (token) {
+            const decoded = jwtDecode(token);
+            return decoded.user_id; // This depends on how your JWT is structured
+        }
+        return null;
+    };
+
     // Fetch user data on component mount
     useEffect(() => {
         // Fetch user information
+        const userId = getUserIdFromJWT();
         axios.get('http://127.0.0.1:5000/api/user-get')
-            .then(response => {
-                console.log(response.data); // Check what data is returned
-                const data = response.data;
-                setUserData(prevState => ({
-                    ...prevState, // Keep existing state
-                    firstName: data.f_name,
-                    lastName: data.l_name,
-                    phoneNumber: data.phone_num,
-                    email: data.email,
-                    password: '', // Keep this empty for security reasons
-                    addressInfo: {
-                        ...prevState.addressInfo, // Spread existing address info if necessary
-                        streetAddress: data.street_address,
-                        city: data.city,
-                        state: data.state,
-                        zipCode: data.zip_code
-                    }
-                }));
-                setIsOptedInForPromotions(data.promo_sub);
-            })
-            .catch(error => {
-                console.error('Error fetching user data:', error);
-            });
+        .then(response => {
+            const data = response.data;
+            console.log('Fetched user data:', data); // Log user data
+
+            setUserData(prevState => ({
+                ...prevState,
+                firstName: data.f_name || '', // Ensure it's a string
+                lastName: data.l_name || '',
+                phoneNumber: data.phone_num || '',
+                email: data.email || '',
+                password: '', // Consider security; don't display password
+                addressInfo: {
+                    streetAddress: data.street_address || '',
+                    city: data.city || '',
+                    state: data.state || '',
+                    zipCode: data.zip_code || ''
+                }
+            }));
+            setIsOptedInForPromotions(data.promo_sub || false); // Ensure default boolean
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+        });
+
 
         // Fetch card information
         axios.get('http://127.0.0.1:5000/api/card-get')

@@ -241,23 +241,34 @@ def fetch_carddata(table_name, user_id):
 
 @app.route('/api/user-get', methods=['GET'])
 def get_userinfo():
-    id = 34
-    user_data = fetch_userdata('Users', id)
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"error": "Missing token"}), 401
 
+    decoded_token = verify_jwt_token(token)
+    if not decoded_token:
+        return jsonify({"error": "Invalid or expired token"}), 401
+
+    user_data = fetch_userdata('Users', decoded_token['id'])
     if user_data:
         return jsonify(user_data), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
+    return jsonify({"error": "User not found"}), 404
     
+# Get card information
 @app.route('/api/card-get', methods=['GET'])
 def get_cardinfo():
-    user_id = 34
-    card_data = fetch_carddata('PaymentCards', user_id)
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"error": "Missing token"}), 401
 
+    decoded_token = verify_jwt_token(token)
+    if not decoded_token:
+        return jsonify({"error": "Invalid or expired token"}), 401
+
+    card_data = fetch_carddata('PaymentCards', decoded_token['id'])
     if card_data:
         return jsonify(card_data), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
+    return jsonify({"error": "No card data found."}), 404
 
 @app.route('/api/register', methods=['POST'])
 def register_user():

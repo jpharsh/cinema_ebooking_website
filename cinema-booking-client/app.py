@@ -209,7 +209,66 @@ def get_coming_soon():
 # @app.route('/api/register2', methods=['POST'])
 # def register_user2():
 #     return jsonify({'message': 'HELLO'}), 200
+def fetch_userdata(table_name, id):
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        sql = f"SELECT * FROM {table_name} WHERE id = %s"
+        cursor.execute(sql, (id,))
+        result = cursor.fetchone()
+        return result
+    except Exception as e:
+        print(f"Error fetching user data: {str(e)}")  # Debug error
+        return None
+    finally:
+        connection.close()
 
+def fetch_carddata(table_name, user_id):
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        sql = f"SELECT * FROM {table_name} WHERE user_id = %s"
+        cursor.execute(sql, (user_id,))
+        result = cursor.fetchall()
+        # Transform the result into a list of dictionaries
+        cardFields = [{'id': row['id'], 'name_on_card': row['name_on_card'], 'card_num': row['card_num'], 'exp_month': row['exp_month'], 'exp_year': row['exp_year'], 'cv_num': row['cv_num'], 'street_address': row['street_address'], 'city': row['city'], 'state': row['state'], 'zip_code': row['zip_code']} for row in result]
+        return cardFields
+    except Exception as e:
+        print(f"Error fetching user data: {str(e)}")  # Debug error
+        return None
+    finally:
+        connection.close()
+
+@app.route('/api/user-get', methods=['GET'])
+def get_userinfo():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"error": "Missing token"}), 401
+
+    decoded_token = verify_jwt_token(token)
+    if not decoded_token:
+        return jsonify({"error": "Invalid or expired token"}), 401
+
+    user_data = fetch_userdata('Users', decoded_token['id'])
+    if user_data:
+        return jsonify(user_data), 200
+    return jsonify({"error": "User not found"}), 404
+    
+# Get card information
+@app.route('/api/card-get', methods=['GET'])
+def get_cardinfo():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({"error": "Missing token"}), 401
+
+    decoded_token = verify_jwt_token(token)
+    if not decoded_token:
+        return jsonify({"error": "Invalid or expired token"}), 401
+
+    card_data = fetch_carddata('PaymentCards', decoded_token['id'])
+    if card_data:
+        return jsonify(card_data), 200
+    return jsonify({"error": "No card data found."}), 404
 
 @app.route('/api/register', methods=['POST'])
 def register_user():

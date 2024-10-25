@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EditProfile.css'; // Import your CSS file for styling
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+//import { jwtDecode } from 'jwt-decode';
 
 
 const EditProfile = () => {
@@ -31,7 +31,7 @@ const EditProfile = () => {
             zipCode: ''
         }
     });
-
+    /*
     const getUserIdFromJWT = () => {
         const token = localStorage.getItem('jwt'); // Assuming the token is stored in localStorage
         if (token) {
@@ -40,11 +40,11 @@ const EditProfile = () => {
         }
         return null;
     };
-
+    */
     // Fetch user data on component mount
     useEffect(() => {
         // Fetch user information
-        const userId = getUserIdFromJWT();
+        //const userId = getUserIdFromJWT();
         axios.get('http://127.0.0.1:5000/api/user-get')
         .then(response => {
             const data = response.data;

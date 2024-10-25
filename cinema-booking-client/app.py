@@ -244,15 +244,15 @@ def fetch_carddata(table_name, user_id):
 def get_userinfo():
     id = 140
     user_data = fetch_userdata('Users', id)
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({"error": "Missing token"}), 401
+    #token = request.headers.get('Authorization')
+    #if not token:
+        #return jsonify({"error": "Missing token"}), 401
 
-    decoded_token = verify_jwt_token(token)
-    if not decoded_token:
-        return jsonify({"error": "Invalid or expired token"}), 401
+    #decoded_token = verify_jwt_token(token)
+    #if not decoded_token:
+    #    return jsonify({"error": "Invalid or expired token"}), 401
 
-    user_data = fetch_userdata('Users', decoded_token['id'])
+    #user_data = fetch_userdata('Users', decoded_token['id'])
     if user_data:
         return jsonify(user_data), 200
     return jsonify({"error": "User not found"}), 404

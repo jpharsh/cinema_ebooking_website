@@ -1,10 +1,18 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoggedInNavbar.css';
 
 const LoggedInNavbar = ({ onLogout }) => {
+    const navigate = useNavigate();
+
     const handleLogout = () => {
         // Call the logout function passed from the parent
         onLogout();
+    };
+
+    const handleEditProfile = () => {
+        // Navigate to the edit profile page
+        navigate('/edit-profile');
     };
 
     return (
@@ -12,7 +20,10 @@ const LoggedInNavbar = ({ onLogout }) => {
             <div className="logo">
                 <h1>Cinema Movies</h1>
             </div>
-            <button className="btn black" onClick={handleLogout}>Log Out</button>
+            <div className="nav-buttons">
+                <button className="btn black" onClick={handleEditProfile}>Edit Profile</button>
+                <button className="btn black" onClick={handleLogout}>Log Out</button>
+            </div>
         </nav>
     );
 };

@@ -3,6 +3,7 @@ import './EditProfile.css'; // Import your CSS file for styling
 import LoggedInNavbar from '../components/LoggedInNavbar';
 import axios from 'axios';
 
+
 const EditProfile = () => {
     const [showRequiredInfo, setShowRequiredInfo] = useState(true);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
@@ -10,7 +11,7 @@ const EditProfile = () => {
     const [cards, setCards] = useState([{ id: 1, nameOnCard: '', cardNumber: '', expirationMonth: '', expirationYear: '', cvc: '', streetAddress: '', city: '', state: '', zipCode: ''}]); // Initialize with one empty card
     const [isOptedInForPromotions, setIsOptedInForPromotions] = useState(false); // Promotion state
 
-    const [currentPassword, setCurrentPassword] = useState('stinks'); 
+    
     const [enteredPassword, setEnteredPassword] = useState('');
     const [passwordVerified, setPasswordVerified] = useState(false); // Whether the user entered the correct current password
     const [newPassword, setNewPassword] = useState('');
@@ -83,6 +84,7 @@ const EditProfile = () => {
 
     }, []);
 
+    //const [currentPassword, setCurrentPassword] = useState(userData.password);
 
     const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
     const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
@@ -107,7 +109,7 @@ const EditProfile = () => {
         return phoneNumberPattern.test(phoneNumber);
     };
 
-    const validateCardNumber = (cardNumber) => {
+    const validateCardNumber = (cardNumber) => { 
         // Simple regex for card number validation
         const cardNumberPattern = /^[0-9]{16}$/;
         return cardNumberPattern.test(cardNumber);
@@ -124,6 +126,85 @@ const EditProfile = () => {
         const cvcPattern = /^[0-9]{3}$/;
         return cvcPattern.test(cvc);
     };
+
+
+// Handle form submission for updating profile
+const handleSubmit = async (e) => {
+    if (e) {
+        e.preventDefault();
+    }
+    const formErrors = validateForm(); // Run validations
+
+    // Validate phone number format
+    if (userData.phoneNumber && !validatePhoneNumber(userData.phoneNumber)) {
+        formErrors.phoneNumber = 'Phone Number must be a 10-digit number (no spaces or dashes)';
+    }
+
+    // Validate card information if Payment Info section is shown
+    if (showPaymentInfo) {
+        const cardErrors = [];
+        cards.forEach((card, index) => {
+            let cardError = {};
+            if (!card.nameOnCard) cardError.nameOnCard = 'Name on Card is required';
+            if (!card.cardNumber || !validateCardNumber(card.cardNumber)) cardError.cardNumber = 'Card Number must be a 16-digit number';
+            if (!card.cvc || !validateCVC(card.cvc)) cardError.cvc = 'CVC must be a 3-digit number';
+            if (!card.streetAddress) cardError.streetAddress = 'Street Address is required';
+            if (!card.city) cardError.city = 'City is required';
+            if (!card.state) cardError.state = 'State is required';
+            if (!card.zipCode || isNaN(card.zipCode)) cardError.zipCode = 'Zip Code must be a number';
+
+            cardErrors.push(cardError);
+        });
+
+        // Check if any card has errors and prevent form submission if true
+        const hasCardErrors = cardErrors.some(cardError => Object.keys(cardError).length > 0);
+        if (hasCardErrors) {
+            setErrors(cardErrors);
+            return;
+        }
+    }
+
+    // Update state with form validation errors
+    setErrors(formErrors);
+
+    if (Object.keys(formErrors).length === 0) { // Submit only if no form errors
+        try {
+            const dataToSend = {
+                ...userData, 
+                password: newPassword || userData.password,
+                cards: cards, // Include updated card data
+                isOptedInForPromotions,
+            };
+
+            // Send updated user info to the backend
+            const response = await axios.post('http://127.0.0.1:5000/api/edit', dataToSend);
+            console.log(response.data)
+            if (response.status === 200) {
+                setSuccessMessage("Profile updated successfully!");
+            }
+        } catch (e) {
+            console.error("Error updating the profile:", e);
+
+            if (e.response && e.response.data && e.response.data.error) {
+                const newFormErrors = { ...formErrors };
+                if (e.response.data.error === "Email already exists.") {
+                    newFormErrors.email = "Email already exists";
+                }
+                setErrors(newFormErrors); // Set any server-side validation errors
+            }
+        }
+    }
+};
+
+
+
+
+
+
+
+
+
+
 
 
     const handleInputChange = (e) => {
@@ -146,22 +227,15 @@ const EditProfile = () => {
         }));
     };
 
-    
-    // Function to handle the change in card inputs
-    const handleCardChange = (index, field, value) => {
-        const newCards = [...cards];
-        newCards[index][field] = value;
-        setCards(newCards);
 
-        
-        setUserData((prevState) => ({
-            ...prevState,
-            cardInfo: {
-                ...prevState.cardInfo,
-                [field]: value
-            }
-        }));
-    };
+    
+// Function to handle changes in the card inputs
+const handleCardChange = (index, field, value) => {
+    const updatedCards = [...cards];
+    updatedCards[index][field] = value; // Update only the targeted card's field
+    setCards(updatedCards); // Update cards state directly
+};
+
 
     // Function to add a new card
     const addCard = () => {
@@ -173,12 +247,26 @@ const EditProfile = () => {
     };
 
     // Function to remove a card
-    const removeCard = (index) => {
+    const removeCard = async (index, cardId) => {
         if (cards.length > 1) {
-            const newCards = cards.filter((_, i) => i !== index);
-            setCards(newCards);
+            try {
+                // Send a request to the 'edit' endpoint to delete the specific card
+                await axios.post('http://127.0.0.1:5000/api/edit', {
+                    action: 'delete_card',
+                    cardId: cardId
+                });
+    
+                // Update the cards state by filtering out the deleted card
+                const newCards = cards.filter((_, i) => i !== index);
+                setCards(newCards);
+            } catch (error) {
+                console.error("Error deleting card:", error);
+                alert("An error occurred while deleting the card.");
+            }
         }
     };
+    
+    
 
     // Promotion toggle
     const handlePromotionsChange = (e) => {
@@ -187,13 +275,22 @@ const EditProfile = () => {
 
     // Verify password function
     const verifyPassword = () => {
-        if (enteredPassword === currentPassword) {
-            setPasswordVerified(true); // Allow editing if password is correct
-            alert("Password verified! You can now update your password.");
-        } else {
-            alert("Incorrect password, please try again.");
-        }
+        axios.post('http://127.0.0.1:5000/api/verify-password', { password: enteredPassword, id: userData.id})
+            .then(response => {
+                if (response.data.passwordVerified) {
+                    console.log("Password verified!");
+                    setPasswordVerified(true); // Allow editing if password is correct
+                    alert("Password verified! You can now update your password.");
+                } else {
+                    alert("Incorrect password, please try again.");
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying password:', error);
+                alert("An error occurred during password verification. Please try again.");
+            });
     };
+
 
     return (
         <div>
@@ -213,6 +310,7 @@ const EditProfile = () => {
                                     <p>First Name</p>
                                     <input 
                                         type="text"
+                                        placeholder="Required field"
                                         name="firstName"
                                         value={userData.firstName}
                                         onChange={handleInputChange}
@@ -224,6 +322,7 @@ const EditProfile = () => {
                                     <p>Last Name</p>
                                     <input
                                         type="text"
+                                        placeholder="Required field"
                                         name="lastName"
                                         value={userData.lastName}
                                         onChange={handleInputChange}
@@ -235,6 +334,7 @@ const EditProfile = () => {
                             <p>Phone Number</p>
                             <input 
                                 type="text"
+                                placeholder="Required field"
                                 name="phoneNumber"
                                 value={userData.phoneNumber}
                                 onChange={handleInputChange}
@@ -374,7 +474,7 @@ const EditProfile = () => {
                                         className={errors.zipCode ? 'error' : ''} 
                                     />
                                     <div className="center-btn">
-                                        <button className="remove-btn" onClick={() => removeCard(index)}>Remove Card</button>
+                                        <button className="remove-btn" onClick={() => removeCard(index, card.id)}>Remove Card</button>
                                     </div>
                                 </div>
                             ))}
@@ -455,8 +555,13 @@ const EditProfile = () => {
                 </div>
 
                 <div className="center-btn">
-                    <button className="edit-profile-btn">Save Changes</button>
+                <button className="edit-profile-btn" onClick={handleSubmit}>Save Changes</button>
                 </div>
+
+                {/* Success or error messages */}
+                {successMessage && <p className="success">{successMessage}</p>}
+                {errors.api && <p className="error">{errors.api}</p>}
+
             </div>
         </div>
     );

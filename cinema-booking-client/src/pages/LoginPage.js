@@ -22,6 +22,7 @@ const LoginPage = () => {
 
       console.log("Login successful, token:", token, "userType:", userType);  // Debugging info
       localStorage.setItem('token', token);  // Store token in localStorage
+      console.log(localStorage.getItem('token'))
       
       if (userType === 2) {
         navigate('/admin-home');  // Redirect admin to AdminHomepage.js

@@ -14,7 +14,7 @@ const LoginPage = () => {
     const trimmedPassword = password.trim();
   
     try {
-      console.log("Attempting login with:", trimmedEmail, trimmedPassword);  // Debugging info
+      console.log("Attempting login with:", { email: trimmedEmail, password: trimmedPassword });  // Debugging info
       const response = await axios.post('http://127.0.0.1:5000/api/login', { email: trimmedEmail, password: trimmedPassword });
       
       const token = response.data.token;  // Retrieve token

@@ -1,4 +1,4 @@
-#!/Users/harsh/Desktop/cinema-booking-client/venv/bin/python
+#!/Users/Page/Desktop/cinema_ebook_website/cinema_ebooking_website/cinema-booking-client/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

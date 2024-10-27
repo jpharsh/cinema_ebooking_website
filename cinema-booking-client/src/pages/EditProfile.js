@@ -18,6 +18,7 @@ const EditProfile = () => {
 
 
     const [userData, setUserData] = useState({
+        id: 0,
         firstName: '',
         lastName: '',
         phoneNumber: '',
@@ -45,13 +46,14 @@ const EditProfile = () => {
     useEffect(() => {
         // Fetch user information
         //const userId = getUserIdFromJWT();
-        axios.get('http://127.0.0.1:5000/api/user-get')
+        axios.get('http://127.0.0.1:5000/api/user-get?id=140')
         .then(response => {
             const data = response.data;
             console.log('Fetched user data:', data); // Log user data
 
             setUserData(prevState => ({
                 ...prevState,
+                id: data.id,
                 firstName: data.f_name || '', // Ensure it's a string
                 lastName: data.l_name || '',
                 phoneNumber: data.phone_num || '',
@@ -72,12 +74,12 @@ const EditProfile = () => {
 
 
         // Fetch card information
-        axios.get('http://127.0.0.1:5000/api/card-get')
+        axios.get('http://127.0.0.1:5000/api/cards-get?user_id=140')
             .then(response => {
                 console.log(response.data); // Check what data is returned
                 const cardData = response.data; // Assuming this is an array of cards
                 setCards(cardData.map(card => ({
-                    id: card.card_id, // Assuming card_id is present in the response
+                    id: card.id, // Assuming card_id is present in the response
                     nameOnCard: card.name_on_card,
                     cardNumber: card.card_num,
                     expirationMonth: card.exp_month,
@@ -141,6 +143,7 @@ const EditProfile = () => {
 
 // Handle form submission for updating profile
 const handleSubmit = async (e) => {
+    console.log("clicked");
     if (e) {
         e.preventDefault();
     }
@@ -188,34 +191,29 @@ const handleSubmit = async (e) => {
             };
 
             // Send updated user info to the backend
+            console.log(cards);
+            console.log(dataToSend);
             const response = await axios.post('http://127.0.0.1:5000/api/edit', dataToSend);
+            console.log('asdfsadf');
             console.log(response.data)
             if (response.status === 200) {
                 setSuccessMessage("Profile updated successfully!");
             }
         } catch (e) {
             console.error("Error updating the profile:", e);
-
-            if (e.response && e.response.data && e.response.data.error) {
-                const newFormErrors = { ...formErrors };
-                if (e.response.data.error === "Email already exists.") {
-                    newFormErrors.email = "Email already exists";
-                }
-                setErrors(newFormErrors); // Set any server-side validation errors
-            }
+            
+            
+            //if (e.response && e.response.data && e.response.data.error) {
+                //const newFormErrors = { ...formErrors };
+                //if (e.response.data.error === "Email already exists.") {
+                    //newFormErrors.email = "Email already exists";
+                //}
+                //setErrors(newFormErrors); // Set any server-side validation errors
+            //}
+            
         }
     }
 };
-
-
-
-
-
-
-
-
-
-
 
 
     const handleInputChange = (e) => {
@@ -247,6 +245,34 @@ const handleCardChange = (index, field, value) => {
     setCards(updatedCards); // Update cards state directly
 };
 
+const removeCard = async (index, cardId) => {
+    console.log('this is before the if statement');
+    console.log('cardId:', cardId);
+    console.log('index:', index);
+
+      if (cards.length > 1) {
+          try {
+            console.log([...cards.filter(card => card.id !== cardId)]);
+            setCards([...cards.filter(card => card.id !== cardId)]);
+            // Send a request to the 'edit' endpoint to delete the specific card
+            //   console.log('the right place');
+            //   await axios.post('http://127.0.0.1:5000/api/edit', {
+            //       action: 'delete_card',
+            //       cardId: cardId
+            //   });
+              console.log(cardId + "this is in the if statement");
+              // Update the cards state by filtering out the deleted card
+            //   const newCards = cards.filter((_, i) => i !== index);
+            //   setCards(newCards);
+          } catch (error) {
+              console.error("Error deleting card:", error);
+              alert("An error occurred while deleting the card.");
+          }
+      }
+
+      console.log(cards);
+  };
+
 
     // Function to add a new card
     const addCard = () => {
@@ -258,24 +284,6 @@ const handleCardChange = (index, field, value) => {
     };
 
     // Function to remove a card
-    const removeCard = async (index, cardId) => {
-        if (cards.length > 1) {
-            try {
-                // Send a request to the 'edit' endpoint to delete the specific card
-                await axios.post('http://127.0.0.1:5000/api/edit', {
-                    action: 'delete_card',
-                    cardId: cardId
-                });
-    
-                // Update the cards state by filtering out the deleted card
-                const newCards = cards.filter((_, i) => i !== index);
-                setCards(newCards);
-            } catch (error) {
-                console.error("Error deleting card:", error);
-                alert("An error occurred while deleting the card.");
-            }
-        }
-    };
     
     
 
@@ -288,6 +296,7 @@ const handleCardChange = (index, field, value) => {
     const verifyPassword = () => {
         axios.post('http://127.0.0.1:5000/api/verify-password', { password: enteredPassword, id: userData.id})
             .then(response => {
+                console.log('Password verification response:', response.data);
                 if (response.data.passwordVerified) {
                     console.log("Password verified!");
                     setPasswordVerified(true); // Allow editing if password is correct
@@ -399,7 +408,7 @@ const handleCardChange = (index, field, value) => {
                         <div className="section-content">
                             {cards.map((card, index) => (
                                 <div key={card.id} className="card-section">
-                                    <h4>Card {index + 1}</h4>
+                                    <h4>Card {index}</h4>
                                     <p>Name on Card</p>
                                     <input
                                         type="text"

@@ -17,6 +17,10 @@
     /* margin-left: 750px; */
     margin-left: 80%;
   }
+
+  .navbar .logo {
+    cursor: pointer; /* Indicates that the logo is clickable */
+  }
   
   /* .nav-links {
     list-style-type: none;

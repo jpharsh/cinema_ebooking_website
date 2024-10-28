@@ -17,3 +17,7 @@
     /* margin-left: 750px; */
     margin-left: 80%;
   }
+
+  .admin-navbar .logo {
+    cursor: pointer; /* Indicates that the logo is clickable */
+  }

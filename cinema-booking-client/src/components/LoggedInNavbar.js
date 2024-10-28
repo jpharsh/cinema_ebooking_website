@@ -15,9 +15,13 @@ const LoggedInNavbar = ({ onLogout }) => {
         navigate('/edit-profile');
     };
 
+    const handleLogoClick = () => {
+        navigate('/'); // Navigate to the homepage
+    };
+
     return (
         <nav className="logged-in-navbar">
-            <div className="logo">
+            <div className="logo" onClick={handleLogoClick}>
                 <h1>Cinema Movies</h1>
             </div>
             <div className="nav-buttons">

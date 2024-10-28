@@ -12,6 +12,7 @@ import jwt
 from datetime import datetime, timedelta
 import random  # For generating a reset token
 import string  # For generating a random string
+import traceback
 import os  # To set environment variables
 import base64
 import smtplib
@@ -20,7 +21,7 @@ import google_auth_oauthlib.flow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -28,11 +29,9 @@ app.secret_key = 'supersecretkey'  # Replace with your actual secret key for pro
 app.config['SESSION_TYPE'] = 'filesystem'  # Store session data on the server-side
 Session(app)
 
-
 JWT_SECRET = 'another_super_secret_key'  # Replace with a production key
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION_MINUTES = 30
-
 
 # Database connection parameters
 db_host = 'cinema-ebooking-database.cdm6csm20sfl.us-east-2.rds.amazonaws.com'
@@ -40,16 +39,13 @@ db_user = 'admin'
 db_password = 'kyqtov-narha3-nEcpif'
 db_name = 'mywebsite'
 
-
 encryption_key = b'EcxldqJv4puPs5cRA3vv5So_-wcZNquUvohJyplob_M='  # DO NOT PUBLISH THIS KEY !!!!!
 cipher_suite = Fernet(encryption_key)
-
 
 # Google OAuth Configuration
 CLIENT_ID = '543307738148-faodjbvprsud5i9foiun55i9misrm01i.apps.googleusercontent.com'
 CLIENT_SECRET = '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'
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-
 
 # Load credentials from token.json
 def load_credentials():
@@ -92,7 +88,6 @@ def create_jwt_token2(user_id, email):
     token = jwt.encode({'id': user_id, 'email': email, 'exp': expiration}, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
-
 def verify_jwt_token(token):
    try:
        decoded = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -102,7 +97,6 @@ def verify_jwt_token(token):
    except jwt.InvalidTokenError:
        return None  # Invalid token
 
-
 def connect_db():
    # return sqlite3.connect('users.db')
    return mysql.connector.connect(
@@ -111,7 +105,6 @@ def connect_db():
        password=db_password,
        database=db_name
    )
-
 
 def fetch_movies(table_name):
    connection = pymysql.connect(
@@ -131,20 +124,16 @@ def fetch_movies(table_name):
    finally:
        connection.close()
 
-
 def send_email_via_gmail_api(to, subject, body):
    creds = load_credentials()
    service = build('gmail', 'v1', credentials=creds)
-
 
    message = MIMEText(body)
    message['to'] = to
    message['subject'] = subject
 
-
    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
    message = {'raw': raw_message}
-
 
    try:
        service.users().messages().send(userId='me', body=message).execute()
@@ -154,27 +143,22 @@ def send_email_via_gmail_api(to, subject, body):
 
 
 
-
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
    try:
        data = request.get_json()
        email = data.get('email')
 
-
        if not email:
            return jsonify({'error': 'Email is required.'}), 400
-
 
        with connect_db() as conn:
            cursor = conn.cursor()
            cursor.execute('SELECT id FROM Users WHERE email = %s', (email,))
            user = cursor.fetchone()
 
-
            if not user:
                return jsonify({'error': 'Email not found.'}), 404
-
 
            user_id = user[0]
 
@@ -185,9 +169,7 @@ def forgot_password():
 
        send_email_via_gmail_api(email, subject, body)
 
-
        return jsonify({'message': 'Password reset email sent successfully.'}), 200
-
 
    except Exception as e:
        print(f"Error during password reset: {e}")
@@ -195,16 +177,13 @@ def forgot_password():
 
 
 
-
 @app.route('/api/now-playing', methods=['GET'])
 def get_now_playing():
    return fetch_movies('now_playing_movies')
 
-
 @app.route('/api/coming-soon', methods=['GET'])
 def get_coming_soon():
    return fetch_movies('coming_soon_movies')
-
 
 # @app.route('/api/register2', methods=['POST'])
 # def register_user2():
@@ -234,29 +213,32 @@ def fetch_carddata(table_name, user_id):
         cardFields = [{'id': row['id'], 'name_on_card': row['name_on_card'], 'card_num': row['card_num'], 'exp_month': row['exp_month'], 'exp_year': row['exp_year'], 'cv_num': row['cv_num'], 'street_address': row['street_address'], 'city': row['city'], 'state': row['state'], 'zip_code': row['zip_code']} for row in result]
         return cardFields
     except Exception as e:
-        print(f"Error fetching user data: {str(e)}")  # Debug error
+        print(f"Error fetching user data: {str(e)}")
         return None
     finally:
         connection.close()
 
 @app.route('/api/user-get', methods=['GET'])
 def get_userinfo():
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({"error": "Missing token"}), 401
+    id = request.args.get('id', type=int)  # Get 'id' parameter from the query string
+    if id is None:
+        return jsonify({"error": "Missing 'id' parameter"}), 400
 
-    decoded_token = verify_jwt_token(token)
-    if not decoded_token:
-        return jsonify({"error": "Invalid or expired token"}), 401
-
-    user_data = fetch_userdata('Users', decoded_token['id'])
+    user_data = fetch_userdata('Users', id)
+    
     if user_data:
         return jsonify(user_data), 200
     return jsonify({"error": "User not found"}), 404
     
 # Get card information
-@app.route('/api/card-get', methods=['GET'])
+@app.route('/api/cards-get', methods=['GET'])
 def get_cardinfo():
+    user_id = request.args.get('user_id', type=int)  # Get 'user_id' parameter from the query string
+    if user_id is None:
+        return jsonify({"error": "Missing 'user_id' parameter"}), 400
+
+    card_data = fetch_carddata('PaymentCards', user_id)
+    '''
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({"error": "Missing token"}), 401
@@ -266,16 +248,346 @@ def get_cardinfo():
         return jsonify({"error": "Invalid or expired token"}), 401
 
     card_data = fetch_carddata('PaymentCards', decoded_token['id'])
+    '''
     if card_data:
-        return jsonify(card_data), 200
-    return jsonify({"error": "No card data found."}), 404
+        for row in card_data:
+            try:
+                # Decrypt each field if it exists and is of string type
+                decrypted_card_num = cipher_suite.decrypt(row['card_num'].encode()).decode() if isinstance(row['card_num'], str) else cipher_suite.decrypt(row['card_num']).decode()
+                decrypted_cv_num = cipher_suite.decrypt(row['cv_num'].encode()).decode() if isinstance(row['cv_num'], str) else cipher_suite.decrypt(row['cv_num']).decode()
+                decrypted_exp_month = cipher_suite.decrypt(row['exp_month'].encode()).decode() if isinstance(row['exp_month'], str) else cipher_suite.decrypt(row['exp_month']).decode()
+                decrypted_exp_year = cipher_suite.decrypt(row['exp_year'].encode()).decode() if isinstance(row['exp_year'], str) else cipher_suite.decrypt(row['exp_year']).decode()
+                
+                # Update row with decrypted values
+                row['card_num'] = decrypted_card_num
+                row['cv_num'] = decrypted_cv_num
+                row['exp_month'] = decrypted_exp_month
+                row['exp_year'] = decrypted_exp_year
 
+            except Exception as decrypt_error:
+                print(f"Error decrypting card data: {str(decrypt_error)}")
+        
+        return jsonify(card_data), 200
+
+    else:
+        return jsonify({"error": "User not found"}), 404
+    
+@app.route('/api/verify-password', methods=['POST'])
+def verify_password():
+    data = request.json
+    entered_password = data.get('password')
+    user_id = data.get('id')
+
+    if user_id is None:
+        return jsonify({"error": "Missing 'user_id' parameter"}), 400
+
+    print(f"Received password: {entered_password}, User ID: {user_id}")  # Debugging line
+
+    user = fetch_userdata('Users', user_id)
+
+    if user:
+        print(f"User fetched: {user}")  # Debugging line
+        if check_password_hash(user['u_password'], entered_password):
+            return jsonify({'passwordVerified': True}), 200
+        else:
+            print("Password mismatch!")  # Debugging line
+            return jsonify({'passwordVerified': False}), 401
+    else:
+        print("User not found!")  # Debugging line
+        return jsonify({'passwordVerified': False}), 404
+
+@app.route('/api/delete-card/<int:card_id>', methods=['DELETE'])
+def delete_card(card_id):
+    try:
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM PaymentCards WHERE id = %s", (card_id,))
+            conn.commit()
+            if cursor.rowcount == 0:
+                return jsonify({"error": "Card not found"}), 404
+        return jsonify({"message": "Card deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error deleting card: {e}")
+        return jsonify({"error": "An error occurred while deleting the card."}), 500
+ 
+
+'''
+@app.route('/api/verify-password', methods=['POST'])
+def verify_password():
+    data = request.json
+    entered_password = data.get('password')
+    user_id = data.get('id')
+
+    user = fetch_userdata('Users', user_id)  # Assume user_id is known
+
+    if user and check_password_hash(user['u_password'], entered_password):
+        return jsonify({'passwordVerified': True}), 200
+    else:
+        return jsonify({'passwordVerified': False}), 401
+'''
+@app.route('/api/edit', methods=['POST'])
+# def edit_acc():
+#     print('edit_acc invoked')
+#     try:
+#         data = request.get_json()
+#         print("step 1")
+#         # Check if the request is for deleting a card
+#         # action = data.get('action')
+#         # if action == 'delete_card':
+#         #     print("step 2")
+#         #     card_id = data.get('cardId')    
+#         #     #card_id = data.get('cardId')
+#         #     with connect_db() as conn:
+#         #         print("step 3")
+#         #         print(f"Attempting to delete card with id: {card_id}")
+
+#         #         cursor = conn.cursor()
+#         #         cursor.execute("SELECT * FROM PaymentCards WHERE id = %s", (card_id,))
+#         #         if cursor.fetchone() is None:
+#         #             print("Card not found before deletion")
+#         #         else:
+#         #             print("Card found before deletion")
+
+#         #         conn.commit()
+#         #         if cursor.rowcount == 0:
+#         #             print("step 4")
+#         #             return jsonify({"error": "Card not found"}), 404
+#         #     return jsonify({"message": "Card deleted successfully"}), 200
+#         print("step 5")
+#         # Required information for profile update
+#         userId = data.get('id')
+#         first_name = data.get('firstName')
+#         last_name = data.get('lastName')
+#         phone_number = data.get('phoneNumber')
+#         password = data.get('password')
+#         promo_subscription = data.get('isOptedInForPromotions', False)
+
+#         print(first_name)
+
+#         # Home address information
+#         home_address = data.get('addressInfo')
+#         home_street_address = home_address.get('streetAddress')
+#         home_city = home_address.get('city')
+#         home_state = home_address.get('state')
+#         home_zip_code = home_address.get('zipCode')
+
+#         # Card information
+#         cards = data.get('cards')
+#         # print('cards:', cards)
+
+#         # Hash the password for security
+#         hashed_password = generate_password_hash(password)
+        
+#         # Update user data in the database
+#         with connect_db() as conn:
+#             cursor = conn.cursor()
+#             cursor.execute('''
+#                 UPDATE Users
+#                 SET f_name = %s,
+#                     l_name = %s,
+#                     u_password = %s,
+#                     phone_num = %s,
+#                     promo_sub = %s,
+#                     street_address = %s,
+#                     city = %s,
+#                     state = %s,
+#                     zip_code = %s,
+#                     status = %s
+#                 WHERE id = %d
+#             ''', (first_name, last_name, hashed_password, phone_number, promo_subscription, home_street_address, home_city, home_state, home_zip_code, '1', userId))
+
+#             print("User profile updated")
+
+#             # Insert or update card information
+#             for card in cards:
+#                 name_on_card = card['nameOnCard']
+#                 card_number = card['cardNumber']
+#                 expiration_month = card['expirationMonth']
+#                 expiration_year = card['expirationYear']
+#                 cvc = card['cvc']
+#                 billing_street_address = card['streetAddress']
+#                 billing_city = card['city']
+#                 billing_state = card['state']
+#                 billing_zip_code = card['zipCode']
+
+#                 print("Initializing card update")
+
+#                 # Encrypt the card information
+#                 encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+#                 encrypted_cvc = cipher_suite.encrypt(cvc.encode()).decode()
+#                 encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode()).decode()
+#                 encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode()).decode()
+
+#                 # Insert or update card information in PaymentCards table
+#                 cursor.execute('''
+#                     SELECT * FROM PaymentCards 
+#                     WHERE user_id = %d AND id = %d
+#                 ''', (140, card.get('id', None)))
+
+#                 print("Fetching existing card")
+
+#                 existing_card = cursor.fetchone()
+
+#                 if existing_card:
+#                     cursor.execute('''
+#                         UPDATE PaymentCards
+#                         SET card_num = %s, 
+#                             cv_num = %s,
+#                             exp_month = %s,
+#                             exp_year = %s,
+#                             name_on_card = %s,
+#                             street_address = %s,
+#                             city = %s,
+#                             state = %s,
+#                             zip_code = %s
+#                         WHERE id = %s
+#                     ''', (encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
+#                           name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code,
+#                           existing_card['id']))
+
+#                     print("Updated existing card")
+
+#                 else:
+#                     cursor.execute('''
+#                         INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+#                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#                     ''', (140, encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
+#                           name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+
+#                     print("Inserted new card")
+
+#             conn.commit()
+        
+#         print('after connect_db')
+#         return jsonify({'message': 'Changes have been saved'}), 200
+
+#     except Exception as e:
+#         print(f"Error in edit_acc: {e}")
+#         return jsonify({'error': 'An error occurred while updating the database.'}), 500
+def edit_acc():
+    print('edit_acc invoked')
+    try:
+        data = request.get_json()
+        
+        userId = data.get('id')
+        first_name = data.get('firstName')
+        last_name = data.get('lastName')
+        phone_number = data.get('phoneNumber')
+        password = data.get('password')
+        promo_subscription = data.get('isOptedInForPromotions', False)
+        hashed_password = generate_password_hash(password) if password else None
+
+        home_address = data.get('addressInfo', {})
+        home_street_address = home_address.get('streetAddress')
+        home_city = home_address.get('city')
+        home_state = home_address.get('state')
+        home_zip_code = home_address.get('zipCode')
+
+        request_cards = data.get('cards', [])
+        request_card_ids = {card['id'] for card in request_cards if 'id' in card}
+
+        with connect_db() as conn:
+            cursor = conn.cursor(dictionary=True)
+
+            if hashed_password:
+                cursor.execute('''
+                    UPDATE Users
+                    SET f_name = %s,
+                        l_name = %s,
+                        u_password = %s,
+                        phone_num = %s,
+                        promo_sub = %s,
+                        street_address = %s,
+                        city = %s,
+                        state = %s,
+                        zip_code = %s,
+                        status = %s
+                    WHERE id = %s
+                ''', (first_name, last_name, hashed_password, phone_number, promo_subscription, home_street_address, home_city, home_state, home_zip_code, "1", userId))
+            else:
+                cursor.execute('''
+                    UPDATE Users
+                    SET f_name = %s,
+                        l_name = %s,
+                        phone_num = %s,
+                        promo_sub = %s,
+                        street_address = %s,
+                        city = %s,
+                        state = %s,
+                        zip_code = %s,
+                        status = %s
+                    WHERE id = %s
+                ''', (first_name, last_name, phone_number, promo_subscription, home_street_address, home_city, home_state, home_zip_code, "1", userId))
+
+            print("User profile updated")
+
+            cursor.execute('SELECT id FROM PaymentCards WHERE user_id = %s', (userId,))
+            existing_card_ids = {row['id'] for row in cursor.fetchall()}
+
+            cards_to_delete = existing_card_ids - request_card_ids
+            if cards_to_delete:
+                placeholders = ', '.join(['%s'] * len(cards_to_delete))
+                query = f'DELETE FROM PaymentCards WHERE user_id = %s AND id IN ({placeholders})'
+                cursor.execute(query, (userId, *cards_to_delete))
+
+            for card in request_cards:
+                name_on_card = card['nameOnCard']
+                card_number = card['cardNumber']
+                expiration_month = card['expirationMonth']
+                expiration_year = card['expirationYear']
+                cvc = card['cvc']
+                billing_street_address = card['streetAddress']
+                billing_city = card['city']
+                billing_state = card['state']
+                billing_zip_code = card['zipCode']
+                card_id = card.get('id')
+
+                encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+                encrypted_cvc = cipher_suite.encrypt(cvc.encode()).decode()
+                encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode()).decode()
+                encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode()).decode()
+
+                if card_id in existing_card_ids:
+                    cursor.execute('''
+                        UPDATE PaymentCards
+                        SET card_num = %s, 
+                            cv_num = %s,
+                            exp_month = %s,
+                            exp_year = %s,
+                            name_on_card = %s,
+                            street_address = %s,
+                            city = %s,
+                            state = %s,
+                            zip_code = %s
+                        WHERE id = %s AND user_id = %s
+                    ''', (encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
+                          name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code,
+                          card_id, userId))
+                    print(f"Updated card with ID {card_id}")
+                else:
+                    cursor.execute('''
+                        INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ''', (userId, encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
+                          name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+                    print(f"Inserted new card for user_id {userId}")
+
+            conn.commit()
+
+        print('Database changes committed')
+        return jsonify({'message': 'Changes have been saved'}), 200
+
+    except Exception as e:
+        print(f"Error in edit_acc: {e}")
+        traceback.print_exc()  # Print the full stack trace for debugging
+        return jsonify({'error': 'An error occurred while updating the database.'}), 500
+
+       
 @app.route('/api/register', methods=['POST'])
 def register_user():
    print('register_user invoked')
    try:
        data = request.get_json()
-
 
        # required information
        first_name = data.get('firstName')
@@ -285,14 +597,12 @@ def register_user():
        password = data.get('password')
        promo_subscription = data.get('subscribeToPromo', False)
 
-
        # home address information
        home_address = data.get('addressInfo')
        home_street_address = home_address.get('streetAddress')
        home_city = home_address.get('city')
        home_state = home_address.get('state')
        home_zip_code = home_address.get('zipCode')
-
 
        # card information
        cards = data.get('cards')
@@ -309,23 +619,18 @@ def register_user():
 
 
 
-
        # Basic input validation
        if not first_name or not last_name or not phone_number or not email or not password:
            return jsonify({'error': 'Please provide all required fields.'}), 400
-
 
        # Validate email format
        if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
            return jsonify({'error': 'Invalid email address.'}), 400
 
-
        # Hash the password for security
        hashed_password = generate_password_hash(password)
 
-
        print('before connect_db')
-
 
        # Insert user data into the database
        with connect_db() as conn:
@@ -337,7 +642,6 @@ def register_user():
          
            user_id = cursor.lastrowid 
 
-
            for card in cards:
                name_on_card = card['nameOnCard']
                card_number = card['cardNumber']
@@ -347,7 +651,6 @@ def register_user():
                billing_city = card['city']
                billing_state = card['state']
                billing_zip_code = card['zipCode']
-
 
                # Encrypt the card info
                encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
@@ -369,7 +672,6 @@ def register_user():
                    ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
           
 
-
            # print('after inserting card info')
            #  # Retrieve and decrypt the card info when needed
            # cursor.execute("SELECT exp_month FROM PaymentCards WHERE user_id=%s", (user_id,))
@@ -381,19 +683,15 @@ def register_user():
            #     decrypted_exp_month = cipher_suite.decrypt(encrypted_exp_month.encode()).decode()  # Use .encode() only if needed
            #     print("Decrypted Card Number:", decrypted_exp_month)
 
-
            conn.commit()
-
 
        print('after connect_db')
 
        # Generate the verification code
        verification_code = ''.join(random.choices(string.digits, k=5))  # 5-digit code
 
-
        # Hash the password for security
        hashed_password = generate_password_hash(password)
-
 
        # Insert user data into the database (make sure your Users table has a 'verification_code' column)
        with connect_db() as conn:
@@ -405,12 +703,10 @@ def register_user():
            ''', (verification_code, user_id))
            conn.commit()
 
-
        # Send the verification code via email
        subject = "Verify Your Account"
        body = f"Your 5-digit verification code is {verification_code}."
        send_email_via_gmail_api(email, subject, body)  # Use the Gmail API to send the email
-
 
        return jsonify({'message': 'Registration successful. Please check your email for the verification code.'}), 200
 
@@ -421,7 +717,6 @@ def register_user():
        else:
            return jsonify({'error': 'An error occurred during registration.'}), 500
 
-
 #    except Exception as e:
 #        # If the error is caused by a duplicate email entry, catch it here
 #        print(e)
@@ -430,7 +725,6 @@ def register_user():
 #        else:
 #            # return jsonify({'error': 'Database error occurred.'}), 500
 #            return jsonify({'error': 'An error occurred during registration.'}), 500
-
 
    # except Exception as e:
    #     print(e)
@@ -489,14 +783,11 @@ def login_user():
        email = data.get('email')
        password = data.get('password')
 
-
        print(f"Login attempt - email: {email}, password: {password}")  # Debugging info
-
 
        if not email or not password:
            print("Missing email or password")  # Debugging info
            return jsonify({'error': 'Please provide both email and password.'}), 400
-
 
        with connect_db() as conn:
            cursor = conn.cursor(dictionary=True)
@@ -516,11 +807,9 @@ def login_user():
                 print("User not found")  # Debugging info
                 return jsonify({'error': 'Invalid email or password.'}), 401
 
-
    except Exception as e:
        print(f"Error during login: {e}")  # Debugging info
        return jsonify({'error': 'An error occurred during login.'}), 500
-
 
 
 
@@ -529,7 +818,6 @@ def login_user():
 def logout_user():
    session.clear()
    return jsonify({'message': 'Logged out successfully.'}), 200
-
 
 # Route to check if a user is logged in
 @app.route('/api/check-session', methods=['GET'])
@@ -585,6 +873,6 @@ def reset_password():
         print(f"Error during password reset: {e}")
         return jsonify({'error': 'An error occurred during password reset.'}), 500
 
-
 if __name__ == '__main__':
    app.run(debug=True)
+

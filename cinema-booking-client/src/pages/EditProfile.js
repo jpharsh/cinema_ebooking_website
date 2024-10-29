@@ -195,6 +195,7 @@ useEffect(() => {
                     zipCode: userData.zip_code || ''
                 }
             });
+            setIsOptedInForPromotions(userData.promo_sub || false);
 
             // Fetch card information
             const cardResponse = await axios.get(`http://127.0.0.1:5000/api/cards-get?user_id=${userId}`, {
@@ -222,11 +223,6 @@ useEffect(() => {
 
     loadUserData();
 }, []);
-
-
-
-
-  //const [currentPassword, setCurrentPassword] = useState(userData.password);
 
 
   async function fetchUserId() {
@@ -263,7 +259,6 @@ useEffect(() => {
 
 
 
-
   const toggleRequiredInfo = () => setShowRequiredInfo(!showRequiredInfo);
   const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
   const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
@@ -272,6 +267,8 @@ useEffect(() => {
   const [successMessage, setSuccessMessage] = useState("");
 
   let userErrors = {};
+
+
   // Form validation logic
   const validateForm = () => {
     if (!userData.firstName) userErrors.firstName = "First Name is required";
@@ -281,6 +278,25 @@ useEffect(() => {
     //if (!userData.password) formErrors.password = "Password is required";
     return userErrors;
   };
+
+  const validateFirstName = (firstName) => {
+    // Regular expression: At least 2 alphabetic characters
+    const namePattern = /^[A-Za-z]{1,}$/;
+    return namePattern.test(firstName);
+};
+
+const validateLastName = (lastName) => {
+    // Regular expression: At least 2 alphabetic characters
+    const namePattern = /^[A-Za-z]{1,}$/;
+    return namePattern.test(lastName);
+};
+
+const validateNameOnCard = (nameOnCard) => {
+    // Regular expression: At least 2 alphabetic characters
+    const namePattern = /^[A-Za-z]{1,}$/;
+    return namePattern.test(nameOnCard);
+};
+
 
   const validatePhoneNumber = (phoneNumber) => {
     // Simple regex for phone number validation
@@ -319,6 +335,13 @@ useEffect(() => {
       formErrors.phoneNumber =
         "Phone Number must be a 10-digit number (no spaces or dashes)";
     }
+    if (userData.firstName && !validateFirstName(userData.firstName)) {
+        formErrors.firstName = "First name must be at least 1 characters long and contain only letters";
+    }
+    if (userData.lastName && !validateLastName(userData.firstName)) {
+        formErrors.lastName = "Last name must be at least 1 characters long and contain only letters";
+    }
+    
 
     // Validate card information if Payment Info section is shown
     if (showPaymentInfo) {
@@ -387,6 +410,10 @@ useEffect(() => {
       }
     }
   };
+
+
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

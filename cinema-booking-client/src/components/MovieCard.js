@@ -20,10 +20,9 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
                         className="btn white" 
                         onClick={() => onWatchTrailer(movie.trailer_url)}
                     >Watch Trailer</button>
-                    {/* {isNowPlaying && (
+                    {isNowPlaying && (
                         <button className="btn red">Book Movie</button>
-                    )} */}
-                    <button className="btn red">Book Movie</button>
+                    )}
                 </div>
             )}
             

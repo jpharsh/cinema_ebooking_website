@@ -24,7 +24,12 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
 function App() {
-  const { loggedIn, isAdmin, logout } = useContext(AuthContext);
+  const { loggedIn, isAdmin, logout, loading } = useContext(AuthContext);
+  console.log("LoggedIn:", loggedIn, "IsAdmin:", isAdmin);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>

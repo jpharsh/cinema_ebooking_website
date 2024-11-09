@@ -1,9 +1,16 @@
 // src/App.js
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminPage.css';
 // import AdminNavbar from '../components/AdminNavbar';
 
 function AdminHomePage() {
+  const navigate = useNavigate();
+
+  const handleManageMoviesClick = () => {
+      navigate('/manage-movies'); // Navigate to the homepage
+  };
+  
   return (
     <>
       {/* Cinema Movies Header */}
@@ -22,7 +29,7 @@ function AdminHomePage() {
         <p className="sub-greeting">Pick one of the choices below</p>
 
         <div className="admin-button-group">
-          <button className="admin-button">Manage Movies</button>
+          <button className="admin-button" onClick={handleManageMoviesClick}>Manage Movies</button>
           <button className="admin-button">Manage Users</button>
           <button className="admin-button">Manage Promos</button>
         </div>

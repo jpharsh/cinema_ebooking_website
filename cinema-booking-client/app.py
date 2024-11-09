@@ -106,7 +106,7 @@ def connect_db():
        database=db_name
    )
 
-def fetch_movies(table_name):
+def fetch_movies(is_now_showing):
    connection = pymysql.connect(
        host=db_host,
        user=db_user,
@@ -115,8 +115,8 @@ def fetch_movies(table_name):
    )
    try:
        with connection.cursor() as cursor:
-           sql = f"SELECT title, poster_url, mpaa_rating, trailer_url FROM {table_name}"
-           cursor.execute(sql)
+           sql = f"SELECT title, poster_url, mpaa_rating, trailer_url FROM Movies WHERE isNowShowing = %s"
+           cursor.execute(sql, (is_now_showing, ))
            result = cursor.fetchall()
            # Transform the result into a list of dictionaries
            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3]} for row in result]
@@ -179,11 +179,11 @@ def forgot_password():
 
 @app.route('/api/now-playing', methods=['GET'])
 def get_now_playing():
-   return fetch_movies('now_playing_movies')
+   return fetch_movies(is_now_showing=True)
 
 @app.route('/api/coming-soon', methods=['GET'])
 def get_coming_soon():
-   return fetch_movies('coming_soon_movies')
+   return fetch_movies(is_now_showing=False)
 
 # @app.route('/api/register2', methods=['POST'])
 # def register_user2():

@@ -1,6 +1,6 @@
 .admin-navbar {
     display: flex;
-    justify-content: left;
+    justify-content: space-between;
     align-items: center;
     background-color: #ce0000;
     color: white;
@@ -8,7 +8,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding-right: 5%;
+    padding-left: 2.0%;
   }
   
   .admin-navbar .logo h1 {

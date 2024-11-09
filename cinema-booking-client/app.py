@@ -115,11 +115,11 @@ def fetch_movies(is_now_showing):
    )
    try:
        with connection.cursor() as cursor:
-           sql = f"SELECT title, poster_url, mpaa_rating, trailer_url FROM Movies WHERE isNowShowing = %s"
+           sql = f"SELECT title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies WHERE isNowShowing = %s"
            cursor.execute(sql, (is_now_showing, ))
            result = cursor.fetchall()
            # Transform the result into a list of dictionaries
-           movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3]} for row in result]
+           movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
            return jsonify(movies)
    finally:
        connection.close()

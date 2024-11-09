@@ -11,28 +11,8 @@
     flex-direction: row;
   }
   
-  /* .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #b71c1c;
-    color: white;
-    padding: 10px 20px;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 50px;
-    z-index: 100;
-  } 
-
-  .header h1 {
-    margin: 0;
-    padding-left: 10px; 
-    font-size: 24px; 
-  } */
-  
   .sidebar {
+    margin-top: 20px;
     background-color: #1c1c1c; /* Dark sidebar to match the black theme */
     color: white;
     width: 200px;
@@ -94,17 +74,6 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
   }
-  
-  /* .movie-card {
-    background-color: #1e1e1e; /
-    color: white;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  } */
   
   .movie-poster {
     width: 145px;

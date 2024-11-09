@@ -16,7 +16,6 @@ const Navbar = ({ onLogout }) => {
     
     return (
         <nav className="admin-navbar">
-            <div>Admin</div>
             <div className="logo" onClick={handleLogoClick}>
                 <h1>Cinema Movies</h1>
             </div>

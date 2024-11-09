@@ -124,6 +124,26 @@ def fetch_movies(is_now_showing):
    finally:
        connection.close()
 
+@app.route('/api/fetch-all-movies', methods=['GET'])
+def fetch_all_movies():
+    connection = pymysql.connect(
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name
+    )
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            # Transform the result into a list of dictionaries
+            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
+            return jsonify(movies)
+    finally:
+        connection.close()
+
+
 def send_email_via_gmail_api(to, subject, body):
    creds = load_credentials()
    service = build('gmail', 'v1', credentials=creds)

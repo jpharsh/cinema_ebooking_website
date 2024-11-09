@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
             });
             setLoggedIn(response.data.logged_in);
 
-            if (response.data.user_type === 2) {
+            if (response.data.is_admin) {
                 setIsAdmin(true);
             } else {
                 setIsAdmin(false);

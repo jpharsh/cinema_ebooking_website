@@ -827,7 +827,7 @@ def check_session():
         token = auth_header.split(" ")[1]  # Bearer <token>
         decoded_token = verify_jwt_token(token)
         if decoded_token:
-            is_admin = decoded_token.get('user_type') == '2'
+            is_admin = decoded_token.get('user_type') == 2
             return jsonify({'logged_in': True, 'user_id': decoded_token['id'], 'email': decoded_token['email'], 'is_admin': is_admin}), 200
     return jsonify({'logged_in': False}), 200
 

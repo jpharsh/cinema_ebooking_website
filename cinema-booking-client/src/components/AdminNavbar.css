@@ -21,3 +21,12 @@
   .admin-navbar .logo {
     cursor: pointer; /* Indicates that the logo is clickable */
   }
+
+  .nav-buttons .btn {
+    padding: 10px 20px; /* Adds padding to the buttons */
+    margin-left: 10px; /* Adds some spacing between the buttons */
+    border: none;
+    cursor: pointer;
+    background-color: #222;
+    color: white;
+  }  

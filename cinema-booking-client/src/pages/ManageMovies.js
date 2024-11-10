@@ -110,18 +110,9 @@ function ManageMovies() {
 
   return (
     <div> 
-      {/*<AdminNavbar />*/}
-   
       <div className="admin-panel">
-        {/* <header className="header">
-          <h1>Admin</h1>
-          <div className="logo">Cinema Movies</div>
-          <div className="user-icon">👤</div>
-        </header> */}
-        
         <aside className="sidebar">
           <ul>
-            <li>Home Page</li>
             <li>Manage Movies</li>
             <li>Promo Codes</li>
             <li>Manage Users</li>
@@ -131,6 +122,9 @@ function ManageMovies() {
           <h2>MOVIES</h2>
           <button onClick={() => openModal()} className="add-movie-button">
             Add Movie
+          </button>
+          <button className="sched-movie-button">
+            Schedule Movie
           </button>
           <div>
             <input

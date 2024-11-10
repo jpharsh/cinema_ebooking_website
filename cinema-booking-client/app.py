@@ -525,6 +525,50 @@ def reset_password():
         # Use a logging library instead of print for better production logging
         print(f"Error during password reset: {e}")
         return jsonify({'error': 'An error occurred during password reset.'}), 500
+    
+@app.route('/api/movies', methods=['GET'])
+def get_movies():
+    db = connect_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM Movies")
+    movies = cursor.fetchall()
+    cursor.close()
+    return jsonify(movies)
+
+# POST route to add a new movie
+@app.route('/api/movies', methods=['POST'])
+def add_movie():
+    try: 
+        data = request.json
+
+        # Extract fields from the data
+        title = data.get('title')
+        mpaa_rating = data.get('mpaa_rating')
+        category = data.get('category')
+        movie_cast = data.get('movie_cast')
+        synopsis = data.get('synopsis')
+        reviews = data.get('reviews', "")
+        poster_url = data.get('poster_url')
+        trailer_url = data.get('trailer_url')
+        
+        # Converting show dates and times into strings for simplicity
+        show_dates = ','.join(data.get('showDates', []))
+        show_times = ','.join(data.get('showTimes', []))
+
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO Movies (title, movie_cast, synopsis, poster_url,  mpaa_rating, trailer_url, isNowShowing)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ''', (title, movie_cast, synopsis, poster_url, mpaa_rating, trailer_url, '0'))
+
+            conn.commit()
+            return jsonify({'message': 'Movie added successfully'}), 201
+
+    except Exception as e:
+           return jsonify({'error': 'An error occurred when trying to add movie.'}), 500
+
+
 
 
 if __name__ == '__main__':

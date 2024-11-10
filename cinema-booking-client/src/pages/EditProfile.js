@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./EditProfile.css"; // Import your CSS file for styling
 import axios from "axios";
-import { jwtDecode } from 'jwt-decode';
+//import { jwtDecode } from 'jwt-decode';
 
 // const EditProfile = () => {
 //   const [showRequiredInfo, setShowRequiredInfo] = useState(true);

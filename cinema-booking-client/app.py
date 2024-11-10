@@ -912,22 +912,20 @@ def add_movie():
         title = data.get('title')
         mpaa_rating = data.get('mpaa_rating')
         category = data.get('category')
+        director = data.get('director')
+        producer = data.get('producer')
         movie_cast = data.get('movie_cast')
         synopsis = data.get('synopsis')
         reviews = data.get('reviews', "")
         poster_url = data.get('poster_url')
         trailer_url = data.get('trailer_url')
-        
-        # Converting show dates and times into strings for simplicity
-        show_dates = ','.join(data.get('showDates', []))
-        show_times = ','.join(data.get('showTimes', []))
 
         with connect_db() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO Movies (title, movie_cast, synopsis, poster_url,  mpaa_rating, trailer_url, isNowShowing)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ''', (title, movie_cast, synopsis, poster_url, mpaa_rating, trailer_url, '0'))
+                INSERT INTO Movies (title, movie_cast, synopsis, poster_url, mpaa_rating, trailer_url, isNowShowing, category, director, producer)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ''', (title, movie_cast, synopsis, poster_url, mpaa_rating, trailer_url, '0', category, director, producer))
 
             conn.commit()
             return jsonify({'message': 'Movie added successfully'}), 201

@@ -67,6 +67,8 @@ function ManageMovies() {
       "title",
       "mpaa_rating",
       "category",
+      "director",
+      "producer",
       "movie_cast",
       "synopsis",
       "reviews",
@@ -80,13 +82,13 @@ function ManageMovies() {
       }
     });
 
-    if (currentMovie.showDates.length === 0) {
-      newErrors.showDates = "At least one show date is required";
-    }
+    // if (currentMovie.showDates.length === 0) {
+    //   newErrors.showDates = "At least one show date is required";
+    // }
 
-    if (currentMovie.showTimes.length === 0) {
-      newErrors.showTimes = "At least one show time is required";
-    }
+    // if (currentMovie.showTimes.length === 0) {
+    //   newErrors.showTimes = "At least one show time is required";
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -201,7 +203,7 @@ function ManageMovies() {
                 <img src={movie.poster_url || "https://via.placeholder.com/150"} className="movie-poster" alt={`${movie.title} poster`} />
                 <p>{movie.title}</p>
                 <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
-                <div className="manage-button-group">
+                {/* <div className="manage-button-group">
                   <button
                     onClick={() => openModal(movie)}
                     className="manage-button edit"
@@ -214,7 +216,7 @@ function ManageMovies() {
                   >
                     Delete
                   </button>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
@@ -246,6 +248,28 @@ function ManageMovies() {
                 }
               />
               {errors.category && <p className="error-message">{errors.category}</p>}
+
+              <label>Director</label>
+              <input 
+                type="text"
+                placeholder="Director"
+                value={currentMovie?.director || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, director: e.target.value })
+                }
+              />
+              {errors.director && <p className="error-message">{errors.director}</p>}
+
+              <label>Producer</label>
+              <input
+                type="text"
+                placeholder="Producer"
+                value={currentMovie?.producer || ""}
+                onChange={(e) =>
+                  setCurrentMovie({ ...currentMovie, producer: e.target.value })
+                }
+              />
+              {errors.producer && <p className="error-message">{errors.producer}</p>}
 
               <label>Cast</label>
               <input
@@ -291,7 +315,7 @@ function ManageMovies() {
                   })
                 }
               />
-              {errors.trailerPicture && <p className="error-message">{errors.trailerPicture}</p>}
+              {errors.poster_url && <p className="error-message">{errors.poster_url}</p>}
 
               <label>Trailer Video URL</label>
               <input
@@ -316,9 +340,9 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, mpaa_rating: e.target.value })
                 }
               />
-              {errors.rating && <p className="error-message">{errors.rating}</p>}
-
-              <div className="show-dates">
+              {errors.mpaa_rating && <p className="error-message">{errors.mpaa_rating}</p>}
+              
+              {/* <div className="show-dates">
                 <label>Show Dates:</label>
                 <input
                   type="date"
@@ -352,7 +376,8 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
-              </div>
+              </div> */}
+
               <button onClick={handleSave}>
                 {isEditing ? "Save Changes" : "Add Movie"}
               </button>

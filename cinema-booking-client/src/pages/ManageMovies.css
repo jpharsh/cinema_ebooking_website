@@ -141,6 +141,19 @@
   .add-movie-button:hover {
     background-color: #a50f0f;
   }
+
+  .sched-movie-button {
+    background-color: #b71c1c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    margin-left: 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
   
   /* Modal styles */
   .modal {

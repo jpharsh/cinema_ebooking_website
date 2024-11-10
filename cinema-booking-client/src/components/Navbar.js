@@ -30,9 +30,13 @@ const Navbar = () => {
         }
     };
 
+    const handleLogoClick = () => {
+        navigate('/'); // Navigate to the homepage
+    };
+
     return (
         <nav className="navbar">
-            <div className="logo">
+            <div className="logo" onClick={handleLogoClick}>
                 <h1>Cinema Movies</h1>
             </div>
             {loggedIn ? (

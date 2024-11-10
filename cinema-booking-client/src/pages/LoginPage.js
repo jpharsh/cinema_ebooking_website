@@ -14,7 +14,7 @@ const LoginPage = () => {
     const trimmedPassword = password.trim();
   
     try {
-      console.log("Attempting login with:", trimmedEmail, trimmedPassword);  // Debugging info
+      console.log("Attempting login with:", { email: trimmedEmail, password: trimmedPassword });  // Debugging info
       const response = await axios.post('http://127.0.0.1:5000/api/login', { email: trimmedEmail, password: trimmedPassword });
       
       const token = response.data.token;  // Retrieve token
@@ -22,6 +22,7 @@ const LoginPage = () => {
 
       console.log("Login successful, token:", token, "userType:", userType);  // Debugging info
       localStorage.setItem('token', token);  // Store token in localStorage
+      console.log(localStorage.getItem('token'))
       
       if (userType === 2) {
         navigate('/admin-home');  // Redirect admin to AdminHomepage.js

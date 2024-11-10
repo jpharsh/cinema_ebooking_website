@@ -1,51 +1,31 @@
-// src/App.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import axios for API requests
 import "./ManageMovies.css";
 import "../App.css";
-// import AdminNavbar from "../components/AdminNavbar";
 import searchIcon from "../images/search-icon.png"; // Import the search icon image
 
 function ManageMovies() {
-  const [movies, setMovies] = useState([
-    {
-      id: 1,
-      title: "Avengers",
-      rating: "PG-13",
-      category: "",
-      cast: "",
-      director: "",
-      producer: "",
-      synopsis: "",
-      reviews: "",
-      trailerPicture:
-        "https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-      trailerVideo: "",
-      showDates: [],
-      showTimes: [],
-    },
-    {
-      id: 2,
-      title: "Avengers: Endgame",
-      rating: "PG-13",
-      category: "",
-      cast: "",
-      director: "",
-      producer: "",
-      synopsis: "",
-      reviews: "",
-      trailerPicture:
-        "https://cdn.marvel.com/content/1x/avengersendgame_lob_crd_05.jpg",
-      trailerVideo: "",
-      showDates: [],
-      showTimes: [],
-    },
-  ]);
+  const [movies, setMovies] = useState([]); // Set initial movies state to an empty array
   const [showModal, setShowModal] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [tempDate, setTempDate] = useState(""); // Temporary state for date selection
   const [tempTime, setTempTime] = useState(""); // Temporary state for time selection
   const [searchTerm, setSearchTerm] = useState(""); // State for search input
+
+  // Fetch movies from the backend API (all movies)
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/api/fetch-all-movies"); // Use the new endpoint
+        setMovies(response.data); // Set the movies from the API response to the state
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+
+    fetchMovies();
+  }, []); // Empty dependency array means it runs once when the component mounts
 
   // Function to open the modal for editing or adding
   const openModal = (movie = null) => {
@@ -130,18 +110,9 @@ function ManageMovies() {
 
   return (
     <div> 
-      {/*<AdminNavbar />*/}
-   
       <div className="admin-panel">
-        {/* <header className="header">
-          <h1>Admin</h1>
-          <div className="logo">Cinema Movies</div>
-          <div className="user-icon">👤</div>
-        </header> */}
-        
         <aside className="sidebar">
           <ul>
-            <li>Home Page</li>
             <li>Manage Movies</li>
             <li>Promo Codes</li>
             <li>Manage Users</li>
@@ -151,6 +122,9 @@ function ManageMovies() {
           <h2>MOVIES</h2>
           <button onClick={() => openModal()} className="add-movie-button">
             Add Movie
+          </button>
+          <button className="sched-movie-button">
+            Schedule Movie
           </button>
           <div>
             <input
@@ -167,17 +141,17 @@ function ManageMovies() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="movie-grid">
             {filteredMovies.map((movie) => (
               <div className="movie-card" key={movie.id}>
                 <img
-                  src={movie.trailerPicture || "https://via.placeholder.com/150"}
+                  src={movie.poster_url || "https://via.placeholder.com/150"}
                   alt={movie.title}
                   className="movie-poster"
                 />
                 <p>{movie.title}</p>
-                <p>Rating: {movie.rating}</p> {/* Display rating separately */}
+                <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
                 <div className="manage-button-group">
                   <button
                     onClick={() => openModal(movie)}
@@ -277,16 +251,17 @@ function ManageMovies() {
                 }
               />
 
+              {/* Ratings */}
               <label>MPAA Rating</label>
               <input
                 type="text"
-                placeholder="MPAA Rating"
-                value={currentMovie?.rating || ""}
+                value={currentMovie?.mpaa_rating || ""}
                 onChange={(e) =>
-                  setCurrentMovie({ ...currentMovie, rating: e.target.value })
+                  setCurrentMovie({ ...currentMovie, mpaa_rating: e.target.value })
                 }
               />
 
+              {/* Date and Time Management */}
               <div className="show-dates">
                 <label>Show Dates:</label>
                 <input
@@ -294,11 +269,9 @@ function ManageMovies() {
                   value={tempDate}
                   onChange={(e) => setTempDate(e.target.value)}
                 />
-                <button onClick={handleAddShowDate} className="button">
-                  Add Date
-                </button>
+                <button onClick={handleAddShowDate}>Add Date</button>
                 <ul>
-                  {currentMovie?.showDates.map((date, index) => (
+                  {currentMovie?.showDates?.map((date, index) => (
                     <li key={index}>{date}</li>
                   ))}
                 </ul>
@@ -311,26 +284,22 @@ function ManageMovies() {
                   value={tempTime}
                   onChange={(e) => setTempTime(e.target.value)}
                 />
-                <button onClick={handleAddShowTime} className="manage-button">
-                  Add Time
-                </button>
+                <button onClick={handleAddShowTime}>Add Time</button>
                 <ul>
-                  {currentMovie?.showTimes.map((time, index) => (
+                  {currentMovie?.showTimes?.map((time, index) => (
                     <li key={index}>{time}</li>
                   ))}
                 </ul>
               </div>
 
-              <button onClick={handleSave} className="manage-button">
-                Save
+              <button onClick={handleSave}>
+                {isEditing ? "Save Changes" : "Add Movie"}
               </button>
-              <button onClick={closeModal} className="manage-button">
-                Cancel
-              </button>
+              <button onClick={closeModal}>Cancel</button>
             </div>
           </div>
         )}
-       </div>
+      </div>
     </div>
   );
 }

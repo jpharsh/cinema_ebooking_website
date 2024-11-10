@@ -1,6 +1,6 @@
 .admin-navbar {
     display: flex;
-    justify-content: left;
+    justify-content: space-between;
     align-items: center;
     background-color: #ce0000;
     color: white;
@@ -8,7 +8,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding-right: 5%;
+    padding-left: 2.0%;
   }
   
   .admin-navbar .logo h1 {
@@ -17,3 +17,16 @@
     /* margin-left: 750px; */
     margin-left: 80%;
   }
+
+  .admin-navbar .logo {
+    cursor: pointer; /* Indicates that the logo is clickable */
+  }
+
+  .nav-buttons .btn {
+    padding: 10px 20px; /* Adds padding to the buttons */
+    margin-left: 10px; /* Adds some spacing between the buttons */
+    border: none;
+    cursor: pointer;
+    background-color: #222;
+    color: white;
+  }  

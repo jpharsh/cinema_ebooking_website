@@ -26,4 +26,4 @@ cinema_ebooking_website/cinema-booking-client/flask_session
 *.pyc
 flask_session/
 package-lock.json
-
+token.json

@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios"; // Import axios for API requests
+import React, { useState } from "react";
 import "./ManageMovies.css";
 import "../App.css";
-import searchIcon from "../images/search-icon.png"; // Import the search icon image
+import axios from "axios";
+import { useEffect } from "react";
 
 function ManageMovies() {
-  const [movies, setMovies] = useState([]); // Set initial movies state to an empty array
+  const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [tempDate, setTempDate] = useState(""); // Temporary state for date selection
   const [tempTime, setTempTime] = useState(""); // Temporary state for time selection
   const [searchTerm, setSearchTerm] = useState(""); // State for search input
+  const [errors, setErrors] = useState({}); // State for error messages
 
   // Fetch movies from the backend API (all movies)
   useEffect(() => {
@@ -33,15 +34,15 @@ function ManageMovies() {
       movie || {
         id: null,
         title: "",
-        rating: "",
+        mpaa_rating: "",
         category: "",
-        cast: "",
+        movie_cast: "",
         director: "",
         producer: "",
         synopsis: "",
         reviews: "",
-        trailerPicture: "",
-        trailerVideo: "",
+        poster_url: "",
+        trailer_url: "",
         showDates: [],
         showTimes: [],
       }
@@ -56,10 +57,48 @@ function ManageMovies() {
     setCurrentMovie(null);
     setTempDate(""); // Clear temporary date when modal is closed
     setTempTime(""); // Clear temporary time when modal is closed
+    setErrors({});
+  };
+
+  // Validate the movie fields
+  const validateMovie = () => {
+    const newErrors = {};
+    const requiredFields = [
+      "title",
+      "mpaa_rating",
+      "category",
+      "movie_cast",
+      "synopsis",
+      "reviews",
+      "poster_url",
+      "trailer_url",
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!currentMovie[field]) {
+        newErrors[field] = `${field} is required`;
+      }
+    });
+
+    if (currentMovie.showDates.length === 0) {
+      newErrors.showDates = "At least one show date is required";
+    }
+
+    if (currentMovie.showTimes.length === 0) {
+      newErrors.showTimes = "At least one show time is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Function to handle saving changes (edit or add)
   const handleSave = () => {
+    if (!validateMovie()) {
+      console.log("Validation failed");
+      return; // Don't proceed if there are validation errors
+    }
+    
     if (isEditing) {
       // Update existing movie
       setMovies((prevMovies) =>
@@ -68,8 +107,22 @@ function ManageMovies() {
         )
       );
     } else {
-      // Add new movie
-      setMovies([...movies, { ...currentMovie, id: Date.now() }]);
+      // Check for duplicate movie titles
+      if (movies.some((movie) => movie.title === currentMovie.title)) {
+        alert("A movie with this title already exists.");
+        return;
+      }
+
+      axios
+      .post("http://127.0.0.1:5000/api/movies", currentMovie)
+      .then((response) => {
+        setMovies([...movies, { ...currentMovie, id: response.data.id }]); // Use response data to update the local list
+        closeModal();
+        console.log("Movie added successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error adding movie:", error);
+      });
     }
     closeModal();
   };
@@ -141,15 +194,11 @@ function ManageMovies() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
+          
           <div className="movie-grid">
             {filteredMovies.map((movie) => (
               <div className="movie-card" key={movie.id}>
-                <img
-                  src={movie.poster_url || "https://via.placeholder.com/150"}
-                  alt={movie.title}
-                  className="movie-poster"
-                />
+                <img src={movie.poster_url || "https://via.placeholder.com/150"} className="movie-poster" alt={`${movie.title} poster`} />
                 <p>{movie.title}</p>
                 <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
                 <div className="manage-button-group">
@@ -185,6 +234,7 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, title: e.target.value })
                 }
               />
+              {errors.title && <p className="error-message">{errors.title}</p>}
 
               <label>Category</label>
               <input
@@ -195,16 +245,18 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, category: e.target.value })
                 }
               />
+              {errors.category && <p className="error-message">{errors.category}</p>}
 
               <label>Cast</label>
               <input
                 type="text"
                 placeholder="Cast"
-                value={currentMovie?.cast || ""}
+                value={currentMovie?.movie_cast || ""}
                 onChange={(e) =>
-                  setCurrentMovie({ ...currentMovie, cast: e.target.value })
+                  setCurrentMovie({ ...currentMovie, movie_cast: e.target.value })
                 }
               />
+              {errors.movie_cast && <p className="error-message">{errors.movie_cast}</p>}
 
               <label>Synopsis</label>
               <textarea
@@ -214,6 +266,7 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, synopsis: e.target.value })
                 }
               />
+              {errors.synopsis && <p className="error-message">{errors.synopsis}</p>}
 
               <label>Reviews</label>
               <input
@@ -224,44 +277,47 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, reviews: e.target.value })
                 }
               />
+              {errors.reviews && <p className="error-message">{errors.reviews}</p>}
 
               <label>Trailer Picture URL</label>
               <input
                 type="text"
                 placeholder="Trailer Picture URL"
-                value={currentMovie?.trailerPicture || ""}
+                value={currentMovie?.poster_url || ""}
                 onChange={(e) =>
                   setCurrentMovie({
                     ...currentMovie,
-                    trailerPicture: e.target.value,
+                    poster_url: e.target.value,
                   })
                 }
               />
+              {errors.trailerPicture && <p className="error-message">{errors.trailerPicture}</p>}
 
               <label>Trailer Video URL</label>
               <input
                 type="text"
                 placeholder="Trailer Video URL"
-                value={currentMovie?.trailerVideo || ""}
+                value={currentMovie?.trailer_url || ""}
                 onChange={(e) =>
                   setCurrentMovie({
                     ...currentMovie,
-                    trailerVideo: e.target.value,
+                    trailer_url: e.target.value,
                   })
                 }
               />
+              {errors.trailer_url && <p className="error-message">{errors.trailer_url}</p>}
 
-              {/* Ratings */}
               <label>MPAA Rating</label>
               <input
                 type="text"
+                placeholder="MPAA Rating"
                 value={currentMovie?.mpaa_rating || ""}
                 onChange={(e) =>
                   setCurrentMovie({ ...currentMovie, mpaa_rating: e.target.value })
                 }
               />
+              {errors.rating && <p className="error-message">{errors.rating}</p>}
 
-              {/* Date and Time Management */}
               <div className="show-dates">
                 <label>Show Dates:</label>
                 <input
@@ -269,12 +325,15 @@ function ManageMovies() {
                   value={tempDate}
                   onChange={(e) => setTempDate(e.target.value)}
                 />
-                <button onClick={handleAddShowDate}>Add Date</button>
+                <button onClick={handleAddShowDate} className="button">
+                  Add Date
+                </button>
                 <ul>
-                  {currentMovie?.showDates?.map((date, index) => (
+                  {currentMovie?.showDates.map((date, index) => (
                     <li key={index}>{date}</li>
                   ))}
                 </ul>
+                {errors.showDates && <p className="error-message">{errors.showDates}</p>}
               </div>
 
               <div className="show-times">
@@ -284,22 +343,26 @@ function ManageMovies() {
                   value={tempTime}
                   onChange={(e) => setTempTime(e.target.value)}
                 />
-                <button onClick={handleAddShowTime}>Add Time</button>
+                <button onClick={handleAddShowTime} className="manage-button">
+                  Add Time
+                </button>
                 <ul>
-                  {currentMovie?.showTimes?.map((time, index) => (
+                  {currentMovie?.showTimes.map((time, index) => (
                     <li key={index}>{time}</li>
                   ))}
                 </ul>
+                {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
               </div>
-
               <button onClick={handleSave}>
                 {isEditing ? "Save Changes" : "Add Movie"}
               </button>
-              <button onClick={closeModal}>Cancel</button>
+              <button onClick={closeModal} className="manage-button">
+                Cancel
+              </button>
             </div>
           </div>
         )}
-      </div>
+       </div>
     </div>
   );
 }

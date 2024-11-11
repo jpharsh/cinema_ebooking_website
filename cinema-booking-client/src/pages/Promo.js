@@ -67,9 +67,10 @@ function AdminPage() {
   
         if (response.status === 201) {
           // Add the promo to the local state only if it was successfully saved in the database
-          setPromos([...promos, newPromo]);
+          const updatedPromosResponse = await axios.get('http://127.0.0.1:5000/api/promos');
+          setPromos(updatedPromosResponse.data);
           setNewPromo({ code: '', description: '', discount: '', expirationDate: '' });
-          alert('Promo added successfully!');
+
         } else {
           alert('Failed to add promo');
         }

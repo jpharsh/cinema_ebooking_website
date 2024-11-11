@@ -71,13 +71,13 @@
   
   .movie-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
     gap: 20px;
   }
   
   .movie-poster {
     width: 145px;
-    height: 214.7px;
+    height: 300px !important;
     object-fit: cover; /* Ensures the image covers the space without distortion */
     border-radius: 5px;
     margin-bottom: 10px;

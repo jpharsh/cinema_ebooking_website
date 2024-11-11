@@ -199,7 +199,7 @@ function ManageMovies() {
           
           <div className="movie-grid">
             {filteredMovies.map((movie) => (
-              <div className="movie-card" key={movie.id}>
+              <div className="movie-card" style={{marginBottom: '70px'}} key={movie.id}>
                 <img src={movie.poster_url || "https://via.placeholder.com/150"} className="movie-poster" alt={`${movie.title} poster`} />
                 <p>{movie.title}</p>
                 <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
@@ -292,7 +292,7 @@ function ManageMovies() {
               />
               {errors.synopsis && <p className="error-message">{errors.synopsis}</p>}
 
-              <label>Reviews</label>
+              {/* <label>Reviews</label>
               <input
                 type="text"
                 placeholder="Reviews"
@@ -301,7 +301,7 @@ function ManageMovies() {
                   setCurrentMovie({ ...currentMovie, reviews: e.target.value })
                 }
               />
-              {errors.reviews && <p className="error-message">{errors.reviews}</p>}
+              {errors.reviews && <p className="error-message">{errors.reviews}</p>} */}
 
               <label>Trailer Picture URL</label>
               <input
@@ -378,7 +378,7 @@ function ManageMovies() {
                 {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
               </div> */}
 
-              <button onClick={handleSave}>
+              <button onClick={handleSave} className="manage-button">
                 {isEditing ? "Save Changes" : "Add Movie"}
               </button>
               <button onClick={closeModal} className="manage-button">

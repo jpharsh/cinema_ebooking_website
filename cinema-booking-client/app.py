@@ -22,6 +22,9 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from werkzeug.security import check_password_hash
+from google.auth.exceptions import RefreshError
+from google_auth_oauthlib.flow import InstalledAppFlow
+import json
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -49,33 +52,77 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Load credentials from token.json
 def load_credentials():
-   creds = None
-   token_file = 'token.json'
+#    creds = None
+#    token_file = 'token.json'
   
-   if os.path.exists(token_file):
-       creds = Credentials.from_authorized_user_file(token_file, SCOPES)
+#    if os.path.exists(token_file):
+#        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
   
-   if not creds or not creds.valid:
-       if creds and creds.expired and creds.refresh_token:
-           creds.refresh(Request())
-       else:
-           flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
-               {
-                   "installed": {
-                       "client_id": CLIENT_ID,
-                       "client_secret": CLIENT_SECRET,
-                       "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                       "token_uri": "https://oauth2.googleapis.com/token",
-                       "redirect_uris": ["http://localhost:8080"]
-                   }
-               }, SCOPES
-           )
-           creds = flow.run_local_server(port=8080)
+#    if not creds or not creds.valid:
+#        if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+           
+#        else:
+#            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
+#                {
+#                    "installed": {
+#                        "client_id": CLIENT_ID,
+#                        "client_secret": CLIENT_SECRET,
+#                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#                        "token_uri": "https://oauth2.googleapis.com/token",
+#                        "redirect_uris": ["http://localhost:8080"]
+#                    }
+#                }, SCOPES
+#            )
+#            creds = flow.run_local_server(port=8080)
       
-       with open(token_file, 'w') as token:
-           token.write(creds.to_json())
+#        with open(token_file, 'w') as token:
+#            token.write(creds.to_json())
   
-   return creds
+#    return creds
+    
+    
+    creds = None
+
+    # Load existing token if available
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        print("Token loaded successfully.")
+
+    # Check if credentials are expired or invalid
+    if creds and creds.expired and creds.refresh_token:
+        try:
+            print("Refreshing token...")
+            creds.refresh(Request())  # Attempt to refresh token
+            print("Token refreshed successfully.")
+        except RefreshError:
+            print("Token is expired or revoked. Re-authenticating...")
+            creds = reauthenticate()
+    elif not creds or not creds.valid:
+        print("No valid token found. Authenticating...")
+        creds = reauthenticate()
+
+    return creds
+
+def reauthenticate():
+    flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
+        {
+            "installed": {
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": ["http://localhost:8080"]
+            }
+        }, SCOPES
+    )
+    creds = flow.run_local_server(port=8080)
+    
+    # Save the new token for future use
+    with open('token.json', 'w') as token_file:
+        token_file.write(creds.to_json())
+    
+    return creds
 
 def create_jwt_token(user_id, email, user_type):
     expiration = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
@@ -145,23 +192,24 @@ def fetch_all_movies():
 
 
 def send_email_via_gmail_api(to, subject, body):
-   creds = load_credentials()
-   service = build('gmail', 'v1', credentials=creds)
+    try:
+       creds = load_credentials()
+       service = build('gmail', 'v1', credentials=creds)
+       print("Service initialized successfully.")
+       
+       message = MIMEText(body)
+       message['to'] = to
+       message['subject'] = subject
+       print("Email message created:", message)
+       
+       raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+       message = {'raw': raw_message}
+       print('Encoded message:', message)
 
-   message = MIMEText(body)
-   message['to'] = to
-   message['subject'] = subject
-
-   raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-   message = {'raw': raw_message}
-
-   try:
        service.users().messages().send(userId='me', body=message).execute()
        print("Email sent successfully.")
-   except Exception as e:
-       print(f"Error sending email: {e}")
-
-
+    except Exception as e:
+       print(f"Error sending email: {e.__class__.__name__}: {e}")
 
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
@@ -346,144 +394,6 @@ def verify_password():
         return jsonify({'passwordVerified': False}), 401
 '''
 @app.route('/api/edit', methods=['POST'])
-# def edit_acc():
-#     print('edit_acc invoked')
-#     try:
-#         data = request.get_json()
-#         print("step 1")
-#         # Check if the request is for deleting a card
-#         # action = data.get('action')
-#         # if action == 'delete_card':
-#         #     print("step 2")
-#         #     card_id = data.get('cardId')    
-#         #     #card_id = data.get('cardId')
-#         #     with connect_db() as conn:
-#         #         print("step 3")
-#         #         print(f"Attempting to delete card with id: {card_id}")
-
-#         #         cursor = conn.cursor()
-#         #         cursor.execute("SELECT * FROM PaymentCards WHERE id = %s", (card_id,))
-#         #         if cursor.fetchone() is None:
-#         #             print("Card not found before deletion")
-#         #         else:
-#         #             print("Card found before deletion")
-
-#         #         conn.commit()
-#         #         if cursor.rowcount == 0:
-#         #             print("step 4")
-#         #             return jsonify({"error": "Card not found"}), 404
-#         #     return jsonify({"message": "Card deleted successfully"}), 200
-#         print("step 5")
-#         # Required information for profile update
-#         userId = data.get('id')
-#         first_name = data.get('firstName')
-#         last_name = data.get('lastName')
-#         phone_number = data.get('phoneNumber')
-#         password = data.get('password')
-#         promo_subscription = data.get('isOptedInForPromotions', False)
-
-#         print(first_name)
-
-#         # Home address information
-#         home_address = data.get('addressInfo')
-#         home_street_address = home_address.get('streetAddress')
-#         home_city = home_address.get('city')
-#         home_state = home_address.get('state')
-#         home_zip_code = home_address.get('zipCode')
-
-#         # Card information
-#         cards = data.get('cards')
-#         # print('cards:', cards)
-
-#         # Hash the password for security
-#         hashed_password = generate_password_hash(password)
-        
-#         # Update user data in the database
-#         with connect_db() as conn:
-#             cursor = conn.cursor()
-#             cursor.execute('''
-#                 UPDATE Users
-#                 SET f_name = %s,
-#                     l_name = %s,
-#                     u_password = %s,
-#                     phone_num = %s,
-#                     promo_sub = %s,
-#                     street_address = %s,
-#                     city = %s,
-#                     state = %s,
-#                     zip_code = %s,
-#                     status = %s
-#                 WHERE id = %d
-#             ''', (first_name, last_name, hashed_password, phone_number, promo_subscription, home_street_address, home_city, home_state, home_zip_code, '1', userId))
-
-#             print("User profile updated")
-
-#             # Insert or update card information
-#             for card in cards:
-#                 name_on_card = card['nameOnCard']
-#                 card_number = card['cardNumber']
-#                 expiration_month = card['expirationMonth']
-#                 expiration_year = card['expirationYear']
-#                 cvc = card['cvc']
-#                 billing_street_address = card['streetAddress']
-#                 billing_city = card['city']
-#                 billing_state = card['state']
-#                 billing_zip_code = card['zipCode']
-
-#                 print("Initializing card update")
-
-#                 # Encrypt the card information
-#                 encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
-#                 encrypted_cvc = cipher_suite.encrypt(cvc.encode()).decode()
-#                 encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode()).decode()
-#                 encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode()).decode()
-
-#                 # Insert or update card information in PaymentCards table
-#                 cursor.execute('''
-#                     SELECT * FROM PaymentCards 
-#                     WHERE user_id = %d AND id = %d
-#                 ''', (140, card.get('id', None)))
-
-#                 print("Fetching existing card")
-
-#                 existing_card = cursor.fetchone()
-
-#                 if existing_card:
-#                     cursor.execute('''
-#                         UPDATE PaymentCards
-#                         SET card_num = %s, 
-#                             cv_num = %s,
-#                             exp_month = %s,
-#                             exp_year = %s,
-#                             name_on_card = %s,
-#                             street_address = %s,
-#                             city = %s,
-#                             state = %s,
-#                             zip_code = %s
-#                         WHERE id = %s
-#                     ''', (encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
-#                           name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code,
-#                           existing_card['id']))
-
-#                     print("Updated existing card")
-
-#                 else:
-#                     cursor.execute('''
-#                         INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
-#                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-#                     ''', (140, encrypted_card_number, encrypted_cvc, encrypted_expiration_month, encrypted_expiration_year,
-#                           name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
-
-#                     print("Inserted new card")
-
-#             conn.commit()
-        
-#         print('after connect_db')
-#         return jsonify({'message': 'Changes have been saved'}), 200
-
-#     except Exception as e:
-#         print(f"Error in edit_acc: {e}")
-#         return jsonify({'error': 'An error occurred while updating the database.'}), 500
 def edit_acc():
     print('edit_acc invoked')
     try:
@@ -627,17 +537,6 @@ def register_user():
        # card information
        cards = data.get('cards')
        print('cards:', cards)
-       # card_info = data.get('cardInfo')
-       # name_on_card = card_info.get('nameOnCard')
-       # card_number = card_info.get('cardNumber')
-       # expiration_date = card_info.get('expirationDate')
-       # cvc = card_info.get('cvc')
-       # billing_street_address = card_info.get('streetAddress')
-       # billing_city = card_info.get('city')
-       # billing_state = card_info.get('state')
-       # billing_zip_code = card_info.get('zipCode')
-
-
 
        # Basic input validation
        if not first_name or not last_name or not phone_number or not email or not password:
@@ -690,19 +589,6 @@ def register_user():
                        INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                    ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
-          
-
-           # print('after inserting card info')
-           #  # Retrieve and decrypt the card info when needed
-           # cursor.execute("SELECT exp_month FROM PaymentCards WHERE user_id=%s", (user_id,))
-           # result = cursor.fetchone()
-           # if result:
-           #     print('result: ', result)
-           #     print("Type of result[0]:", type(result[0]))  # Should be <class 'str'> for encrypted values
-           #     encrypted_exp_month = result[0]  # Get the encrypted card number directly
-           #     decrypted_exp_month = cipher_suite.decrypt(encrypted_exp_month.encode()).decode()  # Use .encode() only if needed
-           #     print("Decrypted Card Number:", decrypted_exp_month)
-
            conn.commit()
 
        print('after connect_db')
@@ -736,19 +622,6 @@ def register_user():
            return jsonify({'error': 'Email already exists.'}), 409
        else:
            return jsonify({'error': 'An error occurred during registration.'}), 500
-
-#    except Exception as e:
-#        # If the error is caused by a duplicate email entry, catch it here
-#        print(e)
-#        if "Duplicate entry" in str(e):
-#            return jsonify({'error': 'Email already exists.'}), 409
-#        else:
-#            # return jsonify({'error': 'Database error occurred.'}), 500
-#            return jsonify({'error': 'An error occurred during registration.'}), 500
-
-   # except Exception as e:
-   #     print(e)
-   #     return jsonify({'error': 'An error occurred during registration.'}), 500
 
 @app.route('/api/verify-account', methods=['POST'])
 def verify_account():
@@ -933,8 +806,74 @@ def add_movie():
     except Exception as e:
            return jsonify({'error': 'An error occurred when trying to add movie.'}), 500
 
+@app.route('/api/add-promo', methods=['POST'])
+def add_promo():
+    try:
+        data = request.json
+        
+        # Extract fields from the data
+        promo_code = data.get('code')
+        promo_description = data.get('description')
+        promo_discount = data.get('discount')
+        promo_expiry = data.get('expirationDate')
 
+        # Validate the input
+        if not promo_code or not promo_description or not promo_discount or not promo_expiry:
+            return jsonify({'error': 'All fields are required'}), 400
+
+        # Connect to the database and insert the promo
+        connection = connect_db()
+        cursor = connection.cursor()
+        cursor.execute('''
+            INSERT INTO Promotions (promo_code, promo_amount, exp_date)
+            VALUES (%s, %s, %s)
+        ''', (promo_code, promo_discount, promo_expiry))
+
+        connection.commit()
+
+         # Step 2: Fetch all users who are subscribed to promotions
+        cursor.execute('SELECT email FROM Users WHERE promo_sub = 1 AND status = 2')
+        subscribed_users = cursor.fetchall()
+
+        # cursor.close()
+        # connection.close()
+
+        print('before sending email')
+        # Step 3: Send emails to all subscribed users
+        subject = "New Movie Promotion Available!"
+        body = f"Hello, there's a new promotion available: {promo_code} - {promo_description}. It expires on {promo_expiry}."
+
+        print('before users loop')
+        print(f"Subscribed users: {subscribed_users}")
+        # Loop through the list of subscribed users and send an email
+        for user in subscribed_users:
+            email = user[0]
+            print(f"Sending email to {email}")
+            send_email_via_gmail_api(email, subject, body)
+        
+        print('after sending email')
+        cursor.close()
+        connection.close()
+        return jsonify({'message': 'Promo added and emails sent successfully!'}), 201
+
+    except Exception as e:
+        print(f"Error adding promo: {e}")
+        return jsonify({'error': 'An error occurred while adding the promo'}), 500
+
+# Endpoint to get all promos
+@app.route('/api/promos', methods=['GET'])
+def get_promos():
+    try:
+        connection = connect_db()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM Promotions')
+        promos = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return jsonify(promos), 200
+    except Exception as e:
+        print(f"Error fetching promos: {e}")
+        return jsonify({'error': 'An error occurred while fetching promos.'}), 500
 
 if __name__ == '__main__':
    app.run(debug=True)
-

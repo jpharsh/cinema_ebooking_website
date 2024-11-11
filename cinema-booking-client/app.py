@@ -766,7 +766,6 @@ def reset_password():
         print(f"Error during password reset: {e}")
         return jsonify({'error': 'An error occurred during password reset.'}), 500
     
-<<<<<<< HEAD
 @app.route('/api/movies', methods=['GET'])
 def get_movies():
     db = connect_db()
@@ -878,7 +877,6 @@ def get_promos():
 
 if __name__ == '__main__':
    app.run(debug=True)
-=======
 @app.route('/api/schedule-movie', methods=['POST'])
 def schedule_movie():
     data = request.get_json()
@@ -960,4 +958,3 @@ if __name__ == '__main__':
 #         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
 #     finally:
 #         connection.close()
->>>>>>> jasper

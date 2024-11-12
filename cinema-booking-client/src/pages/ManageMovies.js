@@ -231,8 +231,12 @@ function ManageMovies() {
             );
         }
     } catch (error) {
-        console.error("Error scheduling movie:", error);
-        alert("An error occurred while scheduling the movie. Please check the console for details.");
+      if (error.response?.data?.error) {
+        alert(error.response.data.error); // Show specific error from backend
+      } else {
+          console.error("Error scheduling movie:", error);
+          alert("An error occurred while scheduling the movie. Please check the console for details.");
+      }
     }
 };
 

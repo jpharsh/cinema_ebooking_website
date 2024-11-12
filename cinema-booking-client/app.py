@@ -181,11 +181,11 @@ def fetch_all_movies():
     )
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
+            sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
             cursor.execute(sql)
             result = cursor.fetchall()
             # Transform the result into a list of dictionaries
-            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
+            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3], 'trailer_url': row[4], 'isNowShowing': row[5]} for row in result]
             return jsonify(movies)
     finally:
         connection.close()
@@ -875,8 +875,6 @@ def get_promos():
         print(f"Error fetching promos: {e}")
         return jsonify({'error': 'An error occurred while fetching promos.'}), 500
 
-if __name__ == '__main__':
-   app.run(debug=True)
 @app.route('/api/schedule-movie', methods=['POST'])
 def schedule_movie():
     data = request.get_json()

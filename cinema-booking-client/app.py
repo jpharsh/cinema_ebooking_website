@@ -181,11 +181,11 @@ def fetch_all_movies():
     )
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
+            sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
             cursor.execute(sql)
             result = cursor.fetchall()
             # Transform the result into a list of dictionaries
-            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
+            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3], 'trailer_url': row[4], 'isNowShowing': row[5]} for row in result]
             return jsonify(movies)
     finally:
         connection.close()
@@ -875,5 +875,84 @@ def get_promos():
         print(f"Error fetching promos: {e}")
         return jsonify({'error': 'An error occurred while fetching promos.'}), 500
 
+@app.route('/api/schedule-movie', methods=['POST'])
+def schedule_movie():
+    data = request.get_json()
+    movie_id = data.get('movie_id')
+    room = data.get('room')
+    dtime = data.get('time')
+
+    connection = connect_db()
+    try:
+        cursor = connection.cursor()
+        print(f"Received movie_id: {movie_id} (type: {type(movie_id)})")
+
+        # Check if the movie exists in the Movies table
+        cursor.execute("SELECT COUNT(*) FROM Movies WHERE id = %s", (movie_id,))
+        movie_exists = cursor.fetchone()[0]
+
+        if not movie_exists:
+            return jsonify({"success": False, "error": "Invalid movie ID"}), 400
+
+        # Check if the selected room already has a movie scheduled at the same date and time
+        cursor.execute("""
+            SELECT COUNT(*) FROM Shows
+            WHERE room_id = %s AND showtime = %s
+        """, (room, dtime))
+        conflict = cursor.fetchone()[0]
+
+        if conflict > 0:
+            return jsonify({"success": False, "error": "Time conflict in the selected room"}), 400
+
+        # Insert new schedule
+        cursor.execute("""
+            INSERT INTO Shows (movie_id, room_id, showtime)
+            VALUES (%s, %s, %s)
+        """, (movie_id, room, dtime))
+        connection.commit()
+
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Error scheduling movie: {e}")
+        return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
+    finally:
+        connection.close()
+
+
 if __name__ == '__main__':
    app.run(debug=True)
+
+
+# @app.route('/api/schedule-movie', methods=['POST'])
+# def schedule_movie():
+#     data = request.get_json()
+#     movie_id = data.get('movie_id')
+#     room = data.get('room')
+#     dtime = data.get('show_time')
+
+#     connection = connect_db()
+#     try:
+#         with connection.cursor() as cursor:
+#             # Check if the selected room already has a movie scheduled at the same date and time
+#             cursor.execute("""
+#                 SELECT COUNT(*) FROM Shows
+#                 WHERE room_id = %s AND showtime = %s
+#             """, (room, dtime))
+#             conflict = cursor.fetchone()[0]
+
+#             if conflict > 0:
+#                 return jsonify({"success": False, "error": "Time conflict in the selected room"}), 400
+
+#             # Insert new schedule
+#             cursor.execute("""
+#                 INSERT INTO Shows (movie_id, room_id, showtime)
+#                 VALUES (%s, %s, %s)
+#             """, (movie_id, room, dtime))
+#             connection.commit()
+
+#         return jsonify({"success": True}), 200
+#     except Exception as e:
+#         print(f"Error scheduling movie: {e}")
+#         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
+#     finally:
+#         connection.close()

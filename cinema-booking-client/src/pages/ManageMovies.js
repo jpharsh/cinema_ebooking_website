@@ -19,15 +19,14 @@ function ManageMovies() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/api/fetch-all-movies"); // Use the new endpoint
-        setMovies(response.data); // Set the movies from the API response to the state
+        const response = await axios.get("http://127.0.0.1:5000/api/fetch-all-movies");
+        setMovies(response.data);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
     };
-
     fetchMovies();
-  }, []); // Empty dependency array means it runs once when the component mounts
+  }, []); // Only run once on mount  
 
   // Function to open the modal for editing or adding
   const openModal = (movie = null) => {
@@ -164,8 +163,86 @@ function ManageMovies() {
     movie.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Additional states
+  const [scheduleModal, setScheduleModal] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [scheduleDatetime, setScheduleDatetime] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+
+  // Open schedule modal
+  const openScheduleModal = (movie = null) => {
+    setScheduleModal(true);
+    setCurrentMovie(
+        movie || {
+          id: null,
+          title: "",
+          rating: "",
+          category: "",
+          cast: "",
+          director: "",
+          producer: "",
+          synopsis: "",
+          reviews: "",
+          trailerPicture: "",
+          trailerVideo: "",
+          showDates: [],
+          showTimes: [],
+        }
+    );
+    setSelectedRoom(null);
+    setScheduleDatetime("");
+    setScheduleTime("");
+  };
+
+  // Close schedule modal
+  const closeScheduleModal = () => {
+    setScheduleModal(false);
+  };
+
+  const handleMovieSelection = (movieId) => {
+    const selected = movies.find((movie) => movie.id === parseInt(movieId, 10));
+    setSelectedMovie(selected); // Now selectedMovie will have the correct details
+};
+
+  // Handle scheduling
+  const handleSchedule = async () => {
+    console.log("Movie data:", selectedMovie); // Ensure this logs movie data
+    if (!selectedMovie || !selectedMovie.id) {
+        alert("Please select a movie before scheduling.");
+        return;
+    }
+    const showtime = `${scheduleDatetime} ${scheduleTime}:00`;
+    try {
+        const response = await axios.post(
+            "http://127.0.0.1:5000/api/schedule-movie",
+            {
+                movie_id: selectedMovie.id,
+                room: selectedRoom,
+                time: showtime,
+            }
+        );
+        if (response.data.success) {
+            alert("Movie scheduled successfully");
+            closeScheduleModal();
+        } else {
+            alert(
+                response.data.error ||
+                "Scheduling conflict: This room already has a movie at the selected time."
+            );
+        }
+    } catch (error) {
+      if (error.response?.data?.error) {
+        alert(error.response.data.error); // Show specific error from backend
+      } else {
+          console.error("Error scheduling movie:", error);
+          alert("An error occurred while scheduling the movie. Please check the console for details.");
+      }
+    }
+};
+
   return (
-    <div> 
+    <div>
       <div className="admin-panel">
         {/* <aside className="sidebar">
           <ul>
@@ -187,9 +264,10 @@ function ManageMovies() {
           <button onClick={() => openModal()} className="add-movie-button">
             Add Movie
           </button>
-          <button className="sched-movie-button">
+          <button className="sched-movie-button" onClick={openScheduleModal}>
             Schedule Movie
           </button>
+
           <div>
             <input
               type="text"
@@ -213,6 +291,9 @@ function ManageMovies() {
                 <p>{movie.title}</p>
                 <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
                 {/* <div className="manage-button-group">
+                <p>Rating: {movie.mpaa_rating}</p>{" "}
+                {/* Display rating separately */}
+                <div className="manage-button-group">
                   <button
                     onClick={() => openModal(movie)}
                     className="manage-button edit"
@@ -225,11 +306,57 @@ function ManageMovies() {
                   >
                     Delete
                   </button>
-                </div> */}
+                </div> */
               </div>
             ))}
           </div>
         </main>
+
+        {scheduleModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Schedule Movie</h3>
+              <label>Choose Movie</label>
+              <select
+                onChange={(e) => handleMovieSelection(e.target.value)} // Call handleMovieSelection on movie change
+              >
+                <option value="">Select a movie</option>
+                {movies.map((movie) => (
+                  <option key={movie.id} value={movie.id}>
+                    {movie.title}
+                  </option>
+                ))}
+              </select>
+
+              <label>Choose Room</label>
+              <select onChange={(e) => setSelectedRoom(Number(e.target.value))}>
+                <option value="">Select a room</option>
+                {[1, 2, 3].map((room) => (
+                  <option key={room} value={room}>
+                    {room}
+                  </option>
+                ))}
+              </select>
+
+              <label>Schedule Date</label>
+              <input
+                type="date"
+                value={scheduleDatetime}
+                onChange={(e) => setScheduleDatetime(e.target.value)}
+              />
+
+              <label>Schedule Time</label>
+              <input
+                type="time"
+                value={scheduleTime}
+                onChange={(e) => setScheduleTime(e.target.value)}
+              />
+
+              <button onClick={handleSchedule}>Schedule</button>
+              <button onClick={closeScheduleModal}>Cancel</button>
+            </div>
+          </div>
+        )}
 
         {/* Modal Component */}
         {showModal && (
@@ -346,7 +473,10 @@ function ManageMovies() {
                 placeholder="MPAA Rating"
                 value={currentMovie?.mpaa_rating || ""}
                 onChange={(e) =>
-                  setCurrentMovie({ ...currentMovie, mpaa_rating: e.target.value })
+                  setCurrentMovie({
+                    ...currentMovie,
+                    mpaa_rating: e.target.value,
+                  })
                 }
               />
               {errors.mpaa_rating && <p className="error-message">{errors.mpaa_rating}</p>}
@@ -367,7 +497,7 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showDates && <p className="error-message">{errors.showDates}</p>}
-              </div>
+              </div>*/}
 
               <div className="show-times">
                 <label>Show Times:</label>
@@ -385,7 +515,7 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
-              </div> */}
+              </div> 
 
               <button onClick={handleSave} className="manage-button">
                 {isEditing ? "Save Changes" : "Add Movie"}

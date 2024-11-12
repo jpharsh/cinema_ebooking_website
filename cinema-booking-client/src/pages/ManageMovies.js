@@ -3,6 +3,7 @@ import "./ManageMovies.css";
 import "../App.css";
 import axios from "axios";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function ManageMovies() {
   const [movies, setMovies] = useState([]);
@@ -166,13 +167,21 @@ function ManageMovies() {
   return (
     <div> 
       <div className="admin-panel">
-        <aside className="sidebar">
+        {/* <aside className="sidebar">
           <ul>
             <li>Manage Movies</li>
             <li>Promo Codes</li>
             <li>Manage Users</li>
           </ul>
-        </aside>
+        </aside> */}
+        <nav className="sidebar">
+          <ul>
+            <li><Link to="/admin-home">Home Page</Link></li>
+            <li className="active"><Link to="/manage-movies">Manage Movies</Link></li>
+            <li>Manage Users</li>
+            <li><Link to="/promo">Manage Promos</Link></li>
+          </ul>
+        </nav>
         <main className="main-content">
           <h2>MOVIES</h2>
           <button onClick={() => openModal()} className="add-movie-button">

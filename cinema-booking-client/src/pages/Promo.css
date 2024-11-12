@@ -64,7 +64,17 @@
     padding: 15px;
     cursor: pointer;
     color: #fff;
+    
   }
+
+  .sidebar a {
+    text-decoration: none;
+    color: white;
+  }
+
+  .sidebar :hover {
+    color: #ababab; 
+}
   
   .sidebar li.active {
     background-color: #444;

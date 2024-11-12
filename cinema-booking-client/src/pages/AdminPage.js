@@ -10,6 +10,10 @@ function AdminHomePage() {
   const handleManageMoviesClick = () => {
       navigate('/manage-movies'); // Navigate to the homepage
   };
+
+  const handleManagePromosClick = () => {
+    navigate('/promo'); // Navigate to manage promos
+};
   
   return (
     <>
@@ -31,7 +35,7 @@ function AdminHomePage() {
         <div className="admin-button-group">
           <button className="admin-button" onClick={handleManageMoviesClick}>Manage Movies</button>
           <button className="admin-button">Manage Users</button>
-          <button className="admin-button">Manage Promos</button>
+          <button className="admin-button" onClick={handleManagePromosClick}>Manage Promos</button>
         </div>
       </div>
     </>

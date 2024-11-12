@@ -12,6 +12,7 @@ const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [selectedTrailer, setSelectedTrailer] = useState(null);
+    const [isSearching, setIsSearching] = useState(false); // New state to track search status
 
     // Fetch Now Playing movies from Flask API
     useEffect(() => {
@@ -37,15 +38,21 @@ const HomePage = () => {
         const searchTerm = event.target.value.toLowerCase();
         setSearchTerm(searchTerm);
 
+        // Set isSearching to true if there's a search term
+        setIsSearching(searchTerm.length > 0);
+
         // Combine movies from both categories to search against
         const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
         
         // Filter movies based on title match
         const filteredSuggestions = searchTerm ? allMovies.filter(movie => 
-            movie.title && movie.title.toLowerCase().includes(searchTerm)
+            movie.title && movie.title.toLowerCase().startsWith(searchTerm)
         ) : []; // Clear suggestions if searchTerm is empty
 
         setSuggestions(filteredSuggestions); // Update suggestions state
+        if (searchTerm && filteredSuggestions.length === 0) {
+            setSuggestions([{ title: 'No movies found' }]); // Show 'No movies found' if no matches
+        }
     };
 
     const handleSuggestionClick = (movieTitle) => {
@@ -55,6 +62,7 @@ const HomePage = () => {
 
     const handleBlur = () => {
         setSuggestions([]); // Clear suggestions when the input loses focus
+        setIsSearching(false); 
     };
 
     const watchTrailer = (trailerUrl) => {
@@ -105,15 +113,17 @@ const HomePage = () => {
                 )}
             </div>
 
-            <div className="movie-section" style={{ padding: '0px', height: '400px' }}>
+            {!searchTerm && (
+                <div className="movie-section" style={{ padding: '0px', height: '400px' }}>
                 <img src={Advertisement} alt="Advertisement" className="advertisement-pic" />
             </div>
+            )}
 
             {/* Movie Lists */}
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Now Playing</h2>
                 <MovieList 
-                    movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().includes(searchTerm.toLowerCase()))} 
+                    movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))} 
                     isNowPlaying={true}
                     onWatchTrailer={watchTrailer}
                 />
@@ -122,7 +132,7 @@ const HomePage = () => {
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Coming Soon</h2>
                 <MovieList 
-                    movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().includes(searchTerm.toLowerCase()))}
+                    movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))}
                     isNowPlaying={false}
                     onWatchTrailer={watchTrailer} 
                 />

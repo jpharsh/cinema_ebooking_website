@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import './MovieCard.css';
+import { Link } from 'react-router-dom';
 
 const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -21,7 +22,15 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
                         onClick={() => onWatchTrailer(movie.trailer_url)}
                     >Watch Trailer</button>
                     {isNowPlaying && (
-                        <button className="btn red">Book Movie</button>
+                        <Link 
+                            to={{
+                                pathname: '/movie-information',
+                                state: { movie }
+                            }}
+                        >
+                            <button style={{width: '100%'}}className="btn red">View Movie Info</button>
+                        </Link>
+                        // <button className="btn red">View Movie Info</button>
                     )}
                 </div>
             )}

@@ -15,26 +15,17 @@ function ManageMovies() {
   const [errors, setErrors] = useState({}); // State for error messages
 
   // Fetch movies from the backend API (all movies)
-  useEffect(
-    () => {
-      const fetchMovies = async () => {
-        try {
-          const response = await axios.get(
-            "http://127.0.0.1:5000/api/fetch-all-movies"
-          ); // Use the new endpoint
-          setMovies(response.data); // Set the movies from the API response to the state
-        } catch (error) {
-          console.error("Error fetching movies:", error);
-        }
-      };
-
-      fetchMovies();
-
-      console.log("Movies data:", movies); // Check structure of movies data
-    },
-    [],
-    [movies]
-  ); // Empty dependency array means it runs once when the component mounts
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/api/fetch-all-movies");
+        setMovies(response.data);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+    fetchMovies();
+  }, []); // Only run once on mount  
 
   // Function to open the modal for editing or adding
   const openModal = (movie = null) => {
@@ -209,46 +200,41 @@ function ManageMovies() {
   };
 
   const handleMovieSelection = (movieId) => {
-    const selected = movies.find((movie) => movie.title === movieId);
-    setSelectedMovie(selected); // Now selectedMovie has all details of the selected movie
-  };
+    const selected = movies.find((movie) => movie.id === parseInt(movieId, 10));
+    setSelectedMovie(selected); // Now selectedMovie will have the correct details
+};
 
   // Handle scheduling
   const handleSchedule = async () => {
-    //console.log(movies)
-    console.log(selectedMovie);
-    console.log(selectedMovie.id);
+    console.log("Movie data:", selectedMovie); // Ensure this logs movie data
     if (!selectedMovie || !selectedMovie.id) {
-      alert("Please select a movie before scheduling.");
-      return;
+        alert("Please select a movie before scheduling.");
+        return;
     }
     const showtime = `${scheduleDatetime} ${scheduleTime}:00`;
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/api/schedule-movie",
-        {
-          movie_id: selectedMovie.id,
-          room: selectedRoom,
-          //date: scheduleDate,
-          time: showtime,
-        }
-      );
-      if (response.data.success) {
-        alert("Movie scheduled successfully");
-        closeScheduleModal();
-      } else {
-        alert(
-          response.data.error ||
-            "Scheduling conflict: This room already has a movie at the selected time."
+        const response = await axios.post(
+            "http://127.0.0.1:5000/api/schedule-movie",
+            {
+                movie_id: selectedMovie.id,
+                room: selectedRoom,
+                time: showtime,
+            }
         );
-      }
+        if (response.data.success) {
+            alert("Movie scheduled successfully");
+            closeScheduleModal();
+        } else {
+            alert(
+                response.data.error ||
+                "Scheduling conflict: This room already has a movie at the selected time."
+            );
+        }
     } catch (error) {
-      console.error("Error scheduling movie:", error);
-      alert(
-        "An error occurred while scheduling the movie. Please check the console for details."
-      );
+        console.error("Error scheduling movie:", error);
+        alert("An error occurred while scheduling the movie. Please check the console for details.");
     }
-  };
+};
 
   return (
     <div>
@@ -498,7 +484,7 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showDates && <p className="error-message">{errors.showDates}</p>}
-              </div>
+              </div>*/}
 
               <div className="show-times">
                 <label>Show Times:</label>
@@ -516,7 +502,7 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
-              </div> */}
+              </div> 
 
               <button onClick={handleSave} className="manage-button">
                 {isEditing ? "Save Changes" : "Add Movie"}

@@ -3,6 +3,7 @@ import "./ManageMovies.css";
 import "../App.css";
 import axios from "axios";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function ManageMovies() {
   const [movies, setMovies] = useState([]);
@@ -29,6 +30,10 @@ function ManageMovies() {
 
   // Function to open the modal for editing or adding
   const openModal = (movie = null) => {
+    if (!showModal && scheduleModal) {
+      alert("Please finish scheduling movie or cancel.");
+      return;
+    }
     setCurrentMovie(
       movie || {
         id: null,
@@ -70,7 +75,6 @@ function ManageMovies() {
       "producer",
       "movie_cast",
       "synopsis",
-      "reviews",
       "poster_url",
       "trailer_url",
     ];
@@ -80,14 +84,6 @@ function ManageMovies() {
         newErrors[field] = `${field} is required`;
       }
     });
-
-    // if (currentMovie.showDates.length === 0) {
-    //   newErrors.showDates = "At least one show date is required";
-    // }
-
-    // if (currentMovie.showTimes.length === 0) {
-    //   newErrors.showTimes = "At least one show time is required";
-    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -171,6 +167,10 @@ function ManageMovies() {
 
   // Open schedule modal
   const openScheduleModal = (movie = null) => {
+    if (showModal) {
+      alert("Please finish adding movie or cancel.");
+      return;
+    }
     setScheduleModal(true);
     setCurrentMovie(
         movie || {
@@ -197,6 +197,7 @@ function ManageMovies() {
   // Close schedule modal
   const closeScheduleModal = () => {
     setScheduleModal(false);
+    setErrors({});
   };
 
   const handleMovieSelection = (movieId) => {
@@ -204,9 +205,32 @@ function ManageMovies() {
     setSelectedMovie(selected); // Now selectedMovie will have the correct details
 };
 
+  const validateSchedule = () => {
+    const newErrors = {};
+    if (!selectedMovie || !selectedMovie.id) {
+      newErrors.movie = "Please select a movie";
+    }
+    if (!selectedRoom) {
+      newErrors.room = "Please select a room";
+    }
+    if (!scheduleDatetime) {
+      newErrors.showDates = "Please select a date";
+    }
+    if (!scheduleTime) {
+      newErrors.showTimes = "Please select a time";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // Handle scheduling
   const handleSchedule = async () => {
     console.log("Movie data:", selectedMovie); // Ensure this logs movie data
+    if (!validateSchedule()) {
+      console.log("Validate Schedule Movie failed");
+      return; // Don't proceed if there are validation errors
+    }
     if (!selectedMovie || !selectedMovie.id) {
         alert("Please select a movie before scheduling.");
         return;
@@ -243,13 +267,21 @@ function ManageMovies() {
   return (
     <div>
       <div className="admin-panel">
-        <aside className="sidebar">
+        {/* <aside className="sidebar">
           <ul>
             <li>Manage Movies</li>
             <li>Promo Codes</li>
             <li>Manage Users</li>
           </ul>
-        </aside>
+        </aside> */}
+        <nav className="sidebar">
+          <ul>
+            <li><Link to="/admin-home">Home Page</Link></li>
+            <li className="active"><Link to="/manage-movies">Manage Movies</Link></li>
+            <li>Manage Users</li>
+            <li><Link to="/promo">Manage Promos</Link></li>
+          </ul>
+        </nav>
         <main className="main-content">
           <h2>MOVIES</h2>
           <button onClick={() => openModal()} className="add-movie-button">
@@ -281,23 +313,6 @@ function ManageMovies() {
                 <img src={movie.poster_url || "https://via.placeholder.com/150"} className="movie-poster" alt={`${movie.title} poster`} />
                 <p>{movie.title}</p>
                 <p>Rating: {movie.mpaa_rating}</p> {/* Display rating separately */}
-                {/* <div className="manage-button-group">
-                <p>Rating: {movie.mpaa_rating}</p>{" "}
-                {/* Display rating separately */}
-                <div className="manage-button-group">
-                  <button
-                    onClick={() => openModal(movie)}
-                    className="manage-button edit"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(movie.id)}
-                    className="manage-button delete"
-                  >
-                    Delete
-                  </button>
-                </div> */
               </div>
             ))}
           </div>
@@ -318,6 +333,7 @@ function ManageMovies() {
                   </option>
                 ))}
               </select>
+              {errors.movie && <p className="error-message">{errors.movie}</p>}
 
               <label>Choose Room</label>
               <select onChange={(e) => setSelectedRoom(Number(e.target.value))}>
@@ -328,6 +344,7 @@ function ManageMovies() {
                   </option>
                 ))}
               </select>
+              {errors.room && <p className="error-message">{errors.room}</p>}
 
               <label>Schedule Date</label>
               <input
@@ -335,6 +352,7 @@ function ManageMovies() {
                 value={scheduleDatetime}
                 onChange={(e) => setScheduleDatetime(e.target.value)}
               />
+              {errors.showDates && <p className="error-message">{errors.showDates}</p>}
 
               <label>Schedule Time</label>
               <input
@@ -342,6 +360,7 @@ function ManageMovies() {
                 value={scheduleTime}
                 onChange={(e) => setScheduleTime(e.target.value)}
               />
+              {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
 
               <button onClick={handleSchedule}>Schedule</button>
               <button onClick={closeScheduleModal}>Cancel</button>
@@ -490,7 +509,7 @@ function ManageMovies() {
                 {errors.showDates && <p className="error-message">{errors.showDates}</p>}
               </div>*/}
 
-              <div className="show-times">
+              {/* <div className="show-times">
                 <label>Show Times:</label>
                 <input
                   type="time"
@@ -506,7 +525,7 @@ function ManageMovies() {
                   ))}
                 </ul>
                 {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
-              </div> 
+              </div>  */}
 
               <button onClick={handleSave} className="manage-button">
                 {isEditing ? "Save Changes" : "Add Movie"}

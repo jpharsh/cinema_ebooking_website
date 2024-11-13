@@ -813,12 +813,11 @@ def add_promo():
         
         # Extract fields from the data
         promo_code = data.get('code')
-        promo_description = data.get('description')
         promo_discount = data.get('discount')
         promo_expiry = data.get('expirationDate')
 
         # Validate the input
-        if not promo_code or not promo_description or not promo_discount or not promo_expiry:
+        if not promo_code or not promo_discount or not promo_expiry:
             return jsonify({'error': 'All fields are required'}), 400
 
         # Connect to the database and insert the promo
@@ -841,7 +840,7 @@ def add_promo():
         print('before sending email')
         # Step 3: Send emails to all subscribed users
         subject = "New Movie Promotion Available!"
-        body = f"Hello, there's a new promotion available: {promo_code} - {promo_description}. It expires on {promo_expiry}."
+        body = f"Hello, there's a new promotion available: {promo_code}. It expires on {promo_expiry}."
 
         print('before users loop')
         print(f"Subscribed users: {subscribed_users}")

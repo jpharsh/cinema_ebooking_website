@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './Promo.css';
 import axios from 'axios';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 
 // import AdminNavbar from '../components/AdminNavbar';
 
@@ -14,7 +16,7 @@ function PromoTable({ promos, searchQuery, onDelete }) {
       <thead>
         <tr>
           <th>Promo Code</th>
-          <th>Description</th>
+          <th></th>
           <th>Discount Amount</th>
           <th>Expiration Date</th>
           <th>Action</th>
@@ -55,12 +57,11 @@ function AdminPage() {
   }, []);
 
   const handleAddPromo = async () => {
-    if (newPromo.code && newPromo.description && newPromo.discount && newPromo.expirationDate) {
+    if (newPromo.code && newPromo.discount && newPromo.expirationDate) {
       try {
         // Send a POST request to the Flask backend to save the promo
         const response = await axios.post('http://127.0.0.1:5000/api/add-promo', {
           code: newPromo.code,
-          description: newPromo.description,
           discount: newPromo.discount,
           expirationDate: newPromo.expirationDate
         });
@@ -69,7 +70,7 @@ function AdminPage() {
           // Add the promo to the local state only if it was successfully saved in the database
           const updatedPromosResponse = await axios.get('http://127.0.0.1:5000/api/promos');
           setPromos(updatedPromosResponse.data);
-          setNewPromo({ code: '', description: '', discount: '', expirationDate: '' });
+          setNewPromo({ code: '', discount: '', expirationDate: '' });
 
         } else {
           alert('Failed to add promo');
@@ -104,8 +105,10 @@ function AdminPage() {
         {/* Sidebar */}
         <nav className="sidebar">
           <ul>
-            <li>Home Page</li>
-            <li className="active">Promo Codes</li>
+            <li><Link to="/admin-home">Home Page</Link></li>
+            <li><Link to="/manage-movies">Manage Movies</Link></li>
+            <li>Manage Users</li>
+            <li className="active"><Link to="/promo">Manage Promos</Link></li>
           </ul>
         </nav>
 
@@ -120,7 +123,7 @@ function AdminPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button className="add-promo-button" onClick={handleAddPromo}>Add Promo</button>
+            {/* <button className="add-promo-button" onClick={handleAddPromo}>Add Promo</button> */}
           </div>
 
           {/* Promo Table */}
@@ -134,12 +137,12 @@ function AdminPage() {
               value={newPromo.code}
               onChange={(e) => setNewPromo({ ...newPromo, code: e.target.value })}
             />
-            <input 
+            {/* <input 
               type="text" 
               placeholder="Description" 
               value={newPromo.description}
               onChange={(e) => setNewPromo({ ...newPromo, description: e.target.value })}
-            />
+            /> */}
             <input 
               type="text" 
               placeholder="Discount Amount"

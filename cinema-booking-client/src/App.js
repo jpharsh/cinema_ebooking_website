@@ -22,6 +22,7 @@ import Promo from './pages/Promo.js';
 import './App.css';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import MovieInformation from './pages/MovieInformation.js';
 
 function App() {
   const { loggedIn, isAdmin, logout, loading } = useContext(AuthContext);
@@ -54,6 +55,7 @@ function App() {
         <Route path="/promo" element={<Promo />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/movie-information" element={<MovieInformation />} />
       </Routes>
     </>
   );

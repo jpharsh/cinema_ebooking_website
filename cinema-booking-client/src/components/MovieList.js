@@ -2,7 +2,7 @@ import React from 'react';
 import MovieCard from './MovieCard';
 import './MovieList.css';
 
-const MovieList = ({ movies , isNowPlaying, onWatchTrailer}) => {
+const MovieList = ({ movies , isNowPlaying}) => {
   return (
     <div className="movie-list">
       {movies.map((movie, index) => (
@@ -10,7 +10,6 @@ const MovieList = ({ movies , isNowPlaying, onWatchTrailer}) => {
           key={index} 
           movie={movie} 
           isNowPlaying={isNowPlaying}
-          onWatchTrailer={onWatchTrailer}
         />
       ))}
     </div>

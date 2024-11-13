@@ -11,11 +11,11 @@ const HomePage = () => {
     const [comingSoonMovies, setComingSoonMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedTrailer, setSelectedTrailer] = useState(null);
     const [isSearching, setIsSearching] = useState(false); // New state to track search status
 
     // Fetch Now Playing movies from Flask API
     useEffect(() => {
+        
         axios.get('http://127.0.0.1:5000/api/now-playing')
             .then(response => {
                 setNowPlayingMovies(response.data);
@@ -32,11 +32,25 @@ const HomePage = () => {
             .catch(error => {
                 console.error("Error fetching coming soon movies:", error);
             });
+
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+        if (storedSearchTerm) {
+            setSearchTerm(storedSearchTerm);
+
+            const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
+            const filtered = allMovies.filter(movie => 
+                movie.title.toLowerCase().startsWith(storedSearchTerm)
+            );
+            setComingSoonMovies(filtered);
+            setNowPlayingMovies(filtered);
+
+        }
     }, []);
 
     const handleSearch = (event) => {
         const searchTerm = event.target.value.toLowerCase();
         setSearchTerm(searchTerm);
+        localStorage.setItem('searchTerm', searchTerm);
 
         // Set isSearching to true if there's a search term
         setIsSearching(searchTerm.length > 0);
@@ -63,14 +77,6 @@ const HomePage = () => {
     const handleBlur = () => {
         setSuggestions([]); // Clear suggestions when the input loses focus
         setIsSearching(false); 
-    };
-
-    const watchTrailer = (trailerUrl) => {
-        setSelectedTrailer(trailerUrl); // Set the trailer URL to display the trailer
-    };
-
-    const closeTrailer = () => {
-        setSelectedTrailer(null); // Close the trailer pop-up
     };
 
     return (
@@ -107,6 +113,7 @@ const HomePage = () => {
                                 onClick={() => handleSuggestionClick(movie.title)}
                             >
                                 {movie.title}
+                                
                             </div>
                         ))}
                     </div>
@@ -125,7 +132,6 @@ const HomePage = () => {
                 <MovieList 
                     movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))} 
                     isNowPlaying={true}
-                    onWatchTrailer={watchTrailer}
                 />
             </div>
 
@@ -134,32 +140,12 @@ const HomePage = () => {
                 <MovieList 
                     movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))}
                     isNowPlaying={false}
-                    onWatchTrailer={watchTrailer} 
                 />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button className="btn red">All Movies</button>
             </div>
-            
-            {/* Trailer Pop-up */}
-            {selectedTrailer && (
-                <div className="trailer-popup">
-                    <div className="trailer-popup-content">
-                        <button className="close-button" onClick={closeTrailer}>X</button>
-                        <iframe 
-                            width="100%" 
-                            height="400px" 
-                            src={selectedTrailer} 
-                            title="Trailer" 
-                            frameBorder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 };

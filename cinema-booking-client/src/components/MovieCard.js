@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import '../App.css';
 import './MovieCard.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
+const MovieCard = ({ movie, isNowPlaying}) => {
     const [isHovered, setIsHovered] = useState(false);
+    const navigate = useNavigate();
+
+    const viewMovieInfo = () => {
+        navigate('/movie-information', { state: { movie } });
+    };
 
     return ( 
         <div
@@ -14,23 +20,20 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
         >
             
             <img src={movie.poster_url} className="movie-card" alt={`${movie.title} poster`} />
-            <p className="movie-card-title">{movie.title} | {movie.mpaa_rating}</p>
+            <p className="movie-card-title">{movie.title} | {movie.mpaa_rating} </p>
             {isHovered && (
                 <div className="movie-info">
-                    <button 
-                        className="btn white" 
-                        onClick={() => onWatchTrailer(movie.trailer_url)}
-                    >Watch Trailer</button>
+
+                    <button style={{ width: '100%' }} className="btn white" onClick={viewMovieInfo}>View Movie Info</button>
                     {isNowPlaying && (
                         <Link 
                             to={{
-                                pathname: '/movie-information',
+                                pathname: '/showtimes',
                                 state: { movie }
                             }}
                         >
-                            <button style={{width: '100%'}}className="btn red">View Movie Info</button>
+                            <button style={{width: '100%'}}className="btn red">Book Movie</button>
                         </Link>
-                        // <button className="btn red">View Movie Info</button>
                     )}
                 </div>
             )}

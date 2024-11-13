@@ -4,7 +4,7 @@ import './MovieCard.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
+const MovieCard = ({ movie, isNowPlaying}) => {
     const [isHovered, setIsHovered] = useState(false);
     const navigate = useNavigate();
 
@@ -25,12 +25,6 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
                 <div className="movie-info">
 
                     <button style={{ width: '100%' }} className="btn white" onClick={viewMovieInfo}>View Movie Info</button>
- 
-                    {/* <button 
-                        className="btn red" 
-                        onClick={() => onWatchTrailer(movie.trailer_url)}
-                        
-                    >Watch Trailer</button> */}
                     {isNowPlaying && (
                         <Link 
                             to={{

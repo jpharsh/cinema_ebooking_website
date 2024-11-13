@@ -11,7 +11,6 @@ const HomePage = () => {
     const [comingSoonMovies, setComingSoonMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedTrailer, setSelectedTrailer] = useState(null);
     const [isSearching, setIsSearching] = useState(false); // New state to track search status
 
     // Fetch Now Playing movies from Flask API
@@ -80,14 +79,6 @@ const HomePage = () => {
         setIsSearching(false); 
     };
 
-    const watchTrailer = (trailerUrl) => {
-        setSelectedTrailer(trailerUrl); // Set the trailer URL to display the trailer
-    };
-
-    const closeTrailer = () => {
-        setSelectedTrailer(null); // Close the trailer pop-up
-    };
-
     return (
         <div>
             <div className="App" style={{ padding: '20px', position: 'relative' }}>
@@ -141,7 +132,6 @@ const HomePage = () => {
                 <MovieList 
                     movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))} 
                     isNowPlaying={true}
-                    onWatchTrailer={watchTrailer}
                 />
             </div>
 
@@ -150,32 +140,12 @@ const HomePage = () => {
                 <MovieList 
                     movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))}
                     isNowPlaying={false}
-                    onWatchTrailer={watchTrailer} 
                 />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button className="btn red">All Movies</button>
             </div>
-            
-            {/* Trailer Pop-up */}
-            {selectedTrailer && (
-                <div className="trailer-popup">
-                    <div className="trailer-popup-content">
-                        <button className="close-button" onClick={closeTrailer}>X</button>
-                        <iframe 
-                            width="100%" 
-                            height="400px" 
-                            src={selectedTrailer} 
-                            title="Trailer" 
-                            frameBorder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 };

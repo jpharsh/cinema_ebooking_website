@@ -44,7 +44,7 @@ function ManageMovies() {
         director: "",
         producer: "",
         synopsis: "",
-        reviews: "",
+        // reviews: "",
         poster_url: "",
         trailer_url: "",
         showDates: [],
@@ -116,12 +116,15 @@ function ManageMovies() {
         setMovies([...movies, { ...currentMovie, id: response.data.id }]); // Use response data to update the local list
         closeModal();
         console.log("Movie added successfully:", response.data);
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error adding movie:", error);
       });
     }
     closeModal();
+
+    
   };
 
   // Function to handle deleting a movie with confirmation
@@ -248,6 +251,8 @@ function ManageMovies() {
         if (response.data.success) {
             alert("Movie scheduled successfully");
             closeScheduleModal();
+            
+            window.location.reload();
         } else {
             alert(
                 response.data.error ||

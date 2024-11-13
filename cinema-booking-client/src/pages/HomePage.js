@@ -16,6 +16,7 @@ const HomePage = () => {
 
     // Fetch Now Playing movies from Flask API
     useEffect(() => {
+        
         axios.get('http://127.0.0.1:5000/api/now-playing')
             .then(response => {
                 setNowPlayingMovies(response.data);
@@ -32,11 +33,25 @@ const HomePage = () => {
             .catch(error => {
                 console.error("Error fetching coming soon movies:", error);
             });
+
+        const storedSearchTerm = localStorage.getItem('searchTerm');
+        if (storedSearchTerm) {
+            setSearchTerm(storedSearchTerm);
+
+            const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
+            const filtered = allMovies.filter(movie => 
+                movie.title.toLowerCase().startsWith(storedSearchTerm)
+            );
+            setComingSoonMovies(filtered);
+            setNowPlayingMovies(filtered);
+
+        }
     }, []);
 
     const handleSearch = (event) => {
         const searchTerm = event.target.value.toLowerCase();
         setSearchTerm(searchTerm);
+        localStorage.setItem('searchTerm', searchTerm);
 
         // Set isSearching to true if there's a search term
         setIsSearching(searchTerm.length > 0);
@@ -107,6 +122,7 @@ const HomePage = () => {
                                 onClick={() => handleSuggestionClick(movie.title)}
                             >
                                 {movie.title}
+                                
                             </div>
                         ))}
                     </div>

@@ -75,7 +75,6 @@ function ManageMovies() {
       "producer",
       "movie_cast",
       "synopsis",
-      "reviews",
       "poster_url",
       "trailer_url",
     ];

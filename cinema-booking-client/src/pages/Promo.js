@@ -57,12 +57,11 @@ function AdminPage() {
   }, []);
 
   const handleAddPromo = async () => {
-    if (newPromo.code && newPromo.description && newPromo.discount && newPromo.expirationDate) {
+    if (newPromo.code && newPromo.discount && newPromo.expirationDate) {
       try {
         // Send a POST request to the Flask backend to save the promo
         const response = await axios.post('http://127.0.0.1:5000/api/add-promo', {
           code: newPromo.code,
-          description: newPromo.description,
           discount: newPromo.discount,
           expirationDate: newPromo.expirationDate
         });
@@ -71,7 +70,7 @@ function AdminPage() {
           // Add the promo to the local state only if it was successfully saved in the database
           const updatedPromosResponse = await axios.get('http://127.0.0.1:5000/api/promos');
           setPromos(updatedPromosResponse.data);
-          setNewPromo({ code: '', description: '', discount: '', expirationDate: '' });
+          setNewPromo({ code: '', discount: '', expirationDate: '' });
 
         } else {
           alert('Failed to add promo');

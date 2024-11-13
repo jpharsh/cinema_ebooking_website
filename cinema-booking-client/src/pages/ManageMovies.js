@@ -367,8 +367,8 @@ function ManageMovies() {
               />
               {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
 
-              <button onClick={handleSchedule}>Schedule</button>
-              <button onClick={closeScheduleModal}>Cancel</button>
+              <button className="manage-button" onClick={handleSchedule}>Schedule</button>
+              <button className="manage-button" onClick={closeScheduleModal}>Cancel</button>
             </div>
           </div>
         )}

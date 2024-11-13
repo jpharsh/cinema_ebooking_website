@@ -29,7 +29,7 @@ const MovieInformation = () => {
     };
 
     const handleBookClick = () => {
-        navigate('/showtimes');
+        navigate('/showtimes', { state: { movie } });
     };
 
   return (

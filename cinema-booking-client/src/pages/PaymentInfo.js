@@ -3,8 +3,18 @@ import './PaymentInfo.css';
 import MasterCardLogo from '../images/MasterCardLogo.png';
 import VisaLogo from '../images/VisaLogo.png';
 // import LoggedInNavbar from '../components/LoggedInNavbar';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PaymentInfo = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { totalPrice, movie, userSeats } = location.state || {};
+  const formattedSeats = userSeats.map(seat => `Row ${seat.row + 1}, Seat ${seat.col + 1}`);
+
+   if (!totalPrice) {
+    return <p>No price available</p>;
+   }
+
   return (
     <div>
         {/*<LoggedInNavbar />*/}
@@ -91,13 +101,25 @@ const PaymentInfo = () => {
             <input className="input-box" style={{ width: '150px' }} type="text" />
             <div style={{ width: '97%', display: 'flex', justifyContent: 'space-between'}}>
                 <button className="red btn">Apply Promo</button>
-                <label>Total: $33.97</label>
+                <label>Total: ${totalPrice}</label>
             </div>
         </div>
         <div className="btn-container">
             <button className="btn white">Cancel</button>
             <button className="btn red">Continue to Checkout</button>
         </div>
+
+        {/* remove this: (this was just to see what info is passing to order summary page) */}
+        {movie.title}
+        <div>
+            <h3>Selected Seats:</h3>
+            <ul>
+                {formattedSeats.map((seat, index) => (
+                    <li key={index}>{seat}</li> // Each seat is rendered as a list item
+                ))}
+            </ul>
+        </div>
+
         </div>
     </div>
   );

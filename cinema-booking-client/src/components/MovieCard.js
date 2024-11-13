@@ -17,20 +17,30 @@ const MovieCard = ({ movie, isNowPlaying, onWatchTrailer}) => {
             <p className="movie-card-title">{movie.title} | {movie.mpaa_rating}</p>
             {isHovered && (
                 <div className="movie-info">
-                    <button 
-                        className="btn white" 
-                        onClick={() => onWatchTrailer(movie.trailer_url)}
-                    >Watch Trailer</button>
-                    {isNowPlaying && (
+                    
                         <Link 
                             to={{
                                 pathname: '/movie-information',
                                 state: { movie }
                             }}
                         >
-                            <button style={{width: '100%'}}className="btn red">View Movie Info</button>
+                            <button style={{width: '100%'}}className="btn white">View Movie Info</button>
                         </Link>
-                        // <button className="btn red">View Movie Info</button>
+                    
+                    {/* <button 
+                        className="btn red" 
+                        onClick={() => onWatchTrailer(movie.trailer_url)}
+                        
+                    >Watch Trailer</button> */}
+                    {isNowPlaying && (
+                        <Link 
+                            to={{
+                                pathname: '/showtimes',
+                                state: { movie }
+                            }}
+                        >
+                            <button style={{width: '100%'}}className="btn red">Book Movie</button>
+                        </Link>
                     )}
                 </div>
             )}

@@ -66,13 +66,13 @@ const HomePage = () => {
     };
 
     /// Filter movies based on selected categories and search term
-const filterMovies = (movies) => {
-    return movies.filter(movie => {
-        const matchesCategory = selectedFilters.length === 0 || selectedFilters.includes(movie.category);
-        const matchesSearch = searchTerm === "" || movie.title.toLowerCase().startsWith(searchTerm.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
-};
+    const filterMovies = (movies) => {
+        return movies.filter(movie => {
+            const matchesCategory = selectedFilters.length === 0 || selectedFilters.includes(movie.category);
+            const matchesSearch = searchTerm === "" || movie.title.toLowerCase().startsWith(searchTerm.toLowerCase());
+            return matchesCategory && matchesSearch;
+        });
+    };
 
     return (
         <div>

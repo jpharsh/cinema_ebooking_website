@@ -52,35 +52,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Load credentials from token.json
 def load_credentials():
-#    creds = None
-#    token_file = 'token.json'
-  
-#    if os.path.exists(token_file):
-#        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
-  
-#    if not creds or not creds.valid:
-#        if creds and creds.expired and creds.refresh_token:
-#             creds.refresh(Request())
-           
-#        else:
-#            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
-#                {
-#                    "installed": {
-#                        "client_id": CLIENT_ID,
-#                        "client_secret": CLIENT_SECRET,
-#                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#                        "token_uri": "https://oauth2.googleapis.com/token",
-#                        "redirect_uris": ["http://localhost:8080"]
-#                    }
-#                }, SCOPES
-#            )
-#            creds = flow.run_local_server(port=8080)
-      
-#        with open(token_file, 'w') as token:
-#            token.write(creds.to_json())
-  
-#    return creds
-    
+
     
     creds = None
 
@@ -161,22 +133,6 @@ def fetch_movies(is_now_showing):
     movies = cursor.fetchall()
     cursor.close()
     return jsonify(movies)
-#    connection = pymysql.connect(
-#        host=db_host,
-#        user=db_user,
-#        password=db_password,
-#        database=db_name
-#    )
-#    try:
-#        with connection.cursor() as cursor:
-#            sql = f"SELECT * FROM Movies WHERE isNowShowing = %s"
-#            cursor.execute(sql, (is_now_showing, ))
-#            result = cursor.fetchall()
-#            # Transform the result into a list of dictionaries
-#            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
-#            return jsonify(movies)
-#    finally:
-#        connection.close()
 
 @app.route('/api/fetch-all-movies', methods=['GET'])
 def fetch_all_movies():
@@ -962,3 +918,15 @@ if __name__ == '__main__':
 #         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
 #     finally:
 #         connection.close()
+
+
+@app.route('/api/showtimes/<int:movie_id>', methods=['GET'])
+def get_showtimes(movie_id):
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT * FROM Shows WHERE movie_id = %s"
+    cursor.execute(query, (movie_id,))
+    showtimes = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(showtimes)

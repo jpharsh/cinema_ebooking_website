@@ -31,13 +31,14 @@ const HomePage = () => {
         setSearchTerm(searchTerm);
         setIsSearching(searchTerm.length > 0);
         localStorage.setItem('searchTerm', searchTerm);
-
+    
         const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
         const filteredSuggestions = searchTerm
             ? allMovies.filter(movie => movie.title && movie.title.toLowerCase().startsWith(searchTerm))
             : [];
+            
         setSuggestions(filteredSuggestions.length ? filteredSuggestions : [{ title: 'No movies found' }]);
-    };
+    };    
 
     const handleSuggestionClick = (movieTitle) => {
         setSearchTerm(movieTitle);
@@ -64,15 +65,14 @@ const HomePage = () => {
         setSelectedFilters(selectedFilters.filter((filter) => filter !== category));
     };
 
-    // Filter movies based on selected categories and search term
-    const filterMovies = (movies) => {
-        return movies
-            .filter(movie => {
-                const matchesCategory = selectedFilters.length === 0 || selectedFilters.includes(movie.category);
-                const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-    };
+    /// Filter movies based on selected categories and search term
+const filterMovies = (movies) => {
+    return movies.filter(movie => {
+        const matchesCategory = selectedFilters.length === 0 || selectedFilters.includes(movie.category);
+        const matchesSearch = searchTerm === "" || movie.title.toLowerCase().startsWith(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+};
 
     return (
         <div>

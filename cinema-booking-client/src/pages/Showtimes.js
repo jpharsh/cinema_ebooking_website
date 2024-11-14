@@ -48,7 +48,7 @@ const Showtimes = () => {
     }
 
     const handleBackClick = () => {
-        navigate('/movie-information', { state: { movie } });
+        navigate('/', { state: { movie } });
     };
     const confirmShowtime = () => {
         navigate('/select-tickets', { state: { movie } });

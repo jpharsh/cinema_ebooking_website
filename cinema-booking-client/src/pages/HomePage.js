@@ -4,79 +4,74 @@ import axios from 'axios';
 import '../App.css';
 import './HomePage.css'
 import Advertisement from '../images/Advertisement1.png';
-// import Navbar from '../components/Navbar';
 
 const HomePage = () => {
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
     const [comingSoonMovies, setComingSoonMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [isSearching, setIsSearching] = useState(false); // New state to track search status
+    const [isSearching, setIsSearching] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedFilters, setSelectedFilters] = useState([]);
 
-    // Fetch Now Playing movies from Flask API
+    const categories = ['Action', 'Drama', 'Comedy', 'Horror', 'Sci-Fi'];
+
     useEffect(() => {
-        
         axios.get('http://127.0.0.1:5000/api/now-playing')
-            .then(response => {
-                setNowPlayingMovies(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching now playing movies:", error);
-            });
+            .then(response => setNowPlayingMovies(response.data))
+            .catch(error => console.error("Error fetching now playing movies:", error));
 
-        // Fetch Coming Soon movies from Flask API
         axios.get('http://127.0.0.1:5000/api/coming-soon')
-            .then(response => {
-                setComingSoonMovies(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching coming soon movies:", error);
-            });
-
-        const storedSearchTerm = localStorage.getItem('searchTerm');
-        if (storedSearchTerm) {
-            setSearchTerm(storedSearchTerm);
-
-            const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
-            const filtered = allMovies.filter(movie => 
-                movie.title.toLowerCase().startsWith(storedSearchTerm)
-            );
-            setComingSoonMovies(filtered);
-            setNowPlayingMovies(filtered);
-
-        }
+            .then(response => setComingSoonMovies(response.data))
+            .catch(error => console.error("Error fetching coming soon movies:", error));
     }, []);
 
     const handleSearch = (event) => {
         const searchTerm = event.target.value.toLowerCase();
         setSearchTerm(searchTerm);
+        setIsSearching(searchTerm.length > 0);
         localStorage.setItem('searchTerm', searchTerm);
 
-        // Set isSearching to true if there's a search term
-        setIsSearching(searchTerm.length > 0);
-
-        // Combine movies from both categories to search against
         const allMovies = [...nowPlayingMovies, ...comingSoonMovies];
-        
-        // Filter movies based on title match
-        const filteredSuggestions = searchTerm ? allMovies.filter(movie => 
-            movie.title && movie.title.toLowerCase().startsWith(searchTerm)
-        ) : []; // Clear suggestions if searchTerm is empty
-
-        setSuggestions(filteredSuggestions); // Update suggestions state
-        if (searchTerm && filteredSuggestions.length === 0) {
-            setSuggestions([{ title: 'No movies found' }]); // Show 'No movies found' if no matches
-        }
+        const filteredSuggestions = searchTerm
+            ? allMovies.filter(movie => movie.title && movie.title.toLowerCase().startsWith(searchTerm))
+            : [];
+        setSuggestions(filteredSuggestions.length ? filteredSuggestions : [{ title: 'No movies found' }]);
     };
 
     const handleSuggestionClick = (movieTitle) => {
-        setSearchTerm(movieTitle); // Set the search bar to the selected movie
-        setSuggestions([]); // Hide suggestions after selection
+        setSearchTerm(movieTitle);
+        setSuggestions([]);
     };
 
     const handleBlur = () => {
-        setSuggestions([]); // Clear suggestions when the input loses focus
-        setIsSearching(false); 
+        setSuggestions([]);
+        setIsSearching(false);
+    };
+
+    const toggleDropdown = () => {
+        setShowDropdown(!showDropdown);
+    };
+
+    const addFilter = (category) => {
+        if (!selectedFilters.includes(category)) {
+            setSelectedFilters([...selectedFilters, category]);
+        }
+        setShowDropdown(false);
+    };
+
+    const removeFilter = (category) => {
+        setSelectedFilters(selectedFilters.filter((filter) => filter !== category));
+    };
+
+    // Filter movies based on selected categories and search term
+    const filterMovies = (movies) => {
+        return movies
+            .filter(movie => {
+                const matchesCategory = selectedFilters.length === 0 || selectedFilters.includes(movie.category);
+                const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
     };
 
     return (
@@ -91,9 +86,9 @@ const HomePage = () => {
                     className="search-input"
                     style={{ width: '100%', padding: '10px' }}
                 />
-                {/* Suggestion Dropdown */}
+                
                 {suggestions.length > 0 && (
-                    <div className="suggestion-dropdown" style={{ 
+                    <div className="suggestion-dropdown" style={{
                         position: 'absolute', 
                         top: '50px', 
                         left: '0', 
@@ -113,24 +108,71 @@ const HomePage = () => {
                                 onClick={() => handleSuggestionClick(movie.title)}
                             >
                                 {movie.title}
-                                
                             </div>
                         ))}
                     </div>
                 )}
+
+                {/* Filter bubble */}
+                <div style={{ marginTop: '10px', display: 'inline-block' }}>
+                    <button onClick={toggleDropdown}>Filter</button>
+                    
+                    {showDropdown && (
+                        <div style={{ border: '1px solid #ddd', padding: '10px', marginTop: '5px' }}>
+                            {categories.map((category) => (
+                                <div
+                                    key={category}
+                                    onClick={() => addFilter(category)}
+                                    style={{ cursor: 'pointer', padding: '5px' }}
+                                >
+                                    {category}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div style={{ marginTop: '10px' }}>
+                    {selectedFilters.map((filter) => (
+                        <span
+                            key={filter}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '5px 10px',
+                                backgroundColor: '#eee',
+                                borderRadius: '15px',
+                                margin: '0 5px',
+                                color: 'red'
+                            }}
+                        >
+                            {filter}
+                            <span
+                                onClick={() => removeFilter(filter)}
+                                style={{
+                                    marginLeft: '8px',
+                                    cursor: 'pointer',
+                                    color: '#ff0000'
+                                }}
+                            >
+                                x
+                            </span>
+                        </span>
+                    ))}
+                </div>
             </div>
 
             {!searchTerm && (
                 <div className="movie-section" style={{ padding: '0px', height: '400px' }}>
-                <img src={Advertisement} alt="Advertisement" className="advertisement-pic" />
-            </div>
+                    <img src={Advertisement} alt="Advertisement" className="advertisement-pic" />
+                </div>
             )}
 
             {/* Movie Lists */}
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Now Playing</h2>
                 <MovieList 
-                    movies={nowPlayingMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))} 
+                    movies={filterMovies(nowPlayingMovies)}
                     isNowPlaying={true}
                 />
             </div>
@@ -138,7 +180,7 @@ const HomePage = () => {
             <div className="movie-section">
                 <h2 style={{ textAlign: 'left' }}>Coming Soon</h2>
                 <MovieList 
-                    movies={comingSoonMovies.filter(movie => movie.title.toLowerCase().startsWith(searchTerm.toLowerCase()))}
+                    movies={filterMovies(comingSoonMovies)}
                     isNowPlaying={false}
                 />
             </div>

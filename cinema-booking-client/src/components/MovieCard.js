@@ -11,6 +11,12 @@ const MovieCard = ({ movie, isNowPlaying}) => {
     const viewMovieInfo = () => {
         navigate('/movie-information', { state: { movie } });
     };
+    const handleBookMovie = () => {
+        navigate('/showtimes', { state: { movie } });
+    };
+    
+
+    
 
     return ( 
         <div
@@ -18,29 +24,25 @@ const MovieCard = ({ movie, isNowPlaying}) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            
             <img src={movie.poster_url} className="movie-card" alt={`${movie.title} poster`} />
             <p className="movie-card-title">{movie.title} | {movie.mpaa_rating} </p>
             {isHovered && (
                 <div className="movie-info">
-
                     <button style={{ width: '100%' }} className="btn white" onClick={viewMovieInfo}>View Movie Info</button>
                     {isNowPlaying && (
-                        <Link 
-                            to={{
-                                pathname: '/showtimes',
-                                state: { movie }
-                            }}
+                        <button 
+                            style={{ width: '100%' }}
+                            className="btn red"
+                            onClick={handleBookMovie}
                         >
-                            <button style={{width: '100%'}}className="btn red">Book Movie</button>
-                        </Link>
+                            Book Movie
+                        </button>
                     )}
                 </div>
             )}
-            
         </div>
-
     );
+    
 };
 
 export default MovieCard;

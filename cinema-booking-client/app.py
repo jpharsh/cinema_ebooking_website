@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request, session
 import pymysql
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
 import re
 import mysql.connector
 from mysql.connector.errors import IntegrityError
@@ -15,7 +14,6 @@ import string  # For generating a random string
 import traceback
 import os  # To set environment variables
 import base64
-import smtplib
 from email.mime.text import MIMEText
 import google_auth_oauthlib.flow
 from google.oauth2.credentials import Credentials
@@ -24,7 +22,6 @@ from googleapiclient.discovery import build
 from werkzeug.security import check_password_hash
 from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
-import json
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -52,36 +49,6 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Load credentials from token.json
 def load_credentials():
-#    creds = None
-#    token_file = 'token.json'
-  
-#    if os.path.exists(token_file):
-#        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
-  
-#    if not creds or not creds.valid:
-#        if creds and creds.expired and creds.refresh_token:
-#             creds.refresh(Request())
-           
-#        else:
-#            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_config(
-#                {
-#                    "installed": {
-#                        "client_id": CLIENT_ID,
-#                        "client_secret": CLIENT_SECRET,
-#                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#                        "token_uri": "https://oauth2.googleapis.com/token",
-#                        "redirect_uris": ["http://localhost:8080"]
-#                    }
-#                }, SCOPES
-#            )
-#            creds = flow.run_local_server(port=8080)
-      
-#        with open(token_file, 'w') as token:
-#            token.write(creds.to_json())
-  
-#    return creds
-    
-    
     creds = None
 
     # Load existing token if available
@@ -161,22 +128,6 @@ def fetch_movies(is_now_showing):
     movies = cursor.fetchall()
     cursor.close()
     return jsonify(movies)
-#    connection = pymysql.connect(
-#        host=db_host,
-#        user=db_user,
-#        password=db_password,
-#        database=db_name
-#    )
-#    try:
-#        with connection.cursor() as cursor:
-#            sql = f"SELECT * FROM Movies WHERE isNowShowing = %s"
-#            cursor.execute(sql, (is_now_showing, ))
-#            result = cursor.fetchall()
-#            # Transform the result into a list of dictionaries
-#            movies = [{'title': row[0], 'poster_url': row[1], 'mpaa_rating': row[2], 'trailer_url': row[3], 'isNowShowing': row[4]} for row in result]
-#            return jsonify(movies)
-#    finally:
-#        connection.close()
 
 @app.route('/api/fetch-all-movies', methods=['GET'])
 def fetch_all_movies():
@@ -313,17 +264,6 @@ def get_cardinfo():
         return jsonify({"error": "Missing 'user_id' parameter"}), 400
 
     card_data = fetch_carddata('PaymentCards', user_id)
-    '''
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({"error": "Missing token"}), 401
-
-    decoded_token = verify_jwt_token(token)
-    if not decoded_token:
-        return jsonify({"error": "Invalid or expired token"}), 401
-
-    card_data = fetch_carddata('PaymentCards', decoded_token['id'])
-    '''
     if card_data:
         for row in card_data:
             try:
@@ -385,21 +325,6 @@ def delete_card(card_id):
         print(f"Error deleting card: {e}")
         return jsonify({"error": "An error occurred while deleting the card."}), 500
  
-
-'''
-@app.route('/api/verify-password', methods=['POST'])
-def verify_password():
-    data = request.json
-    entered_password = data.get('password')
-    user_id = data.get('id')
-
-    user = fetch_userdata('Users', user_id)  # Assume user_id is known
-
-    if user and check_password_hash(user['u_password'], entered_password):
-        return jsonify({'passwordVerified': True}), 200
-    else:
-        return jsonify({'passwordVerified': False}), 401
-'''
 @app.route('/api/edit', methods=['POST'])
 def edit_acc():
     print('edit_acc invoked')
@@ -924,41 +849,32 @@ def schedule_movie():
     finally:
         connection.close()
 
+@app.route('/api/update-is-now-showing', methods=['POST'])
+def update_is_now_showing():
+    data = request.get_json()
+    movie_id = data.get('movie_id')
+    is_now_showing = data.get('isNowShowing')  # Adjusted to match the frontend payload
+
+    print(f"Received movie_id: {movie_id}, is_now_showing: {is_now_showing}")
+
+    connection = connect_db()
+    try:
+        cursor = connection.cursor()
+        print(f"Updating isNowShowing for movie_id: {movie_id} to {is_now_showing}")
+
+        cursor.execute("""
+            UPDATE Movies
+            SET isNowShowing = %s
+            WHERE id = %s
+        """, (is_now_showing, movie_id))
+        connection.commit()
+
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Error updating isNowShowing: {e}")
+        return jsonify({"success": False, "error": "An error occurred while updating the movie"}), 500
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
    app.run(debug=True)
-
-
-# @app.route('/api/schedule-movie', methods=['POST'])
-# def schedule_movie():
-#     data = request.get_json()
-#     movie_id = data.get('movie_id')
-#     room = data.get('room')
-#     dtime = data.get('show_time')
-
-#     connection = connect_db()
-#     try:
-#         with connection.cursor() as cursor:
-#             # Check if the selected room already has a movie scheduled at the same date and time
-#             cursor.execute("""
-#                 SELECT COUNT(*) FROM Shows
-#                 WHERE room_id = %s AND showtime = %s
-#             """, (room, dtime))
-#             conflict = cursor.fetchone()[0]
-
-#             if conflict > 0:
-#                 return jsonify({"success": False, "error": "Time conflict in the selected room"}), 400
-
-#             # Insert new schedule
-#             cursor.execute("""
-#                 INSERT INTO Shows (movie_id, room_id, showtime)
-#                 VALUES (%s, %s, %s)
-#             """, (movie_id, room, dtime))
-#             connection.commit()
-
-#         return jsonify({"success": True}), 200
-#     except Exception as e:
-#         print(f"Error scheduling movie: {e}")
-#         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
-#     finally:
-#         connection.close()

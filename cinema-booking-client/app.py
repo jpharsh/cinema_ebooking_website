@@ -875,6 +875,17 @@ def update_is_now_showing():
         return jsonify({"success": False, "error": "An error occurred while updating the movie"}), 500
     finally:
         connection.close()
+        
+@app.route('/api/showtimes/<int:movie_id>', methods=['GET'])
+def get_showtimes(movie_id):
+    connection = connect_db()
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT * FROM Shows WHERE movie_id = %s"
+    cursor.execute(query, (movie_id,))
+    showtimes = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(showtimes)
 
 if __name__ == '__main__':
    app.run(debug=True)

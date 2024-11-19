@@ -10,6 +10,7 @@ const MovieInformation = () => {
 
     const location = useLocation();
     const movie = location.state?.movie;
+    const isNowPlaying = location.state?.isNowPlaying;
     const [selectedTrailer, setSelectedTrailer] = useState(null);
 
     if (!movie) {
@@ -61,7 +62,10 @@ const MovieInformation = () => {
         </div>
         <div className="btn-container">
             <button className="btn white" onClick={handleBackClick}>Back to Results</button>
-            <button className="btn red" onClick={handleBookClick}>Book Movie</button>
+            {isNowPlaying && 
+                <button className="btn red" onClick={handleBookClick}>Book Movie</button>
+            }
+            
         </div>
     </div>
     {/* Trailer Pop-up */}

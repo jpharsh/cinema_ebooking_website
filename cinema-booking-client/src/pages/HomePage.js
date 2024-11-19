@@ -185,9 +185,9 @@ const HomePage = () => {
                 />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button className="btn red">All Movies</button>
-            </div>
+            </div> */}
         </div>
     );
 };

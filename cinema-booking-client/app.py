@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request, session
-import pymysql
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
@@ -131,12 +130,7 @@ def fetch_movies(is_now_showing):
 
 @app.route('/api/fetch-all-movies', methods=['GET'])
 def fetch_all_movies():
-    connection = pymysql.connect(
-        host=db_host,
-        user=db_user,
-        password=db_password,
-        database=db_name
-    )
+    connection = connect_db()
     try:
         with connection.cursor() as cursor:
             sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"

@@ -2,8 +2,13 @@ import React from 'react';
 import './PaymentInfo.css';
 import MasterCardLogo from '../images/MasterCardLogo.png';
 import VisaLogo from '../images/VisaLogo.png';
+import AmexLogo from '../images/AmericanExpressLogo.png';
+import DiscoverLogo from '../images/DiscoverLogo.png';
+import DefaultCardLogo from '../images/DefaultCardLogo.png';
 // import LoggedInNavbar from '../components/LoggedInNavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const PaymentInfo = () => {
   const navigate = useNavigate();
@@ -17,10 +22,82 @@ const PaymentInfo = () => {
 });
   const date = location.state?.date;
   const time = location.state?.time;
+  const [cards, setCards] = useState([]);
+  useEffect(() => {
+    // Fetch saved cards from the backend
+    const fetchCards = async () => {
+        const userId = await fetchUserId();
+
+        if (!userId) {
+            console.error("User is not logged in or session is invalid.");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            // Fetch card information
+            const cardResponse = await axios.get(`http://127.0.0.1:5000/api/cards-get?user_id=${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            const cardData = cardResponse.data;
+            setCards(cardData.map(card => ({
+                id: card.id,
+                nameOnCard: card.name_on_card,
+                cardNumber: card.card_num,
+                expirationMonth: card.exp_month,
+                expirationYear: card.exp_year,
+                cvc: card.cv_num,
+                streetAddress: card.street_address,
+                city: card.city,
+                state: card.state,
+                zipCode: card.zip_code
+            })));
+        } catch (error) {
+            console.error('Error fetching payment cards:', error);
+        }
+    };
+
+    fetchCards();
+}, []);
+  const [selectedCard, setSelectedCard] = useState(null)
 
    if (!totalPrice) {
     return <p>No price available</p>;
    }
+
+
+   async function fetchUserId() {
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.log("No token found, user is not logged in.");
+        return null;  // Return null if no token is available
+    }
+
+    try {
+        // Make the request with the Authorization header
+        const response = await axios.get('http://127.0.0.1:5000/api/check-session', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        // Extract only the user_id if the user is logged in
+        if (response.data.logged_in) {
+            const user_id = response.data.user_id;
+            console.log("User ID:", user_id);  // Debugging line
+            return user_id;
+        } else {
+            console.log("User is not logged in.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching user ID:", error);
+        return null;
+    }
+}
 
   return (
     <div>
@@ -34,20 +111,58 @@ const PaymentInfo = () => {
                 <p className="small-text">Expiration Date</p>
             </div>
             
-            <button className="card">
+            <div className="card-rows">
+            {cards.map(card => (
+            <button 
+                key={card.id}
+                className="card"
+                onClick={() => setSelectedCard(card.id)} // Update selected card
+                style={{
+                    backgroundColor: selectedCard === card.id ? '#555' : '#353535',
+                }}
+            >
                 <div className="card-info">
                     <div className="card-type">
-                        <img src={MasterCardLogo} alt="MasterCard Logo" className="card-logo" />
-                        <h4>MasterCard</h4>
-                        <p className="small-text">ending in 7890</p>
+                        {/* starts with 4 = visa, starts with 2 or 5 = mastercard, starts with 3 = amex, starts with 6 = discover, else default */}
+                        
+                        {card.cardNumber.toString().startsWith('4') ? (
+                            <div className="card-type">
+                                <img src={VisaLogo} alt="Visa Logo" className="card-logo" />
+                                <h4>Visa</h4>
+                            </div>
+                        ) : card.cardNumber.toString().startsWith('5') || card.cardNumber.toString().startsWith('2') ? (
+                            <div className="card-type">
+                                <img src={MasterCardLogo} alt="MasterCard Logo" className="card-logo" />
+                                <h4>MasterCard</h4>
+                            </div>
+                        ) : card.cardNumber.toString().startsWith('3') ? (
+                            <div className="card-type">
+                                <img src={AmexLogo} alt="Amex Logo" className="card-logo" />
+                                <h4>Amex</h4>
+                            </div>
+                        ) : card.cardNumber.toString().startsWith('6') ? (
+                            <div className="card-type">
+                                <img src={DiscoverLogo} alt="Discover Logo" className="card-logo" />
+                                <h4>Discover</h4>
+                            </div>
+                        ) : (
+                            <div className="card-type">
+                                <img src={DefaultCardLogo} alt="Default Card Logo" className="card-logo" />
+                                <h4>Card</h4>
+                            </div>
+                        )}   
+                        
+                        {/* <h4>{card.cardNumber.toString().startsWith('4') ? 'Visa' : 'MasterCard'}</h4> */}
+                        <p className="small-text">ending in {card.cardNumber.toString().slice(-4)}</p>
                     </div>
                     
-                    <p style={{ paddingRight: '95px' }}> John Smith</p>
-                    <p style={{ paddingRight: '20px' }}> 10/26</p>
+                    <p style={{ paddingRight: '95px' }}> {card.nameOnCard}</p>
+                    <p style={{ paddingRight: '20px' }}> {card.expirationMonth}/{card.expirationYear}</p>
                    
                 </div>
             </button>
-            <button className="card">
+            ))}
+            {/* <button className="card">
                 <div className="card-info">
                     <div className="card-type">
                         <img src={VisaLogo} alt="Visa Logo" className="card-logo" />
@@ -57,7 +172,9 @@ const PaymentInfo = () => {
                     <p style={{ paddingRight: '45px' }}> John Smith</p>
                     <p style={{ paddingRight: '25px' }}> 5/27</p>
                 </div>
-            </button>
+            </button> */}
+          
+            </div>
         </div>
         <h3 style={{ paddingTop: '20px' }}>Enter Payment Info</h3>
         <div className="payment-info-container">

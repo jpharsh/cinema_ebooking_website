@@ -52,11 +52,11 @@ const Showtimes = () => {
         navigate('/', { state: { movie } });
     };
     
-    const handleTimeClick = (time) => {
+    const handleTimeClick = (date, time) => {
         console.log(`Time selected: ${time}`);
         const showtime = showtimes.find(showtime => new Date(showtime.showtime).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', hour12: true }) === time);
         const showid = showtime.id;
-        navigate('/select-tickets', { state: { movie, showid } });
+        navigate('/select-tickets', { state: { movie, showid, date, time } });
     };
 
     const DaySchedule = ({ date, times }) => (
@@ -69,7 +69,7 @@ const Showtimes = () => {
                 <button
                     key={index}
                     className="time-button"
-                    onClick={() => handleTimeClick(time)}
+                    onClick={() => handleTimeClick(date, time)}
                 >
                     {time}
                 </button>

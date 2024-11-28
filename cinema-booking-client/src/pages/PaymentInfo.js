@@ -15,6 +15,8 @@ const PaymentInfo = () => {
     const seatNumber = seat.col + 1; 
     return `${rowLetter}${seatNumber}`;
 });
+  const date = location.state?.date;
+  const time = location.state?.time;
 
    if (!totalPrice) {
     return <p>No price available</p>;
@@ -123,6 +125,8 @@ const PaymentInfo = () => {
                     <li key={index}>{seat}</li> // Each seat is rendered as a list item
                 ))}
             </ul>
+            <p>Date: {date}</p>
+            <p>Time: {time}</p>
         </div>
 
         </div>

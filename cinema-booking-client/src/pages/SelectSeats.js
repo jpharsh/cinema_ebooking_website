@@ -16,6 +16,8 @@ const SelectSeats = () => {
    const totalTickets = (adultCount || 0) + (childCount || 0) + (seniorCount || 0);
    const seatLayout = [9, 9, 9, 9, 11, 11, 11]; // Number of seats in each row
    const showid = location.state?.showid;
+   const date = location.state?.date;
+   const time = location.state?.time;
 
     // Function to map database seats to the layout
 function initializeSeats(seatStatuses) {
@@ -130,7 +132,7 @@ async function displaySeats(showId) {
 
                 if (response.ok) {
                     // Navigate to payment page if the update was successful
-                    navigate('/payment-info', { state: { totalPrice, movie, formattedSeats } });
+                    navigate('/payment-info', { state: { totalPrice, movie, formattedSeats, date, time } });
                 } else {
                     // Handle failure response
                     alert('Error updating seat statuses.');

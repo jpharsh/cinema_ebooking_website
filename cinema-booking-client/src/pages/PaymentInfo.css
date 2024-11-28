@@ -9,6 +9,10 @@ h3 {
     padding: 10px; 
 }
 
+.card-rows :hover {
+    background-color: red;
+}
+
 .card {
     display: flex;
     justify-content: space-between;
@@ -21,6 +25,7 @@ h3 {
 .card :hover {
     background-color: #555;
     line-height: 0px;
+    
 }
 
 .card-type {

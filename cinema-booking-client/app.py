@@ -834,12 +834,60 @@ def schedule_movie():
             INSERT INTO Shows (movie_id, room_id, showtime)
             VALUES (%s, %s, %s)
         """, (movie_id, room, dtime))
+
+       # Get the ID of the newly inserted show
+        show_id = cursor.lastrowid
+
+        # Retrieve seat IDs for the specified room
+        cursor.execute("""
+            SELECT id FROM Seats
+            WHERE room_id = %s
+            LIMIT 69
+        """, (room,))
+        seat_ids = cursor.fetchall()
+
+        if len(seat_ids) < 69:
+            return jsonify({"success": False, "error": "Not enough seats available in the specified room"}), 400
+
+        # Prepare seat data for insertion into ShowSeats
+        seat_data = [(show_id, seat_id[0], 0) for seat_id in seat_ids]  # Status is set to 0 (available)
+        cursor.executemany("""
+            INSERT INTO ShowSeats (show_id, seat_id, seat_status)
+            VALUES (%s, %s, %s)
+        """, seat_data)
+
         connection.commit()
 
         return jsonify({"success": True}), 200
     except Exception as e:
         print(f"Error scheduling movie: {e}")
         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
+    finally:
+        connection.close()
+
+@app.route('/api/get-seats', methods=['GET'])
+def get_seats():
+    show_id = request.args.get('show_id')  # Assume you pass the show_id as a query parameter
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        # Query to fetch seat statuses for the given show_id
+        cursor.execute("""
+            SELECT seat_status 
+            FROM ShowSeats
+            WHERE show_id = %s
+            ORDER BY seat_id ASC
+        """, (show_id,))
+        
+        # Fetch all rows from the query result
+        seats = cursor.fetchall()  # Returns a list of dictionaries
+        print(f"Seats fetched: {seats}")
+        
+        # Return the JSON response
+        return jsonify(seats), 200
+    except Exception as e:
+        print(f"Error fetching seat statuses: {e}")
+        return jsonify({"success": False, "error": "An error occurred while fetching seat statuses"}), 500
     finally:
         connection.close()
 
@@ -880,6 +928,37 @@ def get_showtimes(movie_id):
     cursor.close()
     connection.close()
     return jsonify(showtimes)
+
+@app.route('/api/update-seat-status', methods=['POST'])
+def update_seat_status():
+    data = request.get_json()
+    show_id = data.get('show_id')
+    selected_seats = data.get('selectedSeats')
+    print(f"selected_seats: {selected_seats}")
+
+    if not show_id or not selected_seats or len(selected_seats) == 0:
+        return jsonify({'error': 'Invalid data provided'}), 400
+
+    try:
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        for seat in selected_seats:
+            seat_id = seat.get('seat_id')
+            print(f"Updating seat status for seat_id: {seat_id}")
+            cursor.execute("""
+                UPDATE ShowSeats
+                SET seat_status = 2
+                WHERE show_id = %s AND seat_id = %s
+            """, (show_id, seat_id))
+
+        connection.commit()
+        return jsonify({'message': 'Seat statuses updated successfully'}), 200
+    except Exception as e:
+        print(f"Error updating seat statuses: {e}")
+        return jsonify({'error': 'Failed to update seat statuses'}), 500
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
    app.run(debug=True)

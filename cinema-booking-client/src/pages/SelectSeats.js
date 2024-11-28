@@ -16,19 +16,6 @@ const SelectSeats = () => {
    const totalTickets = (adultCount || 0) + (childCount || 0) + (seniorCount || 0);
    const seatLayout = [9, 9, 9, 9, 11, 11, 11]; // Number of seats in each row
    const showid = location.state?.showid;
-   console.log("showid in Select Seats", showid);
-    
-   // Sample seat layout (0 = available, 1 = selected, 2 = unavailable)
-//    const initialSeatsORG = [
-//        [0, 0, 2, 0, 0, 0, 0, 0, 0],
-//        [0, 2, 2, 2, 0, 0, 0, 0, 0],
-//        [0, 0, 0, 0, 2, 2, 0, 2, 2],
-//        [2, 2, 0, 0, 0, 0, 0, 0, 0],
-       
-//        [0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0],
-//        [0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0],
-//        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-//    ];
 
     // Function to map database seats to the layout
 function initializeSeats(seatStatuses) {
@@ -85,12 +72,12 @@ async function displaySeats(showId) {
    }, []);
    const [selectedSeats, setSelectedSeats] = useState(0); //ava added
    const [userSeats, setUserSeats] = useState([]); // Track user-selected seats
+   const [formattedSeats, setFormattedSeats] = useState([]); 
 
    const handleSeatClick = (row, col) => {
        const seatIndex = seatLayout.slice(0, row).reduce((sum, seatsInRow) => sum + seatsInRow, 0) + col;
        // get the seat id of the selected seat
        const seat_id = seatIndex + 1;
-       console.log("seat_id", seat_id);
        
        const newSeats = seats.map((rowSeats, rowIndex) =>
            rowSeats.map((seat, colIndex) => {
@@ -99,12 +86,14 @@ async function displaySeats(showId) {
                        setSelectedSeats(prev => prev + 1);
                         //setUserSeats(prev => [...prev, { row, col }]); // Add seat
                            setUserSeats(prev => [...prev, { seat_id }]); // Add seat
+                           setFormattedSeats(prev => [...prev, { row, col }]); 
                        return 1;
                    }
                    if (seat === 1) {
                        setSelectedSeats(prev => prev - 1);
                         //setUserSeats(prev => prev.filter(seat => !(seat.row === row && seat.col === col))); // Remove seat
                            setUserSeats(prev => prev.filter(seat => seat.seat_id !== (seat_id))); // Remove seat
+                           setFormattedSeats(prev => prev.filter(seat => !(seat.row === row && seat.col === col)));
                        return 0;
                    }
                }
@@ -125,7 +114,6 @@ async function displaySeats(showId) {
 
     const handleConfirmSeats = async () => {
         // Check if the number of selected seats matches the totalTickets
-        console.log("userSeats", userSeats);
         if (selectedSeats === totalTickets) {
             try {
                 // Make an API call to update the seat statuses to 2 for the specific show_id
@@ -142,7 +130,7 @@ async function displaySeats(showId) {
 
                 if (response.ok) {
                     // Navigate to payment page if the update was successful
-                    navigate('/payment-info', { state: { totalPrice, movie, userSeats } });
+                    navigate('/payment-info', { state: { totalPrice, movie, formattedSeats } });
                 } else {
                     // Handle failure response
                     alert('Error updating seat statuses.');
@@ -159,7 +147,7 @@ async function displaySeats(showId) {
 
 
    const handleCancel = () => {
-     navigate('/select-tickets', { state: { movie } });
+     navigate('/select-tickets', { state: { movie, showid } });
    };
 
    const movie = location.state?.movie;

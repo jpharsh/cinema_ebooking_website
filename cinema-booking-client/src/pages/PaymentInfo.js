@@ -8,8 +8,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const PaymentInfo = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { totalPrice, movie, userSeats } = location.state || {};
-  const formattedSeats = userSeats.map(seat => `Row ${seat.row + 1}, Seat ${seat.col + 1}`);
+  const { totalPrice, movie, formattedSeats } = location.state || {};
+//   const seats = formattedSeats.map(seat => `Row ${seat.row + 1}, Seat ${seat.col + 1}`);
+  const seats = formattedSeats.map(seat => {
+    const rowLetter = String.fromCharCode(65 + seat.row); // Convert row index to letter (A = 65 in ASCII)
+    const seatNumber = seat.col + 1; 
+    return `${rowLetter}${seatNumber}`;
+});
 
    if (!totalPrice) {
     return <p>No price available</p>;
@@ -114,7 +119,7 @@ const PaymentInfo = () => {
         <div>
             <h3>Selected Seats:</h3>
             <ul>
-                {formattedSeats.map((seat, index) => (
+                {seats.map((seat, index) => (
                     <li key={index}>{seat}</li> // Each seat is rendered as a list item
                 ))}
             </ul>

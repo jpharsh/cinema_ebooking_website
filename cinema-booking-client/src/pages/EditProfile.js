@@ -203,18 +203,21 @@ useEffect(() => {
             });
             
             const cardData = cardResponse.data;
-            setCards(cardData.map(card => ({
-                id: card.id,
-                nameOnCard: card.name_on_card,
-                cardNumber: card.card_num,
-                expirationMonth: card.exp_month,
-                expirationYear: card.exp_year,
-                cvc: card.cv_num,
-                streetAddress: card.street_address,
-                city: card.city,
-                state: card.state,
-                zipCode: card.zip_code
-            })));
+            console.log("Fetched card data:", cardData);
+            if (cardData.found) {
+              setCards(cardData.card_data.map(card => ({
+                  id: card.id,
+                  nameOnCard: card.name_on_card,
+                  cardNumber: card.card_num,
+                  expirationMonth: card.exp_month,
+                  expirationYear: card.exp_year,
+                  cvc: card.cv_num,
+                  streetAddress: card.street_address,
+                  city: card.city,
+                  state: card.state,
+                  zipCode: card.zip_code
+              })));
+            }
 
         } catch (error) {
             console.error("Error fetching user or card data:", error);
@@ -447,7 +450,7 @@ const validateNameOnCard = (nameOnCard) => {
     console.log("cardId:", cardId);
     console.log("index:", index);
 
-    if (cards.length > 1) {
+    if (cards.length >= 1) {
       try {
         console.log([...cards.filter((card) => card.id !== cardId)]);
         setCards([...cards.filter((card) => card.id !== cardId)]);
@@ -840,6 +843,12 @@ const validateNameOnCard = (nameOnCard) => {
         </div>
 
         {/* Success or error messages */}
+        {/* {successMessage && (
+          <div>
+            {setSuccessMessage()}
+            {alert(successMessage)}
+          </div>
+        )} */}
         {successMessage && <p className="success">{successMessage}</p>}
         {errors.api && <p className="error">{errors.api}</p>}
       </div>

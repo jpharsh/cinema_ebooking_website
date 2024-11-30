@@ -12,8 +12,8 @@ const SelectSeats = () => {
    const navigate = useNavigate();
    const location = useLocation();
    
-   const { adultCount, childCount, seniorCount } = location.state || {};
-   const totalTickets = (adultCount || 0) + (childCount || 0) + (seniorCount || 0);
+//    const { adultCount, childCount, seniorCount } = location.state || {};
+//    const totalTickets = (adultCount || 0) + (childCount || 0) + (seniorCount || 0);
    const seatLayout = [9, 9, 9, 9, 11, 11, 11]; // Number of seats in each row
    const showid = location.state?.showid;
    const date = location.state?.date;
@@ -84,7 +84,8 @@ async function displaySeats(showId) {
        const newSeats = seats.map((rowSeats, rowIndex) =>
            rowSeats.map((seat, colIndex) => {
                if (rowIndex === row && colIndex === col) {
-                   if (seat === 0 && selectedSeats < totalTickets) {
+                //    if (seat === 0 && selectedSeats < totalTickets) {
+                    if (seat === 0) {
                        setSelectedSeats(prev => prev + 1);
                         //setUserSeats(prev => [...prev, { row, col }]); // Add seat
                            setUserSeats(prev => [...prev, { seat_id }]); // Add seat
@@ -105,55 +106,42 @@ async function displaySeats(showId) {
        setSeats(newSeats);
    };
 
-
-//    const handleConfirmSeats = () => {
-//        if (selectedSeats === totalTickets) {
-//            navigate('/payment-info', { state: { totalPrice, movie, userSeats } });
-//        } else {
-//            alert(`Please select exactly ${totalTickets} seat(s).`);
-//        }
-//    };
-
     const handleConfirmSeats = async () => {
-        // Check if the number of selected seats matches the totalTickets
-        if (selectedSeats === totalTickets) {
-            try {
-                // Make an API call to update the seat statuses to 2 for the specific show_id
-                const response = await fetch('http://127.0.0.1:5000/api/update-seat-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        show_id: showid, // Assuming movie has the show_id
-                        selectedSeats: userSeats, // An array of selected seat IDs
-                    }),
-                });
+        navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
+        
+        // DO THIS AFTER BOOKING IS COMPLETE: 
+            // try {
+            //     // Make an API call to update the seat statuses to 2 for the specific show_id
+            //     const response = await fetch('http://127.0.0.1:5000/api/update-seat-status', {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //         body: JSON.stringify({
+            //             show_id: showid, // Assuming movie has the show_id
+            //             selectedSeats: userSeats, // An array of selected seat IDs
+            //         }),
+            //     });
 
-                if (response.ok) {
-                    // Navigate to payment page if the update was successful
-                    navigate('/payment-info', { state: { totalPrice, movie, formattedSeats, date, time } });
-                } else {
-                    // Handle failure response
-                    alert('Error updating seat statuses.');
-                }
-            } catch (error) {
-                console.error('Error updating seat statuses:', error);
-                alert('Error updating seat statuses.');
-            }
-        } else {
-            alert(`Please select exactly ${totalTickets} seat(s).`);
-        }
+            //     if (response.ok) {
+            //         // Navigate to select tickets page if the update was successful
+            //         navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
+            //     } else {
+            //         // Handle failure response
+            //         alert('Error updating seat statuses.');
+            //     }
+            // } catch (error) {
+            //     console.error('Error updating seat statuses:', error);
+            //     alert('Error updating seat statuses.');
+            // }
     };
 
-
-
    const handleCancel = () => {
-     navigate('/select-tickets', { state: { movie, showid } });
+     navigate('/showtimes', { state: { movie } });
    };
 
    const movie = location.state?.movie;
-   const totalPrice = location.state?.totalPrice;
+//    const totalPrice = location.state?.totalPrice;
    if (!movie) {
     return <p>No movie information available</p>;
    }
@@ -193,7 +181,7 @@ async function displaySeats(showId) {
        </div>
        <div className="btn-container">
             <button className="btn white" onClick={handleCancel}>Cancel</button>
-            <button className="btn red" onClick={handleConfirmSeats}>Confirm Seats</button>
+            <button className="btn red" onClick={handleConfirmSeats} disabled={userSeats.length === 0}>Confirm Seats</button>
        </div>
        </div>
        </div>

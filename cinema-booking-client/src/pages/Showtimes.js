@@ -56,7 +56,7 @@ const Showtimes = () => {
         console.log(`Time selected: ${time}`);
         const showtime = showtimes.find(showtime => new Date(showtime.showtime).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', hour12: true }) === time);
         const showid = showtime.id;
-        navigate('/select-tickets', { state: { movie, showid, date, time } });
+        navigate('/select-seats', { state: { movie, showid, date, time } });
     };
 
     const DaySchedule = ({ date, times }) => (

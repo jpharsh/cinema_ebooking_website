@@ -258,6 +258,7 @@ def get_cardinfo():
         return jsonify({"error": "Missing 'user_id' parameter"}), 400
 
     card_data = fetch_carddata('PaymentCards', user_id)
+    print(f"Card data: {card_data}")
     if card_data:
         for row in card_data:
             try:
@@ -276,10 +277,10 @@ def get_cardinfo():
             except Exception as decrypt_error:
                 print(f"Error decrypting card data: {str(decrypt_error)}")
         
-        return jsonify(card_data), 200
+        return jsonify({"card_data": card_data, "found": True}), 200
 
     else:
-        return jsonify({"error": "User not found"}), 404
+        return jsonify({"found": False}), 200
     
 @app.route('/api/verify-password', methods=['POST'])
 def verify_password():

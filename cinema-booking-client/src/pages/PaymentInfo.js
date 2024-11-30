@@ -41,18 +41,21 @@ const PaymentInfo = () => {
             });
             
             const cardData = cardResponse.data;
-            setCards(cardData.map(card => ({
-                id: card.id,
-                nameOnCard: card.name_on_card,
-                cardNumber: card.card_num,
-                expirationMonth: card.exp_month,
-                expirationYear: card.exp_year,
-                cvc: card.cv_num,
-                streetAddress: card.street_address,
-                city: card.city,
-                state: card.state,
-                zipCode: card.zip_code
-            })));
+            console.log('Card data:', cardData);
+            if (cardData.found) {
+                setCards(cardData.card_data.map(card => ({
+                    id: card.id,
+                    nameOnCard: card.name_on_card,
+                    cardNumber: card.card_num,
+                    expirationMonth: card.exp_month,
+                    expirationYear: card.exp_year,
+                    cvc: card.cv_num,
+                    streetAddress: card.street_address,
+                    city: card.city,
+                    state: card.state,
+                    zipCode: card.zip_code
+                })));
+            }
         } catch (error) {
             console.error('Error fetching payment cards:', error);
         }
@@ -104,10 +107,12 @@ const PaymentInfo = () => {
         {/*<LoggedInNavbar />*/}
     <div className="movie-section" style={{ width: '50%', alignContent: 'center', padding: '30px'}}>
         <h2 style={{ marginTop: '0px', textAlign: 'left' }}>Payment Info</h2>
+        {/* only render saved cards container if there are saved cards  */}
+        {cards.length > 0 && (
         <div className="saved-cards-container">
             <div className="first-row">
                 <h3>Select Saved Card</h3>
-                <p className="small-text">Name</p>
+                <p className="small-text" style={{paddingLeft: '13%'}}>Name</p>
                 <p className="small-text">Expiration Date</p>
             </div>
             
@@ -122,7 +127,7 @@ const PaymentInfo = () => {
                 }}
             >
                 <div className="card-info">
-                    <div className="card-type">
+                    <div className="card-type" style={{width: '31%'}}>
                         {/* starts with 4 = visa, starts with 2 or 5 = mastercard, starts with 3 = amex, starts with 6 = discover, else default */}
                         
                         {card.cardNumber.toString().startsWith('4') ? (
@@ -156,26 +161,15 @@ const PaymentInfo = () => {
                         <p className="small-text">ending in {card.cardNumber.toString().slice(-4)}</p>
                     </div>
                     
-                    <p style={{ paddingRight: '95px' }}> {card.nameOnCard}</p>
-                    <p style={{ paddingRight: '20px' }}> {card.expirationMonth}/{card.expirationYear}</p>
+                    <p style={{ marginRight: '20px' }}> {card.nameOnCard}</p>
+                    <p style={{ display: 'flex', justifyContent: 'end'  }}> {card.expirationMonth}/{card.expirationYear}</p>
                    
                 </div>
             </button>
             ))}
-            {/* <button className="card">
-                <div className="card-info">
-                    <div className="card-type">
-                        <img src={VisaLogo} alt="Visa Logo" className="card-logo" />
-                        <h4>Visa</h4>
-                        <p className="small-text">ending in 2345</p>
-                    </div>
-                    <p style={{ paddingRight: '45px' }}> John Smith</p>
-                    <p style={{ paddingRight: '25px' }}> 5/27</p>
-                </div>
-            </button> */}
-          
             </div>
         </div>
+        )}
         <h3 style={{ paddingTop: '20px' }}>Enter Payment Info</h3>
         <div className="payment-info-container">
             <div className="payment-info">
@@ -214,7 +208,11 @@ const PaymentInfo = () => {
                 <input className="input-box" style={{ width: '90px' }} type="text" />
             </div>
         </div>
-        <button className="red btn" style={{ marginTop: '20px', display: 'flex', alignSelf: 'flex-start'}}>Add Your Card</button>
+        {/* render add your card button if there are less than 3 saved cards */}
+        {cards.length < 3 && (
+            <button className="red btn" style={{ marginTop: '20px', display: 'flex', alignSelf: 'flex-start'}}>Add Your Card</button>
+        )}
+        
         <h3 style={{ paddingTop: '30px' }}>Enter Promo Codes</h3>
         <div className="payment-info" style={{ marginTop: '20px', gap: '10px' }}>
             <div>

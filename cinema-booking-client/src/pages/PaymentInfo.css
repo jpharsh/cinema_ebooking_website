@@ -36,12 +36,12 @@ h3 {
 
 .card-info {
     display: flex;
+    justify-content: space-between;
     color: white;
     font-size: medium;
     width: 100%;
     align-items: baseline;
     gap: 10px;
-    justify-content: space-between;
     
 }
 

@@ -258,7 +258,6 @@ def get_cardinfo():
         return jsonify({"error": "Missing 'user_id' parameter"}), 400
 
     card_data = fetch_carddata('PaymentCards', user_id)
-    print(f"Card data: {card_data}")
     if card_data:
         for row in card_data:
             try:

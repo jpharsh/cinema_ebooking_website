@@ -172,58 +172,82 @@ const PaymentInfo = () => {
         )}
         <h3 style={{ paddingTop: '20px' }}>Enter Payment Info</h3>
         <div className="payment-info-container">
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '50%' }}>
                 <label>Name on Card</label>
-                <input className="input-box" style={{ width: '230px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '60%' }}>
                 <label>Card Number</label>
-                <input className="input-box" style={{ width: '260px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info"style={{ width: '40%' }}>
                 <label>Expiration Date</label>
-                <input className="input-box" style={{ width: '110px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '25%' }}>
                 <label>CVV/CVC</label>
-                <input className="input-box" style={{ width: '50px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
         </div>
-        <h3 style={{ paddingTop: '20px' }}>Enter Billing Address</h3>
+        <h3 style={{ paddingTop: '10px' }}>Enter Billing Address</h3>
         <div className="payment-info-container">
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '40%' }}>
                 <label>Street Address</label>
-                <input className="input-box" style={{ width: '280px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '30%' }}>
                 <label>City</label>
-                <input className="input-box" style={{ width: '210px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '15%' }}>
                 <label>State</label>
-                <input className="input-box" style={{ width: '70px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
-            <div className="payment-info">
+            <div className="payment-info" style={{ width: '20%' }}>
                 <label>Zip Code</label>
-                <input className="input-box" style={{ width: '90px' }} type="text" />
+                <input className="input-box" type="text" />
             </div>
         </div>
-        {/* render add your card button if there are less than 3 saved cards */}
         {cards.length < 3 && (
-            <button className="red btn" style={{ marginTop: '20px', display: 'flex', alignSelf: 'flex-start'}}>Add Your Card</button>
+            <button className="red btn" style={{ marginTop: '5px', display: 'flex', alignSelf: 'flex-start'}}>Add Your Card</button>
         )}
         
-        <h3 style={{ paddingTop: '30px' }}>Enter Promo Codes</h3>
+        <h3 style={{ paddingTop: '20px' }}>Enter Promo Codes</h3>
         <div className="payment-info" style={{ marginTop: '20px', gap: '10px' }}>
             <div>
                 <label>Promo Code </label>
                 <span className="small-text">(optional)</span>
             </div>
             
-            <input className="input-box" style={{ width: '150px' }} type="text" />
+            <input className="input-box" style={{ width: '150px', marginBottom: '0px' }} type="text" />
             <div style={{ width: '97%', display: 'flex', justifyContent: 'space-between'}}>
-                <button className="red btn">Apply Promo</button>
-                <label>Total: ${totalPrice}</label>
+                <button className="red btn" style={{height: '100%'}}>Apply Promo</button>
+                {/* <div className="payment-info">
+                    <label>Subtotal: ${totalPrice}</label>
+                    <label>Sales Tax: ${(totalPrice * .07).toFixed(2)}</label>
+                    <label>Online Fee: $2.00</label>
+                    <h3 style={{paddingTop: '10%'}}>Total: ${(totalPrice + (totalPrice * .07) + 2).toFixed(2)}</h3>
+                </div> */}
+                <div>
+                    <div className="payment-row">
+                        <span className="payment-title">Subtotal:</span>
+                        <span className="payment-value">${totalPrice}</span>
+                    </div>
+                    <div className="payment-row">
+                        <span className="payment-title">Sales Tax:</span>
+                        <span className="payment-value">${(totalPrice * 0.07).toFixed(2)}</span>
+                    </div>
+                    <div className="payment-row">
+                        <span className="payment-title">Online Fee:</span>
+                        <span className="payment-value">$2.00</span>
+                    </div>
+                    <div className="payment-row total-row">
+                        <span className="payment-title">Total:</span>
+                        <span className="payment-value">${(totalPrice + (totalPrice * 0.07) + 2).toFixed(2)}</span>
+                    </div>
+                </div>
+
+                
             </div>
         </div>
         <div className="btn-container">
@@ -232,7 +256,7 @@ const PaymentInfo = () => {
         </div>
 
         {/* remove this: (this was just to see what info is passing to order summary page) */}
-        {movie.title}
+        {/* {movie.title}
         <div>
             <h3>Selected Seats:</h3>
             <ul>
@@ -242,7 +266,7 @@ const PaymentInfo = () => {
             </ul>
             <p>Date: {date}</p>
             <p>Time: {time}</p>
-        </div>
+        </div> */}
 
         </div>
     </div>

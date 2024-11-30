@@ -15,6 +15,8 @@ const SelectTickets = () => {
    const showid = location.state?.showid;
    const date = location.state?.date;
    const time = location.state?.time;
+   const formattedSeats = location.state?.formattedSeats; 
+   const numSeats = formattedSeats.length;  
  
    if (!movie) {
      return <p>No movie information available</p>;
@@ -37,7 +39,7 @@ const SelectTickets = () => {
 
    const handleCancel = () => {
        // Navigate back to the showtimes page
-       navigate('/showtimes', { state: { movie } });
+       navigate('/select-seats', { state: { movie, showid, date, time } });
    };
 
 
@@ -47,14 +49,14 @@ const SelectTickets = () => {
 
    const handleConfirmTickets = () => {
        const ticketData = { adultCount, childCount, seniorCount };
-       navigate('/select-seats', { state: { ...ticketData, movie, totalPrice: getTotalPrice(), showid, date, time } });
+       navigate('/payment-info', { state: { ...ticketData, movie, totalPrice: getTotalPrice(), showid, date, time, formattedSeats } });
    };
 
 
    return (
        <div className="App">
            <div className="movie-section" style={{ width: '40%', alignContent: 'center', padding: '30px' }}>
-               <h2 style={{ textAlign: 'left' }}>Select Tickets</h2>
+               <h2 style={{ textAlign: 'left' }}>Select {numSeats} Tickets</h2>
                <div className="select-tickets-container">
                    <img src={movie.poster_url || "https://via.placeholder.com/150"} className="movie-poster" style={{width: '100%' }}alt={`${movie.title} poster`} />
                    <div className="ticket-selection-section">
@@ -102,7 +104,7 @@ const SelectTickets = () => {
                <button
                className="btn red"
                onClick={handleConfirmTickets}
-               disabled={getTotalTickets() === 0 }>Confirm Tickets</button>
+               disabled={getTotalTickets() !== numSeats }>Confirm Tickets</button>
                </div>
            </div>
        </div>

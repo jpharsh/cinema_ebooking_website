@@ -881,7 +881,6 @@ def get_seats():
         
         # Fetch all rows from the query result
         seats = cursor.fetchall()  # Returns a list of dictionaries
-        print(f"Seats fetched: {seats}")
         
         # Return the JSON response
         return jsonify(seats), 200

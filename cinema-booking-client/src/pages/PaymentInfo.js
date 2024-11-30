@@ -22,6 +22,7 @@ const PaymentInfo = () => {
 });
   const date = location.state?.date;
   const time = location.state?.time;
+  const showid = location.state?.showid;
   const [cards, setCards] = useState([]);
   useEffect(() => {
     // Fetch saved cards from the backend
@@ -102,12 +103,16 @@ const PaymentInfo = () => {
     }
 }
 
+const handleCancel = () => {
+    navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
+};
+
   return (
     <div>
         {/*<LoggedInNavbar />*/}
     <div className="movie-section" style={{ width: '50%', alignContent: 'center', padding: '30px'}}>
         <h2 style={{ marginTop: '0px', textAlign: 'left' }}>Payment Info</h2>
-        {/* only render saved cards container if there are saved cards  */}
+       
         {cards.length > 0 && (
         <div className="saved-cards-container">
             <div className="first-row">
@@ -157,7 +162,6 @@ const PaymentInfo = () => {
                             </div>
                         )}   
                         
-                        {/* <h4>{card.cardNumber.toString().startsWith('4') ? 'Visa' : 'MasterCard'}</h4> */}
                         <p className="small-text">ending in {card.cardNumber.toString().slice(-4)}</p>
                     </div>
                     
@@ -222,12 +226,6 @@ const PaymentInfo = () => {
             <input className="input-box" style={{ width: '150px', marginBottom: '0px' }} type="text" />
             <div style={{ width: '97%', display: 'flex', justifyContent: 'space-between'}}>
                 <button className="red btn" style={{height: '100%'}}>Apply Promo</button>
-                {/* <div className="payment-info">
-                    <label>Subtotal: ${totalPrice}</label>
-                    <label>Sales Tax: ${(totalPrice * .07).toFixed(2)}</label>
-                    <label>Online Fee: $2.00</label>
-                    <h3 style={{paddingTop: '10%'}}>Total: ${(totalPrice + (totalPrice * .07) + 2).toFixed(2)}</h3>
-                </div> */}
                 <div>
                     <div className="payment-row">
                         <span className="payment-title">Subtotal:</span>
@@ -251,7 +249,7 @@ const PaymentInfo = () => {
             </div>
         </div>
         <div className="btn-container">
-            <button className="btn white">Cancel</button>
+            <button className="btn white" onClick={handleCancel}>Cancel</button>
             <button className="btn red">Continue to Checkout</button>
         </div>
 

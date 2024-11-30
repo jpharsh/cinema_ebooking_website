@@ -65,6 +65,19 @@ const PaymentInfo = () => {
     fetchCards();
 }, []);
   const [selectedCard, setSelectedCard] = useState(null)
+  const [cardInfo, setCardInfo] = useState({
+    nameOnCard: '',
+    cardNumber: '',
+    expirationDate: '',
+    cvc: '',
+    streetAddress: '',
+    city: '',
+    state: '',
+    zipCode: ''
+});
+
+const [errors, setErrors] = useState([]);
+const [successMessage, setSuccessMessage] = useState('');
 
    if (!totalPrice) {
     return <p>No price available</p>;
@@ -105,6 +118,102 @@ const PaymentInfo = () => {
 
 const handleCancel = () => {
     navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
+};
+
+const validateCardNumber = (cardNumber) => {
+    // Simple regex for card number validation
+    const cardNumberPattern = /^[0-9]{16}$/;
+    return cardNumberPattern.test(cardNumber);
+};
+
+const validateExpirationDate = (expirationDate) => {
+    console.log("The EXPIRATION DATE: ", expirationDate);
+    // Simple regex for expiration date validation
+    const expirationDatePattern = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
+    
+    return expirationDatePattern.test(expirationDate);
+};
+
+const validateCVC = (cvc) => {
+    // Simple regex for cvc validation
+    console.log("The CVC: ", cvc);
+    const cvcPattern = /^[0-9]{3}$/;
+    return cvcPattern.test(cvc);
+};
+
+// // Handle input change
+// const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData({
+//         ...formData,
+//         [name]: value
+//     });
+// };
+
+const handleCardChange = (field, value) => {
+    // Update the cards array based on the index
+    const updatedCards = [...cards];
+    updatedCards[field] = value;
+    setCards(updatedCards);
+
+
+
+
+    // Dynamically update the correct field in formData.cardInfo
+    setCardInfo((prevCardInfo) => ({
+        ...prevCardInfo,
+            [field]: value
+    }));
+};
+
+// Handle form submission
+const handleAddCard = async (e) => {
+    if (e) {
+        e.preventDefault();
+    }
+
+    let cardError = {};
+    if (!cardInfo.nameOnCard) cardError.nameOnCard = 'Name is required';
+    if (!cardInfo.cardNumber || !validateCardNumber(cardInfo.cardNumber)) cardError.cardNumber = 'Card Number must be a 16-digit number';
+    if (!cardInfo.expirationDate || !validateExpirationDate(cardInfo.expirationDate)) cardError.expirationDate = 'Expiration Date must be in MM/YY format';
+    if (!cardInfo.cvc || !validateCVC(cardInfo.cvc)) cardError.cvc = 'CVC must be a 3-digit number';
+    if (!cardInfo.streetAddress) cardError.streetAddress = 'Street Address is required';
+    if (!cardInfo.city) cardError.city = 'City is required';
+    if (!cardInfo.state) cardError.state = 'State is required';
+    if (!cardInfo.zipCode || isNaN(cardInfo.zipCode)) cardError.zipCode = 'Zip Code must be a number';
+
+    const hasErrors = Object.keys(cardError).length > 0;
+     if (hasErrors) {
+         setErrors(cardError);
+         console.log('Errors:', cardError);
+         return; // Stop the form submission if there are any card errors
+     }
+
+        // if (cardInfo.nameOnCard || cardInfo.cardNumber || cardInfo.expirationDate || cardInfo.cvc || cardInfo.streetAddress || cardInfo.city || cardInfo.state || cardInfo.zipCode) {
+        //     if (!cardInfo.nameOnCard || !cardInfo.cardNumber || !cardInfo.expirationDate || !cardInfo.cvc || !cardInfo.streetAddress || !cardInfo.city || !cardInfo.state || !cardInfo.zipCode) {
+        //         setShowCardPopup(true);  // Show popup if the card info is incomplete
+        //         return;
+        //     }
+        // }
+
+        const userId = await fetchUserId();
+        const dataToSend = {
+            ...cardInfo,
+            user_id: userId,
+        }
+        console.log("Data to send:", dataToSend);
+        try {
+            await axios.post('http://127.0.0.1:5000/api/add-card', dataToSend)
+            .then(response => {
+                if (response.status === 200) {
+                    setSuccessMessage("Added card successfully.");
+                }
+            });
+      
+        } catch (e) {
+            console.error("Error adding card:", e);
+        }
+    
 };
 
   return (
@@ -178,42 +287,50 @@ const handleCancel = () => {
         <div className="payment-info-container">
             <div className="payment-info" style={{ width: '50%' }}>
                 <label>Name on Card</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.nameOnCard ? 'error' : ''} type="text" onChange={(e) => handleCardChange('nameOnCard', e.target.value)}/>
+                {errors.nameOnCard && <p className="payment-error-message">{errors.nameOnCard}</p>}
             </div>
             <div className="payment-info" style={{ width: '60%' }}>
                 <label>Card Number</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.cardNumber ? 'error' : ''} type="text" onChange={(e) => handleCardChange('cardNumber', e.target.value)}/>
+                {errors.cardNumber && <p className="payment-error-message">{errors.cardNumber}</p>}
             </div>
             <div className="payment-info"style={{ width: '40%' }}>
                 <label>Expiration Date</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.expirationDate ? 'error' : ''} type="text" onChange={(e) => handleCardChange('expirationDate', e.target.value)}/>
+                {errors.expirationDate && <p className="payment-error-message">{errors.expirationDate}</p>}
             </div>
             <div className="payment-info" style={{ width: '25%' }}>
                 <label>CVV/CVC</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.cvc ? 'error' : ''} type="text" onChange={(e) => handleCardChange('cvc', e.target.value)}/>
+                {errors.cvc && <p className="payment-error-message">{errors.cvc}</p>}
             </div>
         </div>
         <h3 style={{ paddingTop: '10px' }}>Enter Billing Address</h3>
         <div className="payment-info-container">
             <div className="payment-info" style={{ width: '40%' }}>
                 <label>Street Address</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.streetAddress ? 'error' : ''} type="text" onChange={(e) => handleCardChange('streetAddress', e.target.value)}/>
+                {errors.streetAddress && <p className="payment-error-message">{errors.streetAddress}</p>}
             </div>
             <div className="payment-info" style={{ width: '30%' }}>
                 <label>City</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.city ? 'error' : ''} type="text" onChange={(e) => handleCardChange('city', e.target.value)}/>
+                {errors.city && <p className="payment-error-message">{errors.city}</p>}
             </div>
             <div className="payment-info" style={{ width: '15%' }}>
                 <label>State</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.state ? 'error' : ''} type="text" onChange={(e) => handleCardChange('state', e.target.value)}/>
+                {errors.state && <p className="payment-error-message">{errors.state}</p>}
             </div>
             <div className="payment-info" style={{ width: '20%' }}>
                 <label>Zip Code</label>
-                <input className="input-box" type="text" />
+                <input className={errors?.zipCode ? 'error' : ''} type="text" onChange={(e) => handleCardChange('zipCode', e.target.value)}/>
+                {errors.zipCode && <p className="payment-error-message">{errors.zipCode}</p>}
             </div>
         </div>
         {cards.length < 3 && (
-            <button className="red btn" style={{ marginTop: '5px', display: 'flex', alignSelf: 'flex-start'}}>Add Your Card</button>
+            <button className="red btn" style={{ marginTop: '5px', display: 'flex', alignSelf: 'flex-start'}} onClick={handleAddCard}>Add Your Card</button>
         )}
         
         <h3 style={{ paddingTop: '20px' }}>Enter Promo Codes</h3>
@@ -252,7 +369,6 @@ const handleCancel = () => {
             <button className="btn white" onClick={handleCancel}>Cancel</button>
             <button className="btn red">Continue to Checkout</button>
         </div>
-
         {/* remove this: (this was just to see what info is passing to order summary page) */}
         {/* {movie.title}
         <div>

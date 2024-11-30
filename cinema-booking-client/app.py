@@ -488,34 +488,35 @@ def register_user():
            user_id = cursor.lastrowid 
 
            for card in cards:
-               name_on_card = card['nameOnCard']
-               card_number = card['cardNumber']
-               expiration_date = card['expirationDate']
-               cvc = card['cvc']
-               billing_street_address = card['streetAddress']
-               billing_city = card['city']
-               billing_state = card['state']
-               billing_zip_code = card['zipCode']
+                add_card_to_db(cursor, user_id, card)
+        #        name_on_card = card['nameOnCard']
+        #        card_number = card['cardNumber']
+        #        expiration_date = card['expirationDate']
+        #        cvc = card['cvc']
+        #        billing_street_address = card['streetAddress']
+        #        billing_city = card['city']
+        #        billing_state = card['state']
+        #        billing_zip_code = card['zipCode']
 
-               # Encrypt the card info
-               encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
-               encrypted_cvc = cipher_suite.encrypt(cvc.encode())
-               encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
-               encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
-               if expiration_date:
-                   expiration_month = expiration_date.split('/')[0]
-                   expiration_year = expiration_date.split('/')[1]
-                   encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
-                   encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
-                   encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
-                   encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
-               # Insert encrypted card information into PaymentCard table
-               if encrypted_card_number and encrypted_cvc and expiration_date:
-                   cursor.execute('''
-                       INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                   ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
-           conn.commit()
+        #        # Encrypt the card info
+        #        encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+        #        encrypted_cvc = cipher_suite.encrypt(cvc.encode())
+        #        encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
+        #        encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
+        #        if expiration_date:
+        #            expiration_month = expiration_date.split('/')[0]
+        #            expiration_year = expiration_date.split('/')[1]
+        #            encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
+        #            encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
+        #            encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
+        #            encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
+        #        # Insert encrypted card information into PaymentCard table
+        #        if encrypted_card_number and encrypted_cvc and expiration_date:
+        #            cursor.execute('''
+        #                INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+        #                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        #            ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+                conn.commit()
 
        print('after connect_db')
 
@@ -958,6 +959,54 @@ def update_seat_status():
         return jsonify({'error': 'Failed to update seat statuses'}), 500
     finally:
         connection.close()
+
+
+@app.route('/api/add-card', methods=['POST']) 
+def add_card():
+    try:
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            data = request.get_json()
+            user_id = data.get('user_id')
+            
+            add_card_to_db(cursor, user_id, data)
+            conn.commit()
+        return jsonify({'message': 'Card added successfully'}), 201
+    except Exception as e:
+        print(f"Error adding card: {e}")
+        return jsonify({'error': 'An error occurred while adding the card'}), 500
+    finally:
+        conn.close()
+
+def add_card_to_db(cursor, user_id, card):
+    name_on_card = card['nameOnCard']
+    card_number = card['cardNumber']
+    expiration_date = card['expirationDate']
+    cvc = card['cvc']
+    billing_street_address = card['streetAddress']
+    billing_city = card['city']
+    billing_state = card['state']
+    billing_zip_code = card['zipCode']
+
+    # Encrypt the card info
+    encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+    encrypted_cvc = cipher_suite.encrypt(cvc.encode())
+    encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
+    encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
+    if expiration_date:
+        expiration_month = expiration_date.split('/')[0]
+        expiration_year = expiration_date.split('/')[1]
+        encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
+        encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
+        encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
+        encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
+    # Insert encrypted card information into PaymentCard table
+    if encrypted_card_number and encrypted_cvc and expiration_date:
+        cursor.execute('''
+            INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+
 
 if __name__ == '__main__':
    app.run(debug=True)

@@ -98,3 +98,11 @@ h3 {
 label {
     margin-left: 10px;
 }
+
+.payment-error-message {
+    color: red;
+    font-size: small;
+    font-style: italic;
+    margin-top: -5%;
+    padding-left: 5%;
+}

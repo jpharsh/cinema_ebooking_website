@@ -65,9 +65,9 @@ const SelectTickets = () => {
                            <p>Adult</p>
                            <p>$11.99</p>
                            <div>
-                               <button onClick={() => handleDecreaseButton(adultCount, setAdultCount)}>-</button>
+                               <button className="button" onClick={() => handleDecreaseButton(adultCount, setAdultCount)}>-</button>
                                <span style={{ margin: '0 20px' }}>{adultCount}</span>
-                               <button onClick={() => handleIncreaseButton(setAdultCount)}>+</button>
+                               <button className="button" onClick={() => handleIncreaseButton(setAdultCount)}>+</button>
                            </div>
                        </div>
 
@@ -76,9 +76,9 @@ const SelectTickets = () => {
                            <p>Child</p>
                            <p>$9.99</p>
                            <div>
-                               <button onClick={() => handleDecreaseButton(childCount, setChildCount)}>-</button>
+                               <button className="button" onClick={() => handleDecreaseButton(childCount, setChildCount)}>-</button>
                                <span style={{ margin: '0 20px' }}>{childCount}</span>
-                               <button onClick={() => handleIncreaseButton(setChildCount)}>+</button>
+                               <button className="button" onClick={() => handleIncreaseButton(setChildCount)}>+</button>
                            </div>
                        </div>
 
@@ -87,9 +87,9 @@ const SelectTickets = () => {
                            <p>Senior</p>
                            <p>$10.99</p>
                            <div>
-                               <button onClick={() => handleDecreaseButton(seniorCount, setSeniorCount)}>-</button>
+                               <button className="button" onClick={() => handleDecreaseButton(seniorCount, setSeniorCount)}>-</button>
                                <span style={{ margin: '0 20px' }}>{seniorCount}</span>
-                               <button onClick={() => handleIncreaseButton(setSeniorCount)}>+</button>
+                               <button className="button" onClick={() => handleIncreaseButton(setSeniorCount)}>+</button>
                            </div>
                        </div>
 

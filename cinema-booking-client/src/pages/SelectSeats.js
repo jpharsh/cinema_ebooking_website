@@ -181,7 +181,7 @@ async function displaySeats(showId) {
        </div>
        <div className="btn-container">
             <button className="btn white" onClick={handleCancel}>Cancel</button>
-            <button className="btn red" onClick={handleConfirmSeats}>Confirm Seats</button>
+            <button className="btn red" onClick={handleConfirmSeats} disabled={userSeats.length === 0}>Confirm Seats</button>
        </div>
        </div>
        </div>

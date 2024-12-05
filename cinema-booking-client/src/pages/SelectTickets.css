@@ -80,3 +80,9 @@
     background-color: #353535;
     color:rgb(101, 143, 194);
 }
+
+.button {
+    background-color: #353535;
+    border: 1px solid white;
+    font-weight: bold;
+}

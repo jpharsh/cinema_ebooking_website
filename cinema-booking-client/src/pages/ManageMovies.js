@@ -229,45 +229,64 @@ function ManageMovies() {
 
   // Handle scheduling
   const handleSchedule = async () => {
-    console.log("Movie data:", selectedMovie); // Ensure this logs movie data
+    console.log("Movie data:", selectedMovie); // Log movie data for debugging
     if (!validateSchedule()) {
-      console.log("Validate Schedule Movie failed");
-      return; // Don't proceed if there are validation errors
+      console.log("Validation failed");
+      return; // Exit if validation fails
     }
-    if (!selectedMovie || !selectedMovie.id) {
-        alert("Please select a movie before scheduling.");
-        return;
-    }
+
     const showtime = `${scheduleDatetime} ${scheduleTime}:00`;
     try {
-        const response = await axios.post(
-            "http://127.0.0.1:5000/api/schedule-movie",
-            {
-                movie_id: selectedMovie.id,
-                room: selectedRoom,
-                time: showtime,
-            }
-        );
-        if (response.data.success) {
-            alert("Movie scheduled successfully");
-            closeScheduleModal();
-            
-            window.location.reload();
-        } else {
-            alert(
-                response.data.error ||
-                "Scheduling conflict: This room already has a movie at the selected time."
-            );
+      const response = await axios.post(
+        "http://127.0.0.1:5000/api/schedule-movie",
+        {
+          movie_id: selectedMovie.id,
+          room: selectedRoom,
+          time: showtime,
         }
+      );
+      if (response.data.success) {
+        alert("Movie scheduled successfully");
+
+        // Update isNowShowing to 1 in the backend
+        const updateResponse = await axios.post(
+          "http://127.0.0.1:5000/api/update-is-now-showing",
+          {
+            movie_id: selectedMovie.id,
+            isNowShowing: 1,  // This updates the field in the backend
+          }
+        );
+
+        if (updateResponse.data.success) {
+          // Update the state directly instead of reloading the page
+          setMovies((prevMovies) =>
+            prevMovies.map((movie) =>
+              movie.id === selectedMovie.id
+                ? { ...movie, isNowShowing: 1 }
+                : movie
+            )
+          );
+          closeScheduleModal();
+        } else {
+          console.error("Update failed:", updateResponse.data);
+          alert("Failed to update isNowShowing.");
+        }
+      } else {
+        alert(
+          response.data.error ||
+          "Scheduling conflict: This room already has a movie at the selected time."
+        );
+      }
     } catch (error) {
       if (error.response?.data?.error) {
-        alert(error.response.data.error); // Show specific error from backend
+        console.error("Backend error:", error.response.data.error);
+        alert(error.response.data.error);
       } else {
-          console.error("Error scheduling movie:", error);
-          alert("An error occurred while scheduling the movie. Please check the console for details.");
+        console.error("Unknown error:", error);
+        alert("An error occurred while scheduling. Please check the console for details.");
       }
     }
-};
+};  
 
   return (
     <div>

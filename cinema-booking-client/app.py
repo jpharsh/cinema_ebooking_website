@@ -1,8 +1,6 @@
 from flask import Flask, jsonify, request, session
-import pymysql
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
 import re
 import mysql.connector
 from mysql.connector.errors import IntegrityError
@@ -15,7 +13,6 @@ import string  # For generating a random string
 import traceback
 import os  # To set environment variables
 import base64
-import smtplib
 from email.mime.text import MIMEText
 import google_auth_oauthlib.flow
 from google.oauth2.credentials import Credentials
@@ -24,7 +21,6 @@ from googleapiclient.discovery import build
 from werkzeug.security import check_password_hash
 from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
-import json
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -52,8 +48,6 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Load credentials from token.json
 def load_credentials():
-
-    
     creds = None
 
     # Load existing token if available
@@ -136,12 +130,7 @@ def fetch_movies(is_now_showing):
 
 @app.route('/api/fetch-all-movies', methods=['GET'])
 def fetch_all_movies():
-    connection = pymysql.connect(
-        host=db_host,
-        user=db_user,
-        password=db_password,
-        database=db_name
-    )
+    connection = connect_db()
     try:
         with connection.cursor() as cursor:
             sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
@@ -269,17 +258,6 @@ def get_cardinfo():
         return jsonify({"error": "Missing 'user_id' parameter"}), 400
 
     card_data = fetch_carddata('PaymentCards', user_id)
-    '''
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({"error": "Missing token"}), 401
-
-    decoded_token = verify_jwt_token(token)
-    if not decoded_token:
-        return jsonify({"error": "Invalid or expired token"}), 401
-
-    card_data = fetch_carddata('PaymentCards', decoded_token['id'])
-    '''
     if card_data:
         for row in card_data:
             try:
@@ -298,10 +276,10 @@ def get_cardinfo():
             except Exception as decrypt_error:
                 print(f"Error decrypting card data: {str(decrypt_error)}")
         
-        return jsonify(card_data), 200
+        return jsonify({"card_data": card_data, "found": True}), 200
 
     else:
-        return jsonify({"error": "User not found"}), 404
+        return jsonify({"found": False}), 200
     
 @app.route('/api/verify-password', methods=['POST'])
 def verify_password():
@@ -341,21 +319,6 @@ def delete_card(card_id):
         print(f"Error deleting card: {e}")
         return jsonify({"error": "An error occurred while deleting the card."}), 500
  
-
-'''
-@app.route('/api/verify-password', methods=['POST'])
-def verify_password():
-    data = request.json
-    entered_password = data.get('password')
-    user_id = data.get('id')
-
-    user = fetch_userdata('Users', user_id)  # Assume user_id is known
-
-    if user and check_password_hash(user['u_password'], entered_password):
-        return jsonify({'passwordVerified': True}), 200
-    else:
-        return jsonify({'passwordVerified': False}), 401
-'''
 @app.route('/api/edit', methods=['POST'])
 def edit_acc():
     print('edit_acc invoked')
@@ -525,34 +488,35 @@ def register_user():
            user_id = cursor.lastrowid 
 
            for card in cards:
-               name_on_card = card['nameOnCard']
-               card_number = card['cardNumber']
-               expiration_date = card['expirationDate']
-               cvc = card['cvc']
-               billing_street_address = card['streetAddress']
-               billing_city = card['city']
-               billing_state = card['state']
-               billing_zip_code = card['zipCode']
+                add_card_to_db(cursor, user_id, card)
+        #        name_on_card = card['nameOnCard']
+        #        card_number = card['cardNumber']
+        #        expiration_date = card['expirationDate']
+        #        cvc = card['cvc']
+        #        billing_street_address = card['streetAddress']
+        #        billing_city = card['city']
+        #        billing_state = card['state']
+        #        billing_zip_code = card['zipCode']
 
-               # Encrypt the card info
-               encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
-               encrypted_cvc = cipher_suite.encrypt(cvc.encode())
-               encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
-               encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
-               if expiration_date:
-                   expiration_month = expiration_date.split('/')[0]
-                   expiration_year = expiration_date.split('/')[1]
-                   encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
-                   encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
-                   encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
-                   encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
-               # Insert encrypted card information into PaymentCard table
-               if encrypted_card_number and encrypted_cvc and expiration_date:
-                   cursor.execute('''
-                       INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                   ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
-           conn.commit()
+        #        # Encrypt the card info
+        #        encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+        #        encrypted_cvc = cipher_suite.encrypt(cvc.encode())
+        #        encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
+        #        encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
+        #        if expiration_date:
+        #            expiration_month = expiration_date.split('/')[0]
+        #            expiration_year = expiration_date.split('/')[1]
+        #            encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
+        #            encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
+        #            encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
+        #            encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
+        #        # Insert encrypted card information into PaymentCard table
+        #        if encrypted_card_number and encrypted_cvc and expiration_date:
+        #            cursor.execute('''
+        #                INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+        #                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        #            ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+                conn.commit()
 
        print('after connect_db')
 
@@ -871,6 +835,28 @@ def schedule_movie():
             INSERT INTO Shows (movie_id, room_id, showtime)
             VALUES (%s, %s, %s)
         """, (movie_id, room, dtime))
+
+       # Get the ID of the newly inserted show
+        show_id = cursor.lastrowid
+
+        # Retrieve seat IDs for the specified room
+        cursor.execute("""
+            SELECT id FROM Seats
+            WHERE room_id = %s
+            LIMIT 69
+        """, (room,))
+        seat_ids = cursor.fetchall()
+
+        if len(seat_ids) < 69:
+            return jsonify({"success": False, "error": "Not enough seats available in the specified room"}), 400
+
+        # Prepare seat data for insertion into ShowSeats
+        seat_data = [(show_id, seat_id[0], 0) for seat_id in seat_ids]  # Status is set to 0 (available)
+        cursor.executemany("""
+            INSERT INTO ShowSeats (show_id, seat_id, seat_status)
+            VALUES (%s, %s, %s)
+        """, seat_data)
+
         connection.commit()
 
         return jsonify({"success": True}), 200
@@ -880,46 +866,58 @@ def schedule_movie():
     finally:
         connection.close()
 
+@app.route('/api/get-seats', methods=['GET'])
+def get_seats():
+    show_id = request.args.get('show_id')  # Assume you pass the show_id as a query parameter
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(dictionary=True)
+        # Query to fetch seat statuses for the given show_id
+        cursor.execute("""
+            SELECT seat_status 
+            FROM ShowSeats
+            WHERE show_id = %s
+            ORDER BY seat_id ASC
+        """, (show_id,))
+        
+        # Fetch all rows from the query result
+        seats = cursor.fetchall()  # Returns a list of dictionaries
+        
+        # Return the JSON response
+        return jsonify(seats), 200
+    except Exception as e:
+        print(f"Error fetching seat statuses: {e}")
+        return jsonify({"success": False, "error": "An error occurred while fetching seat statuses"}), 500
+    finally:
+        connection.close()
 
-if __name__ == '__main__':
-   app.run(debug=True)
+@app.route('/api/update-is-now-showing', methods=['POST'])
+def update_is_now_showing():
+    data = request.get_json()
+    movie_id = data.get('movie_id')
+    is_now_showing = data.get('isNowShowing')  # Adjusted to match the frontend payload
 
+    print(f"Received movie_id: {movie_id}, is_now_showing: {is_now_showing}")
 
-# @app.route('/api/schedule-movie', methods=['POST'])
-# def schedule_movie():
-#     data = request.get_json()
-#     movie_id = data.get('movie_id')
-#     room = data.get('room')
-#     dtime = data.get('show_time')
+    connection = connect_db()
+    try:
+        cursor = connection.cursor()
+        print(f"Updating isNowShowing for movie_id: {movie_id} to {is_now_showing}")
 
-#     connection = connect_db()
-#     try:
-#         with connection.cursor() as cursor:
-#             # Check if the selected room already has a movie scheduled at the same date and time
-#             cursor.execute("""
-#                 SELECT COUNT(*) FROM Shows
-#                 WHERE room_id = %s AND showtime = %s
-#             """, (room, dtime))
-#             conflict = cursor.fetchone()[0]
+        cursor.execute("""
+            UPDATE Movies
+            SET isNowShowing = %s
+            WHERE id = %s
+        """, (is_now_showing, movie_id))
+        connection.commit()
 
-#             if conflict > 0:
-#                 return jsonify({"success": False, "error": "Time conflict in the selected room"}), 400
-
-#             # Insert new schedule
-#             cursor.execute("""
-#                 INSERT INTO Shows (movie_id, room_id, showtime)
-#                 VALUES (%s, %s, %s)
-#             """, (movie_id, room, dtime))
-#             connection.commit()
-
-#         return jsonify({"success": True}), 200
-#     except Exception as e:
-#         print(f"Error scheduling movie: {e}")
-#         return jsonify({"success": False, "error": "An error occurred while scheduling the movie"}), 500
-#     finally:
-#         connection.close()
-
-
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Error updating isNowShowing: {e}")
+        return jsonify({"success": False, "error": "An error occurred while updating the movie"}), 500
+    finally:
+        connection.close()
+        
 @app.route('/api/showtimes/<int:movie_id>', methods=['GET'])
 def get_showtimes(movie_id):
     connection = connect_db()
@@ -930,3 +928,85 @@ def get_showtimes(movie_id):
     cursor.close()
     connection.close()
     return jsonify(showtimes)
+
+@app.route('/api/update-seat-status', methods=['POST'])
+def update_seat_status():
+    data = request.get_json()
+    show_id = data.get('show_id')
+    selected_seats = data.get('selectedSeats')
+    print(f"selected_seats: {selected_seats}")
+
+    if not show_id or not selected_seats or len(selected_seats) == 0:
+        return jsonify({'error': 'Invalid data provided'}), 400
+
+    try:
+        connection = connect_db()
+        cursor = connection.cursor()
+
+        for seat in selected_seats:
+            seat_id = seat.get('seat_id')
+            print(f"Updating seat status for seat_id: {seat_id}")
+            cursor.execute("""
+                UPDATE ShowSeats
+                SET seat_status = 2
+                WHERE show_id = %s AND seat_id = %s
+            """, (show_id, seat_id))
+
+        connection.commit()
+        return jsonify({'message': 'Seat statuses updated successfully'}), 200
+    except Exception as e:
+        print(f"Error updating seat statuses: {e}")
+        return jsonify({'error': 'Failed to update seat statuses'}), 500
+    finally:
+        connection.close()
+
+
+@app.route('/api/add-card', methods=['POST']) 
+def add_card():
+    try:
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            data = request.get_json()
+            user_id = data.get('user_id')
+            
+            add_card_to_db(cursor, user_id, data)
+            conn.commit()
+        return jsonify({'message': 'Card added successfully'}), 201
+    except Exception as e:
+        print(f"Error adding card: {e}")
+        return jsonify({'error': 'An error occurred while adding the card'}), 500
+    finally:
+        conn.close()
+
+def add_card_to_db(cursor, user_id, card):
+    name_on_card = card['nameOnCard']
+    card_number = card['cardNumber']
+    expiration_date = card['expirationDate']
+    cvc = card['cvc']
+    billing_street_address = card['streetAddress']
+    billing_city = card['city']
+    billing_state = card['state']
+    billing_zip_code = card['zipCode']
+
+    # Encrypt the card info
+    encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
+    encrypted_cvc = cipher_suite.encrypt(cvc.encode())
+    encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
+    encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
+    if expiration_date:
+        expiration_month = expiration_date.split('/')[0]
+        expiration_year = expiration_date.split('/')[1]
+        encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
+        encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
+        encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
+        encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
+    # Insert encrypted card information into PaymentCard table
+    if encrypted_card_number and encrypted_cvc and expiration_date:
+        cursor.execute('''
+            INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
+
+
+if __name__ == '__main__':
+   app.run(debug=True)

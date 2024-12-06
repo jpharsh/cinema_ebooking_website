@@ -21,6 +21,7 @@ from googleapiclient.discovery import build
 from werkzeug.security import check_password_hash
 from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
+import datetime
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -1010,3 +1011,55 @@ def add_card_to_db(cursor, user_id, card):
 
 if __name__ == '__main__':
    app.run(debug=True)
+
+
+@app.route('/api/validate-promo', methods=['POST'])
+def validate_promo():
+    try:
+        # Get the promo code from the request
+        data = request.json
+        promo_code = data.get("promo_code")
+
+        if not promo_code:
+            return jsonify({"error": "Promo code is required"}), 400
+
+        # Fetch promo details from the database
+        connection = connect_db()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT promo_amount, exp_date FROM Promotions WHERE promo_code = %s", (promo_code,))
+        promo = cursor.fetchone()
+        cursor.close()
+        connection.close()
+
+        if not promo:
+            return jsonify({"error": "Invalid promo code"}), 404
+
+        # Debugging: Check what expiration date is fetched
+        expiration_date = promo.get("exp_date")
+        print(f"Raw expiration_date from DB: {expiration_date}")
+
+        # Ensure the expiration_date is processed correctly
+        if isinstance(expiration_date, str):
+            try:
+                expiration_date = datetime.strptime(expiration_date, "%Y-%m-%d").date()
+            except ValueError as e:
+                print(f"Error parsing expiration_date: {e}")
+                return jsonify({"error": "Invalid expiration date format"}), 500
+
+        # Validate expiration_date type
+        if not isinstance(expiration_date, datetime.date):
+            return jsonify({"error": "Invalid expiration date format"}), 500
+
+        # Check if the promo code is expired
+        current_date = datetime.datetime.now().date()
+        print(f"Current date: {current_date}, Expiration date: {expiration_date}")
+        if expiration_date < current_date:
+            return jsonify({"error": "Promo code has expired"}), 400
+
+        # Return the discount if valid
+        discount = promo.get("promo_amount", 0)
+        return jsonify({"discount": discount}), 200
+
+    except Exception as e:
+        print(f"Error validating promo code: {e}")
+        return jsonify({"error": "An error occurred while validating the promo code"}), 500

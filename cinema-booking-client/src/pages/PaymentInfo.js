@@ -24,6 +24,10 @@ const PaymentInfo = () => {
   const time = location.state?.time;
   const showid = location.state?.showid;
   const [cards, setCards] = useState([]);
+
+
+    
+
   useEffect(() => {
     // Fetch saved cards from the backend
     const fetchCards = async () => {

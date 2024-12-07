@@ -133,15 +133,14 @@ def fetch_movies(is_now_showing):
 def fetch_all_movies():
     connection = connect_db()
     try:
-        with connection.cursor() as cursor:
-            sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
+        with connection.cursor(dictionary=True) as cursor:  # Use dictionary cursor for consistency
+            sql = "SELECT * FROM Movies"
             cursor.execute(sql)
-            result = cursor.fetchall()
-            # Transform the result into a list of dictionaries
-            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3], 'trailer_url': row[4], 'isNowShowing': row[5]} for row in result]
+            movies = cursor.fetchall()
             return jsonify(movies)
     finally:
         connection.close()
+
 
 
 def send_email_via_gmail_api(to, subject, body):
@@ -961,7 +960,6 @@ def update_seat_status():
     finally:
         connection.close()
 
-
 @app.route('/api/add-card', methods=['POST']) 
 def add_card():
     try:
@@ -1007,11 +1005,6 @@ def add_card_to_db(cursor, user_id, card):
             INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
-
-
-if __name__ == '__main__':
-   app.run(debug=True)
-
 
 @app.route('/api/validate-promo', methods=['POST'])
 def validate_promo():
@@ -1063,3 +1056,6 @@ def validate_promo():
     except Exception as e:
         print(f"Error validating promo code: {e}")
         return jsonify({"error": "An error occurred while validating the promo code"}), 500
+
+if __name__ == '__main__':
+   app.run(debug=True)

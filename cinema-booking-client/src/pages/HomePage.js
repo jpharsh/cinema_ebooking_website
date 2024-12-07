@@ -4,6 +4,7 @@ import axios from 'axios';
 import '../App.css';
 import './HomePage.css'
 import Advertisement from '../images/Advertisement1.png';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -186,7 +187,9 @@ const HomePage = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <button className="btn red">All Movies</button>
+                <Link to="/all-movies">
+                    <button className="btn red">All Movies</button>
+                </Link>
             </div>
         </div>
     );

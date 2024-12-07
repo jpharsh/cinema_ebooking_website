@@ -25,7 +25,7 @@ const MovieInformation = () => {
     };
     
     const handleBackClick = () => {
-        navigate('/');
+        navigate(-1);
     };
 
     const handleBookClick = () => {
@@ -60,7 +60,7 @@ const MovieInformation = () => {
             
         </div>
         <div className="btn-container">
-            <button className="btn white" onClick={handleBackClick}>Back to Results</button>
+            <button className="btn white" onClick={handleBackClick}>Back</button>
             <button className="btn red" onClick={handleBookClick}>Book Movie</button>
         </div>
     </div>

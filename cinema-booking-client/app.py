@@ -132,15 +132,14 @@ def fetch_movies(is_now_showing):
 def fetch_all_movies():
     connection = connect_db()
     try:
-        with connection.cursor() as cursor:
-            sql = "SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing FROM Movies"
+        with connection.cursor(dictionary=True) as cursor:  # Use dictionary cursor for consistency
+            sql = "SELECT * FROM Movies"
             cursor.execute(sql)
-            result = cursor.fetchall()
-            # Transform the result into a list of dictionaries
-            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3], 'trailer_url': row[4], 'isNowShowing': row[5]} for row in result]
+            movies = cursor.fetchall()
             return jsonify(movies)
     finally:
         connection.close()
+
 
 
 def send_email_via_gmail_api(to, subject, body):
@@ -880,6 +879,31 @@ def get_showtimes(movie_id):
     cursor.close()
     connection.close()
     return jsonify(showtimes)
+
+@app.route('/api/fetch-movies-by-category', methods=['GET'])
+def fetch_movies_by_category():
+    category = request.args.get('category')
+
+    if not category:
+        # If no category is provided, return all movies
+        return jsonify({"error": "Category is required"}), 400
+    
+    connection = connect_db()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                SELECT id, title, poster_url, mpaa_rating, trailer_url, isNowShowing, category 
+                FROM Movies 
+                WHERE category = %s
+            """
+            cursor.execute(sql, (category,))
+            result = cursor.fetchall()
+            # Transform the result into a list of dictionaries
+            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3], 'trailer_url': row[4], 'isNowShowing': row[5], 'category': row[6]} for row in result]
+            return jsonify(movies)
+    finally:
+        connection.close()
+
 
 if __name__ == '__main__':
    app.run(debug=True)

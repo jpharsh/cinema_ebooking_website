@@ -20,11 +20,11 @@ const MovieCard = ({ movie, isNowPlaying}) => {
 
     return ( 
         <div
-            style={{ maxHeight: '350px' }}
+            className="movie-card"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <img src={movie.poster_url} className="movie-card" alt={`${movie.title} poster`} />
+            <img src={movie.poster_url} alt={`${movie.title} poster`} />
             <p className="movie-card-title">{movie.title} | {movie.mpaa_rating} </p>
             {isHovered && (
                 <div className="movie-info">

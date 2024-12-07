@@ -1056,6 +1056,38 @@ def validate_promo():
     except Exception as e:
         print(f"Error validating promo code: {e}")
         return jsonify({"error": "An error occurred while validating the promo code"}), 500
+    
+@app.route('/api/show-dates', methods=['GET'])
+def get_show_dates():
+    connection = connect_db()
+    try:
+        with connection.cursor(dictionary=True) as cursor:
+            sql = "SELECT DISTINCT DATE(showtime) as show_date FROM Shows ORDER BY show_date ASC"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            dates = [row['show_date'].strftime('%Y-%m-%d') for row in result]
+            return jsonify(dates)
+    finally:
+        connection.close()
+
+@app.route('/api/movies-by-date', methods=['GET'])
+def get_movies_by_date():
+    show_date = request.args.get('date')  # Expecting date in 'YYYY-MM-DD' format
+    connection = connect_db()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT DISTINCT m.id, m.title, m.poster_url, m.mpaa_rating
+            FROM Movies m
+            JOIN Shows s ON m.id = s.movie_id
+            WHERE DATE(s.showtime) = %s
+            """
+            cursor.execute(sql, (show_date,))
+            result = cursor.fetchall()
+            movies = [{'id': row[0], 'title': row[1], 'poster_url': row[2], 'mpaa_rating': row[3]} for row in result]
+            return jsonify(movies)
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
    app.run(debug=True)

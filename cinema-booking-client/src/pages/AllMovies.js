@@ -9,7 +9,10 @@ const AllMovies = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [selectedFilters, setSelectedFilters] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [showDatesDropdown, setShowDatesDropdown] = useState(false);
+    const [showDates, setShowDates] = useState([]);
+    const [selectedDate, setSelectedDate] = useState('');
 
     const categories = ['Action', 'Drama', 'Comedy', 'Horror', 'Sci-Fi'];
 
@@ -17,6 +20,10 @@ const AllMovies = () => {
         axios.get('http://127.0.0.1:5000/api/fetch-all-movies')
             .then(response => setAllMovies(response.data))
             .catch(error => console.error("Error fetching movies:", error));
+
+        axios.get('http://127.0.0.1:5000/api/show-dates')
+            .then(response => setShowDates(response.data))
+            .catch(error => console.error("Error fetching show dates:", error));
     }, []);
 
     const handleSearch = (event) => {
@@ -33,19 +40,45 @@ const AllMovies = () => {
         setSuggestions([]);
     };
 
-    const toggleDropdown = () => {
-        setShowDropdown(!showDropdown);
+    const toggleCategoryDropdown = () => {
+        setShowCategoryDropdown(!showCategoryDropdown);
+    };
+
+    const toggleDatesDropdown = () => {
+        setShowDatesDropdown(!showDatesDropdown);
     };
 
     const addFilter = (category) => {
         if (!selectedFilters.includes(category)) {
             setSelectedFilters([...selectedFilters, category]);
         }
-        setShowDropdown(false);
+        setShowCategoryDropdown(false);
     };
 
     const removeFilter = (category) => {
         setSelectedFilters(selectedFilters.filter((filter) => filter !== category));
+    };
+
+    const handleDateSelect = (date) => {
+        setSelectedDate(date);
+        setShowDatesDropdown(false);
+
+        if (date) {
+            axios.get(`http://127.0.0.1:5000/api/movies-by-date?date=${date}`)
+                .then(response => setAllMovies(response.data))
+                .catch(error => console.error("Error fetching movies by date:", error));
+        } else {
+            axios.get('http://127.0.0.1:5000/api/fetch-all-movies')
+                .then(response => setAllMovies(response.data))
+                .catch(error => console.error("Error fetching all movies:", error));
+        }
+    };
+
+    const clearSelectedDate = () => {
+        setSelectedDate('');
+        axios.get('http://127.0.0.1:5000/api/fetch-all-movies')
+            .then(response => setAllMovies(response.data))
+            .catch(error => console.error("Error fetching all movies:", error));
     };
 
     const filterMovies = (movies) => {
@@ -81,21 +114,45 @@ const AllMovies = () => {
                 </div>
             )}
 
-            <div style={{ marginTop: '10px' }}>
-                <button onClick={toggleDropdown}>Filter</button>
-                {showDropdown && (
-                    <div style={{ border: '1px solid #ddd', padding: '10px', marginTop: '5px' }}>
-                        {categories.map((category) => (
-                            <div
-                                key={category}
-                                onClick={() => addFilter(category)}
-                                style={{ cursor: 'pointer', padding: '5px' }}
-                            >
-                                {category}
-                            </div>
-                        ))}
-                    </div>
-                )}
+            <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                <div>
+                    <button onClick={toggleCategoryDropdown}>By Category</button>
+                    {showCategoryDropdown && (
+                        <div style={{ border: '1px solid #ddd', padding: '10px', marginTop: '5px' }}>
+                            {categories.map((category) => (
+                                <div
+                                    key={category}
+                                    onClick={() => addFilter(category)}
+                                    style={{ cursor: 'pointer', padding: '5px' }}
+                                >
+                                    {category}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div>
+                    <button onClick={toggleDatesDropdown}>By Date</button>
+                    {showDatesDropdown && (
+                        <div style={{
+                            border: '1px solid #ddd',
+                            padding: '10px',
+                            marginTop: '5px',
+                            maxHeight: '200px',
+                            overflowY: 'scroll',
+                        }}>
+                            {showDates.map((date) => (
+                                <div
+                                    key={date}
+                                    onClick={() => handleDateSelect(date)}
+                                    style={{ cursor: 'pointer', padding: '5px' }}
+                                >
+                                    {date}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div style={{ marginTop: '10px' }}>
@@ -125,6 +182,31 @@ const AllMovies = () => {
                         </span>
                     </span>
                 ))}
+                {selectedDate && (
+                    <span
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '5px 10px',
+                            backgroundColor: '#eee',
+                            borderRadius: '15px',
+                            margin: '0 5px',
+                            color: 'blue',
+                        }}
+                    >
+                        {selectedDate}
+                        <span
+                            onClick={clearSelectedDate}
+                            style={{
+                                marginLeft: '8px',
+                                cursor: 'pointer',
+                                color: '#ff0000',
+                            }}
+                        >
+                            x
+                        </span>
+                    </span>
+                )}
             </div>
 
             <div className="movie-grid">

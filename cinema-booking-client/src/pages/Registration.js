@@ -421,6 +421,19 @@ const Registration = () => {
 
 
  return (
+
+   
+        // <div>
+        //   <div className="registration-container">
+        //     <h1>Edit Profile</h1>
+    
+        //     {/* Personal Information */}
+        //     <div className="section">
+        //       <button onClick={toggleRequiredInfo} className="section-toggle">
+        //         <span>Personal Information</span>
+        //         <span>{showRequiredInfo ? "▲" : "▼"}</span>
+        //       </button>
+        //       {showRequiredInfo && (
   <div>
       {/*<Navbar />*/}
       <div className="registration-container">
@@ -429,12 +442,12 @@ const Registration = () => {
 
 
 
-          <form onSubmit={handleSubmit}>
+          <form className="registration-form" onSubmit={handleSubmit}>
           {/* Required Information */}
           <div className="section">
               <button type="button" onClick={toggleRequiredInfo} className="section-toggle">
-                  <span>Required Information</span> {/* Wrap the text in a span */}
-                  <span>{showRequiredInfo ? '▲' : '▼'}</span> {/* The arrow */}
+                  <span>Required Information</span> 
+                  <span>{showRequiredInfo ? "▲" : "▼"}</span> 
               </button>
 
 

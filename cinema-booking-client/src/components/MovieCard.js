@@ -9,7 +9,7 @@ const MovieCard = ({ movie, isNowPlaying}) => {
     const navigate = useNavigate();
 
     const viewMovieInfo = () => {
-        navigate('/movie-information', { state: { movie } });
+        navigate('/movie-information', { state: { movie, isNowPlaying } });
     };
     const handleBookMovie = () => {
         navigate('/showtimes', { state: { movie } });

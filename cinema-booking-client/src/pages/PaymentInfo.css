@@ -9,6 +9,10 @@ h3 {
     padding: 10px; 
 }
 
+.card-rows :hover {
+    background-color: red;
+}
+
 .card {
     display: flex;
     justify-content: space-between;
@@ -16,11 +20,11 @@ h3 {
     width: 100%;
     border-width: 0;
     line-height: 0px;
+    padding: 0px;
 }
 
 .card :hover {
     background-color: #555;
-    line-height: 0px;
 }
 
 .card-type {
@@ -31,13 +35,11 @@ h3 {
 
 .card-info {
     display: flex;
+    justify-content: space-between;
     color: white;
     font-size: medium;
     width: 100%;
     align-items: baseline;
-    gap: 10px;
-    justify-content: space-between;
-    
 }
 
 .card-logo {
@@ -50,6 +52,7 @@ h3 {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    margin-bottom: -20px;
 }
 
 .small-text {
@@ -60,13 +63,46 @@ h3 {
 .payment-info-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
-    gap: 20px;
+    margin-top: 10px;
 }
 
 .payment-info {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    align-items: flex-start;
+    align-items: flex-start; 
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px; 
+}
+
+.payment-title {
+    text-align: left;
+    flex: 1; /* Pushes the value to the right */
+    padding-right: 40px;
+}
+
+.payment-value {
+    text-align: right;
+    flex: 0; /* Keeps the value aligned to the right */
+}
+
+.total-row {
+    font-weight: bold;
+    padding-top: 10%;
+}
+
+label {
+    margin-left: 10px;
+}
+
+.payment-error-message {
+    color: red;
+    font-size: small;
+    font-style: italic;
+    margin-top: -5%;
+    padding-left: 5%;
 }

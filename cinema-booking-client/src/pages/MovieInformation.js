@@ -10,6 +10,7 @@ const MovieInformation = () => {
 
     const location = useLocation();
     const movie = location.state?.movie;
+    const isNowPlaying = location.state?.isNowPlaying;
     const [selectedTrailer, setSelectedTrailer] = useState(null);
 
     if (!movie) {

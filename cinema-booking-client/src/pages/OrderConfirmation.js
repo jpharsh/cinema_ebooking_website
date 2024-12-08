@@ -1,38 +1,53 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import './OrderConfirmation.css';
-// import LoggedInNavbar from '../components/LoggedInNavbar';
+
 
 const OrderConfirmation = () => {
-  return (
-    <div>
-      {/*<LoggedInNavbar />*/}
-    
-    <div className="confirmation-container">
-      {/* <header className="header">
-        <span className="cinema-text">Cinema Movies</span>
-      </header> */}
-      <h1>Order Confirmation</h1>
-      <div className="confirmation-card">
-        <div className="content-wrapper">
-          <img
-            src="https://t2.gstatic.com/licensed-image?q=tbn:ANd9GcSK0mRgxk6RD6AXbkAzpQRs7FCh9J0FiOxC9eIHCqoxAgpBeywiPrFjbAcGKbCaVYkc"
-            alt="Movie Poster"
-            className="poster-image"
-          />
-          <div className="order-details">
-            <h2 className="order-movie-title">Movie Title</h2>
-            <p><strong>Date:</strong> Tues, Sept 17, 2024</p>
-            <p><strong>Time:</strong> 2:00 PM</p>
-            <p><strong>Tickets:</strong> 2 Adults, 1 Child</p>
-            <p><strong>Seats:</strong> F6, F7, F8</p>
-            <p><strong>Order Total:</strong> $33.97</p>
-          </div>
-        </div>
-      </div>
-      <footer className="footer">Enjoy The Movie!</footer>
-    </div>
-    </div>
-  );
+ const location = useLocation();
+ const { movie, tickets, seats, totalPrice, date, time, adultCount, childCount, seniorCount} = location.state || {};
+ return (
+   <div>
+     <div className="confirmation-container">
+       <h1>Order Confirmation</h1>
+       <div className="confirmation-card">
+         <div className="content-wrapper">
+           <img
+             src={movie?.poster_url || "https://via.placeholder.com/200"}
+             alt={movie?.title || "Movie Poster"}
+             className="poster-image"
+           />
+           <div className="order-details">
+             <h2 className="order-movie-title">{movie?.title || "Movie Title"}</h2>
+             <p><strong>Time:</strong> {time || "N/A"}</p>
+             <p><strong>Tickets:</strong></p>
+             <ul style={{ marginLeft: '20px' }}>
+               {tickets?.adults > 0 && (
+                 <li>
+                   {tickets.adults === 1 ? "1 Adult" : `${tickets.adults} Adults`}
+                 </li>
+               )}
+               {tickets?.children > 0 && (
+                 <li>
+                   {tickets.children === 1 ? "1 Child" : `${tickets.children} Children`}
+                 </li>
+               )}
+               {tickets?.seniors > 0 && (
+                 <li>
+                   {tickets.seniors === 1 ? "1 Senior" : `${tickets.seniors} Seniors`}
+                 </li>
+               )}
+             </ul>
+             <p><strong>Seats:</strong> {seats?.join(', ') || "N/A"}</p>
+             <p><strong>Order Total:</strong> ${totalPrice?.toFixed(2) || "0.00"}</p>
+           </div>
+         </div>
+       </div>
+       <footer className="footer">Enjoy The Movie!</footer>
+     </div>
+   </div>
+ );
 };
+
 
 export default OrderConfirmation;

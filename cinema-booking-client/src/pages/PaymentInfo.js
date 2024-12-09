@@ -26,6 +26,7 @@ const PaymentInfo = () => {
  const date = location.state?.date;
  const time = location.state?.time;
  const showid = location.state?.showid;
+ const userSeats = location.state?.userSeats;
 
 
  const [cards, setCards] = useState([]);
@@ -450,6 +451,8 @@ const handleAddCard = async (e) => {
          date,
          time,
          movie,
+         userSeats,
+         showid
        },
      });
    }}

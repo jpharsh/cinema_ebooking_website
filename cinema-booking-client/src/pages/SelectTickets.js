@@ -17,6 +17,7 @@ const SelectTickets = () => {
   const date = location.state?.date;
   const time = location.state?.time;
   const formattedSeats = location.state?.formattedSeats;
+  const userSeats = location.state?.userSeats;
   const numSeats = formattedSeats.length; 
   if (!movie) {
     return <p>No movie information available</p>;
@@ -60,7 +61,7 @@ const SelectTickets = () => {
 
   const handleConfirmTickets = () => {
       const ticketData = { adultCount, childCount, seniorCount };
-      navigate('/payment-info', { state: { ...ticketData, movie, totalPrice: getTotalPrice(), showid, date, time, formattedSeats } });
+      navigate('/payment-info', { state: { ...ticketData, movie, totalPrice: getTotalPrice(), showid, date, time, formattedSeats, userSeats } });
   };
 
 

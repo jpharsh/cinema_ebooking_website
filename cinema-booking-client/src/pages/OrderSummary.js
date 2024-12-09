@@ -13,15 +13,12 @@ import { AuthContext } from '../AuthContext'; // Replace with your actual contex
 const OrderSummary = () => {
  const location = useLocation();
  const {
-   adultCount,
-   childCount,
-   seniorCount,
    totalPrice,
    movie,
-   formattedSeats,
    seats,
+   userSeats,
+   showid,
    tickets,
-   finalTotalPrice,
    date,
    time,
  } = location.state || {};
@@ -193,6 +190,29 @@ async function getUserEmail() {
              <button
                className="confirm-button"
                onClick={async () => {
+
+                // book the tickets
+                try {
+                  // Make an API call to update the seat statuses to 2 for the specific show_id
+                  const response = await fetch('http://127.0.0.1:5000/api/update-seat-status', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                          show_id: showid, // Assuming movie has the show_id
+                          selectedSeats: userSeats, // An array of selected seat IDs
+                      }),
+                  });
+
+                  if (!response.ok) {
+                      // Handle failure response
+                      alert('Error updating seat statuses.');
+                  }
+                } catch (error) {
+                    console.error('Error updating seat statuses:', error);
+                    alert('Error updating seat statuses.');
+                }
 
                  // Send confirmation email
                  try {

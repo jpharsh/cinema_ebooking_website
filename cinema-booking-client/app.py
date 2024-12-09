@@ -1088,5 +1088,40 @@ def get_movies_by_date():
     finally:
         connection.close()
 
+@app.route('/send-confirmation-email', methods=['POST'])
+def send_confirmation_email():
+   data = request.json
+   print(f"Received data: {data}")
+   to = data.get('to')
+   movie = data.get('movie')
+   date = data.get('date')
+   time = data.get('time')
+   tickets = data.get('tickets')
+   seats = data.get('seats')
+   total_price = data.get('total_price')
+
+   if not to or not movie or not date or not time or not tickets or not seats or not total_price:
+       return jsonify({'error': 'Missing required fields'}), 400
+
+   subject = f"Your Movie Confirmation for {movie}"
+   body = f"""
+   Thank you for your purchase!
+
+   Movie: {movie}
+   Date: {date}
+   Time: {time}
+   Tickets: {tickets}
+   Seats: {seats}
+   Total Price: ${total_price}
+
+   Enjoy the movie!
+   """
+
+   try:
+       send_email_via_gmail_api(to, subject, body)
+       return jsonify({'message': 'Email sent successfully'}), 200
+   except Exception as e:
+       return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
    app.run(debug=True)

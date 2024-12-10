@@ -117,7 +117,7 @@ async function displaySeats(showId) {
 
 
    const handleConfirmSeats = async () => {
-       navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
+       navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid, userSeats } });
       
        // DO THIS AFTER BOOKING IS COMPLETE:
            // try {

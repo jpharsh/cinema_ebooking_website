@@ -365,18 +365,18 @@ const Registration = () => {
 
        // Add an empty error object for the new card (ensures no errors are carried over)
        setErrors((prevErrors) => [
-           ...prevErrors,
-           {
-               nameOnCard: '',
-               cardNumber: '',
-               expirationDate: '',
-               cvc: '',
-               streetAddress: '',
-               city: '',
-               state: '',
-               zipCode: ''
-           }
-       ]);
+        ...(Array.isArray(prevErrors) ? prevErrors : []),
+        {
+            nameOnCard: '',
+            cardNumber: '',
+            expirationDate: '',
+            cvc: '',
+            streetAddress: '',
+            city: '',
+            state: '',
+            zipCode: ''
+        }
+    ]);    
    }
 };
 

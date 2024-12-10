@@ -62,7 +62,9 @@ const MovieInformation = () => {
         </div>
         <div className="btn-container">
             <button className="btn white" onClick={handleBackClick}>Back</button>
-            <button className="btn red" onClick={handleBookClick}>Book Movie</button>
+            {isNowPlaying && 
+                <button className="btn red" onClick={handleBookClick}>Book Movie</button>
+            }
         </div>
     </div>
     {/* Trailer Pop-up */}

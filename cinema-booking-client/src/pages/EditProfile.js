@@ -475,7 +475,7 @@ const validateNameOnCard = (nameOnCard) => {
 
   // Function to add a new card
   const addCard = () => {
-    if (cards.length < 4) {
+    if (cards.length < 3) {
       setCards([
         ...cards,
         {
@@ -492,7 +492,7 @@ const validateNameOnCard = (nameOnCard) => {
         },
       ]);
     } else {
-      alert("You can only add up to 4 cards.");
+      alert("You can only add up to 3 cards.");
     }
   };
 
@@ -757,7 +757,8 @@ const validateNameOnCard = (nameOnCard) => {
                 </div>
               ))}
               <div className="center-btn">
-                <button className="edit-profile-btn" onClick={addCard}>
+                <button className="edit-profile-btn" onClick={addCard} disabled={cards.length >= 3}
+                >
                   Add Card
                 </button>
               </div>

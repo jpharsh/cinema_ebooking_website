@@ -21,6 +21,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import MovieInformation from './pages/MovieInformation.js';
 import AllMovies from './pages/AllMovies.js';
+import OrderHistory from './pages/OrderHistory.js';
 import './App.css';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/movie-information" element={<MovieInformation />} />
                 <Route path="/all-movies" element={<AllMovies />} />
+                <Route path="/order-history" element={<OrderHistory />} />
             </Routes>
         </>
     );

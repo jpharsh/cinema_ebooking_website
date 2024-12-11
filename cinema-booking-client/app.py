@@ -21,6 +21,7 @@ from googleapiclient.discovery import build
 from werkzeug.security import check_password_hash
 from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
+import traceback
 
 
 app = Flask(__name__)
@@ -1135,6 +1136,131 @@ def get_movies_by_date():
     finally:
         connection.close()
 
+import traceback
+
+@app.route('/api/get-promo-id', methods=['GET'])
+def get_promo_id():
+    promo_code = request.args.get('promo_code')  # Extract promo_code from query parameters
+
+    if not promo_code:
+        return jsonify({'error': 'Promo code is required'}), 400
+
+    try:
+        # Connect to the database
+        connection = connect_db()
+    except Exception as e:
+        return jsonify({'error': f'Database connection error: {str(e)}'}), 500
+
+    try:
+        with connection.cursor() as cursor:
+            # Query to fetch promo_id based on promo_code
+            sql = """
+            SELECT id
+            FROM Promotions
+            WHERE promo_code = %s
+            """
+            cursor.execute(sql, (promo_code,))
+            result = cursor.fetchone()
+
+            if result:
+                return jsonify({'id': result[0]}), 200  # Return the promo_id if found
+            else:
+                return jsonify({'error': 'Promo code not found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': f'Error executing query: {str(e)}'}), 500
+
+    finally:
+        connection.close()
+
+        
+@app.route('/api/save-order', methods=['POST'])
+def save_order():
+    try:
+        # Parse incoming JSON data
+        data = request.get_json()
+        print(f"Received data: {data}")  # Debug log
+
+        customer_id = data.get('customer_id')
+        show_id = data.get('show_id')
+        total = data.get('total')
+        card_id = data.get('card_id')
+        promo_id = data.get('promo_id')  # Optional
+        adults = data.get('adults', 0)
+        seniors = data.get('seniors', 0)
+        children = data.get('children', 0)
+        seats = data.get('seats', [])
+
+        # Validate required fields
+        if not (customer_id and show_id and total and card_id):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        if len(seats) != adults + seniors + children:
+            return jsonify({'error': 'Mismatch between ticket counts and seats provided'}), 400
+
+        # Normalize seat IDs
+        seats = [seat['seat_id'] for seat in seats]
+
+        # Ensure all values are integers
+        customer_id = int(customer_id)
+        show_id = int(show_id)
+        total = float(total)
+        card_id = int(card_id)
+        promo_id = int(promo_id) if promo_id is not None else None
+
+        # Insert into Bookings table
+        connection = connect_db()
+        print("Database connection established")  # Debug log
+
+        with connection.cursor() as cursor:
+            # Insert booking into Bookings table
+            booking_query = """
+                INSERT INTO Bookings (customer_id, show_id, total, card_id, promo_id) 
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(booking_query, (customer_id, show_id, total, card_id, promo_id))
+            connection.commit()
+
+            # Get the last inserted booking_id
+            booking_id = cursor.lastrowid
+            print(f"Booking ID: {booking_id}")  # Debug log
+
+            # Insert tickets into Tickets table
+            ticket_types = {
+                'adult': (1, adults),
+                'senior': (2, seniors),
+                'child': (3, children)
+            }
+
+            ticket_query = """
+                INSERT INTO Tickets (booking_id, ticket_type, seat_id) 
+                VALUES (%s, %s, %s)
+            """
+
+            seat_index = 0
+            for ticket_type, (type_id, count) in ticket_types.items():
+                for _ in range(count):
+                    seat_id = seats[seat_index]
+                    cursor.execute(ticket_query, (booking_id, type_id, seat_id))
+                    seat_index += 1
+
+            connection.commit()
+            print("Tickets saved successfully!")  # Debug log
+
+        return jsonify({'message': 'Order and tickets saved successfully!'}), 201
+
+    except ValueError:
+        return jsonify({'error': 'All values must be integers'}), 400
+    except Exception as e:
+        # Log the full error including traceback for debugging
+        print(f"Error saving order: {e}")
+        traceback.print_exc()  # This will print the detailed error stack trace
+        return jsonify({'error': f'An error occurred while saving the order: {str(e)}'}), 500
+    finally:
+        if 'connection' in locals() and connection.is_connected():
+            connection.close()
+
+
 @app.route('/send-confirmation-email', methods=['POST'])
 def send_confirmation_email():
    data = request.json
@@ -1206,3 +1332,6 @@ def get_bookings():
 
 if __name__ == '__main__':
    app.run(debug=True)
+
+
+   

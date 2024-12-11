@@ -52,6 +52,7 @@ const OrderHistory = () => {
                     throw new Error('Failed to fetch orders');
                 }
                 const data = await response.json();
+                console.log(data);
                 const formattedOrders = data.map(order => ({
                     id: order.id,
                     movie: order.title,

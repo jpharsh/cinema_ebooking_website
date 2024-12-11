@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./EditProfile.css"; // Import your CSS file for styling
 import axios from "axios";
+import isEqual from "lodash/isEqual";
 //import { jwtDecode } from 'jwt-decode';
 
 // const EditProfile = () => {
@@ -137,7 +138,23 @@ const EditProfile = () => {
         zipCode: "",
       },
     ]); // Initialize with one empty card
+    const [oldCards, setOldCards] = useState([
+      {
+        id: 1,
+        nameOnCard: "",
+        cardNumber: "",
+        expirationMonth: "",
+        expirationYear: "",
+        cvc: "",
+        streetAddress: "",
+        city: "",
+        state: "",
+        zipCode: "",
+      },
+    ]); // Initialize with one empty card
+
     const [isOptedInForPromotions, setIsOptedInForPromotions] = useState(false); // Promotion state
+    const [isOldInForPromotions, setIsOldInForPromotions] = useState(false); // Promotion state
   
     //const [currentPassword, setCurrentPassword] = useState('');
     const [enteredPassword, setEnteredPassword] = useState("");
@@ -145,6 +162,21 @@ const EditProfile = () => {
     const [newPassword, setNewPassword] = useState("");
   
     const [userData, setUserData] = useState({
+      id: 0,
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      email: "",
+      password: "",
+  
+      addressInfo: {
+        streetAddress: "",
+        city: "",
+        state: "",
+        zipCode: "",
+      },
+    });
+    const [originalData, setOriginalData] = useState({
       id: 0,
       firstName: "",
       lastName: "",
@@ -196,7 +228,22 @@ useEffect(() => {
                 }
             });
             setIsOptedInForPromotions(userData.promo_sub || false);
+            setIsOldInForPromotions(userData.promo_sub || false);
 
+            const originalData = userData;
+            setOriginalData({
+              id: originalData.id,
+              firstName: originalData.f_name || '',
+              lastName: originalData.l_name || '',
+              phoneNumber: originalData.phone_num || '',
+              email: originalData.email || '',
+              addressInfo: {
+                  streetAddress: originalData.street_address || '',
+                  city: originalData.city || '',
+                  state: originalData.state || '',
+                  zipCode: originalData.zip_code || ''
+              }
+            });
             // Fetch card information
             const cardResponse = await axios.get(`http://127.0.0.1:5000/api/cards-get?user_id=${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -216,6 +263,18 @@ useEffect(() => {
                   city: card.city,
                   state: card.state,
                   zipCode: card.zip_code
+              })));
+              setOldCards(cardData.card_data.map(card => ({
+                id: card.id,
+                nameOnCard: card.name_on_card,
+                cardNumber: card.card_num,
+                expirationMonth: card.exp_month,
+                expirationYear: card.exp_year,
+                cvc: card.cv_num,
+                streetAddress: card.street_address,
+                city: card.city,
+                state: card.state,
+                zipCode: card.zip_code
               })));
             }
 
@@ -258,7 +317,7 @@ useEffect(() => {
         console.error("Error fetching user ID:", error);
         return null;
     }
-}
+  }
 
 
 
@@ -266,7 +325,7 @@ useEffect(() => {
   const togglePaymentInfo = () => setShowPaymentInfo(!showPaymentInfo);
   const toggleHomeAddress = () => setShowHomeAddress(!showHomeAddress);
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
 
   let userErrors = {};
@@ -286,19 +345,20 @@ useEffect(() => {
     // Regular expression: At least 2 alphabetic characters
     const namePattern = /^[A-Za-z]{1,}$/;
     return namePattern.test(firstName);
-};
+  };
 
-const validateLastName = (lastName) => {
-    // Regular expression: At least 2 alphabetic characters
-    const namePattern = /^[A-Za-z]{1,}$/;
-    return namePattern.test(lastName);
-};
+  const validateLastName = (lastName) => {
+      // Regular expression: At least 2 alphabetic characters
+      const namePattern = /^[A-Za-z]{1,}$/;
+      return namePattern.test(lastName);
+  };
 
-const validateNameOnCard = (nameOnCard) => {
-    // Regular expression: At least 2 alphabetic characters
-    const namePattern = /^[A-Za-z]{1,}$/;
-    return namePattern.test(nameOnCard);
-};
+  const validateNameOnCard = (nameOnCard) => {
+      // Regular expression: At least 2 alphabetic characters
+      const namePattern = /^[A-Za-z\s]{1,}$/;
+      console.log(`Validating "${nameOnCard}":`, namePattern.test(nameOnCard));
+      return namePattern.test(nameOnCard);
+  };
 
 
   const validatePhoneNumber = (phoneNumber) => {
@@ -332,7 +392,7 @@ const validateNameOnCard = (nameOnCard) => {
       e.preventDefault();
     }
     const formErrors = validateForm(); // Run validations
-
+    console.log("2click");
     // Validate phone number format
     if (userData.phoneNumber && !validatePhoneNumber(userData.phoneNumber)) {
       formErrors.phoneNumber =
@@ -341,43 +401,81 @@ const validateNameOnCard = (nameOnCard) => {
     if (userData.firstName && !validateFirstName(userData.firstName)) {
         formErrors.firstName = "First name must be at least 1 characters long and contain only letters";
     }
-    if (userData.lastName && !validateLastName(userData.firstName)) {
+    if (userData.lastName && !validateLastName(userData.lastName)) {
         formErrors.lastName = "Last name must be at least 1 characters long and contain only letters";
     }
     
+    console.log("3click");
 
     // Validate card information if Payment Info section is shown
     if (showPaymentInfo) {
       const cardErrors = [];
       cards.forEach((card, index) => {
         let cardError = {};
-        if (!card.nameOnCard) cardError.nameOnCard = "Name on Card is required";
-        if (!card.cardNumber || !validateCardNumber(card.cardNumber))
+    
+        // Validate fields and populate cardError object
+        if (!card.nameOnCard){
+          cardError.nameOnCard = "Name on Card is required";
+        } else if (!validateNameOnCard(card.nameOnCard)) {
+          cardError.nameOnCard = "Name must be at least 1 characters long and contain only letters"
+        }
+        if (!card.cardNumber) {
+          cardError.cardNumber = "Card Number is required";
+        } else if (!validateCardNumber(card.cardNumber)) {
           cardError.cardNumber = "Card Number must be a 16-digit number";
-        if (!card.cvc || !validateCVC(card.cvc))
+        }
+        if (!card.cvc) {
+          cardError.cvc = "CVC is required";
+        } else if (!validateCVC(card.cvc)) {
           cardError.cvc = "CVC must be a 3-digit number";
-        if (!card.streetAddress)
+        }
+        if (!card.streetAddress) {
           cardError.streetAddress = "Street Address is required";
-        if (!card.city) cardError.city = "City is required";
-        if (!card.state) cardError.state = "State is required";
-        if (!card.zipCode || isNaN(card.zipCode))
-          cardError.zipCode = "Zip Code must be a number";
+        }
+        if (!card.expirationMonth) {
+          cardError.expirationMonth = "Expiration Month is required"
+        }
+        if (!card.expirationYear) {
+          cardError.expirationYear = "Expiration Year is required"
+        }
+        if (!card.city) {
+          cardError.city = "City is required";
+        }
+        if (!card.state) {
+          cardError.state = "State is required";
+        }
+        if (!card.zipCode || isNaN(card.zipCode)) {
+          cardError.zipCode = "Zip Code is required";
+        }
 
-        cardErrors.push(cardError);
+        // If any validation failed, add to the cardErrors list
+        if (Object.keys(cardError).length > 0) {
+          //cardErrors.push(cardError);
+          cardErrors[index] = cardError;
+        }
       });
-
-      // Check if any card has errors and prevent form submission if true
-      const hasCardErrors = cardErrors.some(
-        (cardError) => Object.keys(cardError).length > 0
-      );
+    
+      console.log("Card errors:", cardErrors); // Log the errors for better visibility
+    
+      // Check if any card has errors
+      const hasCardErrors = cardErrors.length > 0;
+    
+      console.log("After checking card errors. Has errors:", hasCardErrors); // Log if any card has errors
+    
       if (hasCardErrors) {
         setErrors(cardErrors);
-        return;
+        alert("please fill fields correctly");
+        return; // Stop submission if there are errors
       }
+    
+      console.log("after3"); // This should only run if there are no errors
     }
-
+    
+    
+    console.log("4click");
     // Update state with form validation errors
     setErrors(formErrors);
+    console.log("before obj if");
 
     if (Object.keys(formErrors).length === 0) {
       // Submit only if no form errors
@@ -388,17 +486,30 @@ const validateNameOnCard = (nameOnCard) => {
           cards: cards, // Include updated card data
           isOptedInForPromotions,
         };
+        console.log(dataToSend.cards);
 
         // Send updated user info to the backend
-        console.log(cards);
-        console.log(dataToSend);
-        const response = await axios.post(
-          "http://127.0.0.1:5000/api/edit",
-          dataToSend
-        );
-        console.log(response.data);
-        if (response.status === 200) {
-          setSuccessMessage("Profile updated successfully!");
+        if (!isEqual(originalData, userData) || (dataToSend.password !== userData.password) || !isEqual(oldCards, cards) || (isOptedInForPromotions !== isOldInForPromotions)) {
+          console.log(cards);
+          console.log(dataToSend);
+          const response = await axios.post(
+            "http://127.0.0.1:5000/api/edit",
+            dataToSend
+          );
+          console.log(response.data);
+          if ((response.status === 200)) {
+            setSuccessMessage("Profile updated successfully! Reloading page");
+            setTimeout(() => {
+              window.location.reload(); // Refresh the page
+            }, 3000);
+          }
+        }
+        else {
+          setSuccessMessage("No updates made, reloading page.")
+          console.log("No updates made, skipping submission.");
+          setTimeout(() => {
+            window.location.reload(); // Refresh the page
+          }, 3000);
         }
       } catch (e) {
         console.error("Error updating the profile:", e);
@@ -412,11 +523,10 @@ const validateNameOnCard = (nameOnCard) => {
         //}
       }
     }
+    else {
+      alert("please fill fields correctly");
+    }
   };
-
-
-
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -454,6 +564,8 @@ const validateNameOnCard = (nameOnCard) => {
       try {
         console.log([...cards.filter((card) => card.id !== cardId)]);
         setCards([...cards.filter((card) => card.id !== cardId)]);
+        const updatedErrors = errors.filter((_, i) => i !== index);
+        setErrors(updatedErrors);
         // Send a request to the 'edit' endpoint to delete the specific card
         //   console.log('the right place');
         //   await axios.post('http://127.0.0.1:5000/api/edit', {
@@ -476,10 +588,10 @@ const validateNameOnCard = (nameOnCard) => {
   // Function to add a new card
   const addCard = () => {
     if (cards.length < 3) {
-      setCards([
-        ...cards,
+      setCards((prevCards) => [
+        ...prevCards,
         {
-          id: cards.length + 1,
+          id: prevCards.length + 1,
           nameOnCard: "",
           cardNumber: "",
           expirationMonth: "",
@@ -490,6 +602,20 @@ const validateNameOnCard = (nameOnCard) => {
           state: "",
           zipCode: "",
         },
+      ]);
+      setErrors((prevErrors) => [
+        ...prevErrors,
+        {
+          nameOnCard: "",
+          cardNumber: "",
+          expirationMonth: "",
+          expirationYear: "",
+          cvc: "",
+          streetAddress: "",
+          city: "",
+          state: "",
+          zipCode: ""
+        }
       ]);
     } else {
       alert("You can only add up to 3 cards.");
@@ -644,10 +770,10 @@ const validateNameOnCard = (nameOnCard) => {
                     onChange={(e) =>
                       handleCardChange(index, "nameOnCard", e.target.value)
                     }
-                    className={errors.nameOnCard ? "error" : ""}
+                    className={errors[index]?.nameOnCard ? "error" : ""}
                   />
-                  {errors.nameOnCard && (
-                    <p className="error-message">{errors.nameOnCard}</p>
+                  {errors[index]?.nameOnCard && (
+                    <p className="error-message">{errors[index]?.nameOnCard}</p>
                   )}
                   <p>Card Number</p>
                   <input
@@ -657,10 +783,10 @@ const validateNameOnCard = (nameOnCard) => {
                     onChange={(e) =>
                       handleCardChange(index, "cardNumber", e.target.value)
                     }
-                    className={errors.cardNumber ? "error" : ""}
+                    className={errors[index]?.cardNumber ? "error" : ""}
                   />
-                  {errors.cardNumber && (
-                    <p className="error-message">{errors.cardNumber}</p>
+                  {errors[index]?.cardNumber && (
+                    <p className="error-message">{errors[index]?.cardNumber}</p>
                   )}
                   {/* Separate inputs for month and year */}
                   <p>Expiration Month</p>
@@ -672,10 +798,10 @@ const validateNameOnCard = (nameOnCard) => {
                     onChange={(e) =>
                       handleCardChange(index, "expirationMonth", e.target.value)
                     }
-                    className={errors.expirationMonth ? "error" : ""}
+                    className={errors[index]?.expirationMonth ? "error" : ""}
                   />
-                  {errors.expirationMonth && (
-                    <p className="error-message">{errors.expirationMonth}</p>
+                  {errors[index]?.expirationMonth && (
+                    <p className="error-message">{errors[index]?.expirationMonth}</p>
                   )}
                   <p>Expiration Year</p>
                   <input
@@ -686,10 +812,10 @@ const validateNameOnCard = (nameOnCard) => {
                     onChange={(e) =>
                       handleCardChange(index, "expirationYear", e.target.value)
                     }
-                    className={errors.expirationYear ? "error" : ""}
+                    className={errors[index]?.expirationYear ? "error" : ""}
                   />
-                  {errors.expirationYear && (
-                    <p className="error-message">{errors.expirationYear}</p>
+                  {errors[index]?.expirationYear && (
+                    <p className="error-message">{errors[index]?.expirationYear}</p>
                   )}
                   <p>CVC</p>
                   <input
@@ -699,9 +825,11 @@ const validateNameOnCard = (nameOnCard) => {
                     onChange={(e) =>
                       handleCardChange(index, "cvc", e.target.value)
                     }
-                    className={errors.cvc ? "error" : ""}
+                    className={errors[index]?.cvc ? "error" : ""}
                   />
-                  {errors.cvc && <p className="error-message">{errors.cvc}</p>}
+                  {errors[index]?.cvc && (
+                    <p className="error-message">{errors[index]?.cvc}</p>
+                  )}
                   <p>Street Address</p>
                   <input
                     type="text"
@@ -711,8 +839,11 @@ const validateNameOnCard = (nameOnCard) => {
                       handleCardChange(index, "streetAddress", e.target.value)
                     }
                     placeholder="Enter Street Address"
-                    className={errors.streetAddress ? "error" : ""}
+                    className={errors[index]?.streetAddress ? "error" : ""}
                   />
+                  {errors[index]?.streetAddress && (
+                    <p className="error-message">{errors[index]?.streetAddress}</p>
+                  )}
                   <p>City</p>
                   <input
                     type="text"
@@ -722,8 +853,11 @@ const validateNameOnCard = (nameOnCard) => {
                       handleCardChange(index, "city", e.target.value)
                     }
                     placeholder="Enter City"
-                    className={errors.city ? "error" : ""}
+                    className={errors[index]?.city ? "error" : ""}
                   />
+                  {errors[index]?.city && (
+                    <p className="error-message">{errors[index]?.city}</p>
+                  )}
                   <p>State</p>
                   <input
                     type="text"
@@ -733,8 +867,11 @@ const validateNameOnCard = (nameOnCard) => {
                       handleCardChange(index, "state", e.target.value)
                     }
                     placeholder="Enter State"
-                    className={errors.state ? "error" : ""}
+                    className={errors[index]?.state ? "error" : ""}
                   />
+                  {errors[index]?.state && (
+                    <p className="error-message">{errors[index]?.state}</p>
+                  )}
                   <p>Zip Code</p>
                   <input
                     type="text"
@@ -744,8 +881,11 @@ const validateNameOnCard = (nameOnCard) => {
                       handleCardChange(index, "zipCode", e.target.value)
                     }
                     placeholder="Enter Zip Code"
-                    className={errors.zipCode ? "error" : ""}
+                    className={errors[index]?.zipCode ? "error" : ""}
                   />
+                  {errors[index]?.zipCode && (
+                    <p className="error-message">{errors[index]?.zipCode}</p>
+                  )}
                   <div className="center-btn">
                     <button
                       className="remove-btn"
@@ -757,8 +897,7 @@ const validateNameOnCard = (nameOnCard) => {
                 </div>
               ))}
               <div className="center-btn">
-                <button className="edit-profile-btn" onClick={addCard} disabled={cards.length >= 3}
-                >
+                <button className="edit-profile-btn" onClick={addCard}>
                   Add Card
                 </button>
               </div>

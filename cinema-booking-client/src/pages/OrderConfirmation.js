@@ -23,17 +23,17 @@ const OrderConfirmation = () => {
              <p><strong>Tickets:</strong></p>
              <ul style={{ marginLeft: '20px' }}>
                {tickets?.adults > 0 && (
-                 <li>
+                 <li style={{marginLeft: '30%'}}>
                    {tickets.adults === 1 ? "1 Adult" : `${tickets.adults} Adults`}
                  </li>
                )}
                {tickets?.children > 0 && (
-                 <li>
+                 <li style={{marginLeft: '30%'}}>
                    {tickets.children === 1 ? "1 Child" : `${tickets.children} Children`}
                  </li>
                )}
                {tickets?.seniors > 0 && (
-                 <li>
+                 <li style={{marginLeft: '30%'}}>
                    {tickets.seniors === 1 ? "1 Senior" : `${tickets.seniors} Seniors`}
                  </li>
                )}

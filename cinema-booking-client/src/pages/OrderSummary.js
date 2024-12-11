@@ -103,6 +103,10 @@ const OrderSummary = () => {
         total: totalPrice,       // Total price of the order
         card_id: selectedCard,   // Payment card ID
         promo_id: promo_id,      // Promo ID if any
+        adults: tickets.adults,
+        children: tickets.children,
+        seniors: tickets.seniors,
+        seats: userSeats,
       };
 
       try {

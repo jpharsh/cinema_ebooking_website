@@ -1186,10 +1186,20 @@ def save_order():
         total = data.get('total')
         card_id = data.get('card_id')
         promo_id = data.get('promo_id')  # Optional
+        adults = data.get('adults', 0)
+        seniors = data.get('seniors', 0)
+        children = data.get('children', 0)
+        seats = data.get('seats', [])
 
         # Validate required fields
         if not (customer_id and show_id and total and card_id):
             return jsonify({'error': 'Missing required fields'}), 400
+
+        if len(seats) != adults + seniors + children:
+            return jsonify({'error': 'Mismatch between ticket counts and seats provided'}), 400
+
+        # Normalize seat IDs
+        seats = [seat['seat_id'] for seat in seats]
 
         # Ensure all values are integers
         customer_id = int(customer_id)
@@ -1198,20 +1208,46 @@ def save_order():
         card_id = int(card_id)
         promo_id = int(promo_id) if promo_id is not None else None
 
-        # Insert into the correct table (Bookings, not Orders)
+        # Insert into Bookings table
         connection = connect_db()
         print("Database connection established")  # Debug log
 
         with connection.cursor() as cursor:
-            query = """
+            # Insert booking into Bookings table
+            booking_query = """
                 INSERT INTO Bookings (customer_id, show_id, total, card_id, promo_id) 
                 VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(query, (customer_id, show_id, total, card_id, promo_id))
+            cursor.execute(booking_query, (customer_id, show_id, total, card_id, promo_id))
             connection.commit()
-            print("Order saved successfully!")  # Debug log
 
-        return jsonify({'message': 'Order saved successfully!'}), 201
+            # Get the last inserted booking_id
+            booking_id = cursor.lastrowid
+            print(f"Booking ID: {booking_id}")  # Debug log
+
+            # Insert tickets into Tickets table
+            ticket_types = {
+                'adult': (1, adults),
+                'senior': (2, seniors),
+                'child': (3, children)
+            }
+
+            ticket_query = """
+                INSERT INTO Tickets (booking_id, ticket_type, seat_id) 
+                VALUES (%s, %s, %s)
+            """
+
+            seat_index = 0
+            for ticket_type, (type_id, count) in ticket_types.items():
+                for _ in range(count):
+                    seat_id = seats[seat_index]
+                    cursor.execute(ticket_query, (booking_id, type_id, seat_id))
+                    seat_index += 1
+
+            connection.commit()
+            print("Tickets saved successfully!")  # Debug log
+
+        return jsonify({'message': 'Order and tickets saved successfully!'}), 201
 
     except ValueError:
         return jsonify({'error': 'All values must be integers'}), 400
@@ -1223,8 +1259,6 @@ def save_order():
     finally:
         if 'connection' in locals() and connection.is_connected():
             connection.close()
-
-
 
 
 @app.route('/send-confirmation-email', methods=['POST'])

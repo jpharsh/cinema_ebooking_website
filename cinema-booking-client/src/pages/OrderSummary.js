@@ -191,15 +191,17 @@ const OrderSummary = () => {
           <div className="ticket-details">
             <h3>Ticket Details:</h3>
 
+            <div style={{lineHeight: '300%'}}>
             {/* Adult Tickets */}
             {tickets?.adults > 0 && (
               <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <p>
+                {/* <p>
                   {tickets.adults === 1
                     ? "1 Adult Ticket"
                     : `${tickets.adults} Adult Tickets`}:
-                </p>
-                <p style={{ paddingLeft: '20%' }}>
+                </p> */}
+                {tickets.adults} Adult Ticket(s):
+                <p style={{ paddingLeft: '15%' }}>
                   ${(tickets.adults * 11.99).toFixed(2)}
                 </p>
               </div>
@@ -208,12 +210,13 @@ const OrderSummary = () => {
             {/* Child Tickets */}
             {tickets?.children > 0 && (
               <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <p>
+                {/* <p>
                   {tickets.children === 1
                     ? "1 Child Ticket"
                     : `${tickets.children} Child Tickets`}:
-                </p>
-                <p style={{ paddingLeft: '20%' }}>
+                </p> */}
+                {tickets.children} Child Ticket(s):
+                <p style={{ paddingLeft: '15%' }}>
                   ${(tickets.children * 9.99).toFixed(2)}
                 </p>
               </div>
@@ -222,16 +225,18 @@ const OrderSummary = () => {
             {/* Senior Tickets */}
             {tickets?.seniors > 0 && (
               <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <p>
+                {/* <p>
                   {tickets.seniors === 1
                     ? "1 Senior Ticket"
                     : `${tickets.seniors} Senior Tickets`}:
-                </p>
-                <p style={{ paddingLeft: '20%' }}>
+                </p> */}
+                {tickets.seniors} Senior Ticket(s):
+                <p style={{ paddingLeft: '13%' }}>
                   ${(tickets.seniors * 10.99).toFixed(2)}
                 </p>
               </div>
             )}
+            </div>
 
             {/* Order Total */}
             <div
@@ -244,7 +249,7 @@ const OrderSummary = () => {
               <span style={{ alignSelf: 'center' }}>
                 <strong>Order Total: </strong>
               </span>
-              <p>${totalPrice.toFixed(2)}</p>
+              <p style={{paddingLeft: '3%', marginTop: '3%'}}>${totalPrice.toFixed(2)}</p>
               <button
                 className="edit-button"
                 onClick={() => navigate(-2)}
@@ -264,7 +269,7 @@ const OrderSummary = () => {
               <span style={{ alignSelf: 'center' }}>
                 <strong>Seats: </strong>
               </span>
-              <p style={{ paddingLeft: '12%' }}>{seats?.join(', ')}</p>
+              <p style={{ paddingLeft: '12%', marginTop: '3%' }}>{seats?.join(', ')}</p>
               <button
                 className="edit-button"
                 onClick={() => {

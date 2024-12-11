@@ -191,14 +191,6 @@ const PaymentInfo = () => {
       cardInfo.zipCode
     );
   };
-  // // Handle input change
-  // const handleChange = (e) => {
-  //     const { name, value } = e.target;
-  //     setFormData({
-  //         ...formData,
-  //         [name]: value
-  //     });
-  // };
 
   const handleCardChange = (field, value) => {
     // Update the cards array based on the index
@@ -244,13 +236,6 @@ const PaymentInfo = () => {
       return; // Stop the form submission if there are any card errors
     }
 
-    // if (cardInfo.nameOnCard || cardInfo.cardNumber || cardInfo.expirationDate || cardInfo.cvc || cardInfo.streetAddress || cardInfo.city || cardInfo.state || cardInfo.zipCode) {
-    //     if (!cardInfo.nameOnCard || !cardInfo.cardNumber || !cardInfo.expirationDate || !cardInfo.cvc || !cardInfo.streetAddress || !cardInfo.city || !cardInfo.state || !cardInfo.zipCode) {
-    //         setShowCardPopup(true);  // Show popup if the card info is incomplete
-    //         return;
-    //     }
-    // }
-
     const userId = await fetchUserId();
     const dataToSend = {
       ...cardInfo,
@@ -271,33 +256,47 @@ const PaymentInfo = () => {
   };
 
   const handleApplyPromo = async () => {
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/api/validate-promo",
-        {
-          promo_code: promoCode,
-        }
-      );
-
-      if (response.status === 200 && response.data.discount) {
-        const discountAmount = response.data.discount;
-
-        // If the discount is 100%, set the discounted price to 0
-        const newDiscountedPrice =
-          discountAmount === 100
-            ? 0 // Price becomes free if discount is 100%
-            : (totalPrice * (100 - discountAmount)) / 100;
-
-        setDiscountedPrice(newDiscountedPrice); // Set discounted price
-        setPromoError(""); // Clear any existing promo errors
-      } else {
-        setPromoError(response.data.error || "Invalid promo code.");
-      }
-    } catch (error) {
-      console.error("Error applying promo code:", error);
-      setPromoError("An error occurred while validating the promo code.");
-    }
-  };
+        try {
+            // Send promo code to backend for validation
+            const response = await axios.post(
+                "http://127.0.0.1:5000/api/validate-promo",
+                { promo_code: promoCode }
+            );
+    
+            // Handle successful validation
+            if (response.status === 200 && response.data.discount) {
+                const discountAmount = response.data.discount;
+    
+                // Calculate the new discounted price
+                const newDiscountedPrice =
+                    discountAmount === 100
+                        ? 0 // Full discount means price is free
+                        : (totalPrice * (100 - discountAmount)) / 100;
+    
+                setDiscountedPrice(newDiscountedPrice); // Update discounted price
+                setPromoError(""); // Clear any existing promo errors
+            } else {
+                // Handle unexpected response structure
+                setPromoError(response.data.error || "Invalid promo code.");
+            }
+        } catch (error) {
+            // Handle errors from the backend or network
+            if (error.response) {
+                if (error.response.status === 404) {
+                    setPromoError("Invalid promo code. Please try again.");
+                } else if (error.response.status === 400) {
+                    setPromoError(error.response.data.error || "Invalid request.");
+                } else {
+                    setPromoError("An unexpected error occurred. Please try again.");
+                }
+            } else {
+                setPromoError("Unable to connect to the server. Please try again.");
+            }
+    
+            // Log the error for debugging purposes
+            console.error("Error applying promo code:", error);
+        }
+    };
 
   return (
     <div>
@@ -542,6 +541,8 @@ const PaymentInfo = () => {
             >
               Apply Promo
             </button>
+            {/* Error message display */}
+            {promoError && <p style={{ color: "red", marginTop: "8px" }}>{promoError}</p>}
             <div>
               {/* Payment Details */}
               <div className="payment-row">

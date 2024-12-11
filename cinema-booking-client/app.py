@@ -206,9 +206,6 @@ def get_now_playing():
 def get_coming_soon():
    return fetch_movies(is_now_showing=False)
 
-# @app.route('/api/register2', methods=['POST'])
-# def register_user2():
-#     return jsonify({'message': 'HELLO'}), 200
 def fetch_userdata(table_name, id):
     connection = connect_db()
     try:
@@ -490,33 +487,6 @@ def register_user():
 
            for card in cards:
                 add_card_to_db(cursor, user_id, card)
-        #        name_on_card = card['nameOnCard']
-        #        card_number = card['cardNumber']
-        #        expiration_date = card['expirationDate']
-        #        cvc = card['cvc']
-        #        billing_street_address = card['streetAddress']
-        #        billing_city = card['city']
-        #        billing_state = card['state']
-        #        billing_zip_code = card['zipCode']
-
-        #        # Encrypt the card info
-        #        encrypted_card_number = cipher_suite.encrypt(card_number.encode()).decode()
-        #        encrypted_cvc = cipher_suite.encrypt(cvc.encode())
-        #        encrypted_card_number_str = encrypted_card_number.decode('utf-8') if isinstance(encrypted_card_number, bytes) else encrypted_card_number
-        #        encrypted_cvc_str = encrypted_cvc.decode('utf-8') if isinstance(encrypted_cvc, bytes) else encrypted_cvc
-        #        if expiration_date:
-        #            expiration_month = expiration_date.split('/')[0]
-        #            expiration_year = expiration_date.split('/')[1]
-        #            encrypted_expiration_month = cipher_suite.encrypt(expiration_month.encode())
-        #            encrypted_expiration_year = cipher_suite.encrypt(expiration_year.encode())
-        #            encrypted_expiration_month_str = encrypted_expiration_month.decode('utf-8') if isinstance(encrypted_expiration_month, bytes) else encrypted_expiration_month
-        #            encrypted_expiration_year_str = encrypted_expiration_year.decode('utf-8') if isinstance(encrypted_expiration_year, bytes) else encrypted_expiration_year           
-        #        # Insert encrypted card information into PaymentCard table
-        #        if encrypted_card_number and encrypted_cvc and expiration_date:
-        #            cursor.execute('''
-        #                INSERT INTO PaymentCards (user_id, card_num, cv_num, exp_month, exp_year, name_on_card, street_address, city, state, zip_code)
-        #                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        #            ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
                 conn.commit()
 
        print('after connect_db')
@@ -1008,55 +978,6 @@ def add_card_to_db(cursor, user_id, card):
         ''', (user_id, encrypted_card_number_str, encrypted_cvc_str, encrypted_expiration_month_str, encrypted_expiration_year_str, name_on_card, billing_street_address, billing_city, billing_state, billing_zip_code))
 
 @app.route('/api/validate-promo', methods=['POST'])
-# def validate_promo():
-#     try:
-#         # Get the promo code from the request
-#         data = request.json
-#         promo_code = data.get("promo_code")
-
-#         if not promo_code:
-#             return jsonify({"error": "Promo code is required"}), 400
-
-#         # Fetch promo details from the database
-#         connection = connect_db()
-#         cursor = connection.cursor(dictionary=True)
-#         cursor.execute("SELECT promo_amount, exp_date FROM Promotions WHERE promo_code = %s", (promo_code,))
-#         promo = cursor.fetchone()
-#         cursor.close()
-#         connection.close()
-
-#         if not promo:
-#             return jsonify({"error": "Invalid promo code"}), 404
-
-#         # Debugging: Check what expiration date is fetched
-#         expiration_date = promo.get("exp_date")
-#         print(f"Raw expiration_date from DB: {expiration_date}")
-
-#         # Ensure the expiration_date is processed correctly
-#         if isinstance(expiration_date, str):
-#             try:
-#                 expiration_date = datetime.strptime(expiration_date, "%Y-%m-%d").date()
-#             except ValueError as e:
-#                 print(f"Error parsing expiration_date: {e}")
-#                 return jsonify({"error": "Invalid expiration date format"}), 500
-
-#         # Validate expiration_date type
-#         if not isinstance(expiration_date, datetime.date):
-#             return jsonify({"error": "Invalid expiration date format"}), 500
-
-#         # Check if the promo code is expired
-#         current_date = datetime.datetime.now().date()
-#         print(f"Current date: {current_date}, Expiration date: {expiration_date}")
-#         if expiration_date < current_date:
-#             return jsonify({"error": "Promo code has expired"}), 400
-
-#         # Return the discount if valid
-#         discount = promo.get("promo_amount", 0)
-#         return jsonify({"discount": discount}), 200
-
-#     except Exception as e:
-#         print(f"Error validating promo code: {e}")
-#         return jsonify({"error": "An error occurred while validating the promo code"}), 500
 def validate_promo():
     try:
         # Get the promo code from the request
@@ -1332,6 +1253,3 @@ def get_bookings():
 
 if __name__ == '__main__':
    app.run(debug=True)
-
-
-   

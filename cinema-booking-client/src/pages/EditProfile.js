@@ -2,122 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./EditProfile.css"; // Import your CSS file for styling
 import axios from "axios";
 import isEqual from "lodash/isEqual";
-//import { jwtDecode } from 'jwt-decode';
-
-// const EditProfile = () => {
-//   const [showRequiredInfo, setShowRequiredInfo] = useState(true);
-//   const [showPaymentInfo, setShowPaymentInfo] = useState(false);
-//   const [showHomeAddress, setShowHomeAddress] = useState(false);
-//   const [cards, setCards] = useState([
-//     {
-//       id: 1,
-//       nameOnCard: "",
-//       cardNumber: "",
-//       expirationMonth: "",
-//       expirationYear: "",
-//       cvc: "",
-//       streetAddress: "",
-//       city: "",
-//       state: "",
-//       zipCode: "",
-//     },
-//   ]); // Initialize with one empty card
-//   const [isOptedInForPromotions, setIsOptedInForPromotions] = useState(false); // Promotion state
-
-//   //const [currentPassword, setCurrentPassword] = useState('');
-//   const [enteredPassword, setEnteredPassword] = useState("");
-//   const [passwordVerified, setPasswordVerified] = useState(false); // Whether the user entered the correct current password
-//   const [newPassword, setNewPassword] = useState("");
-
-//   const [userData, setUserData] = useState({
-//     id: 0,
-//     firstName: "",
-//     lastName: "",
-//     phoneNumber: "",
-//     email: "",
-//     password: "",
-
-//     addressInfo: {
-//       streetAddress: "",
-//       city: "",
-//       state: "",
-//       zipCode: "",
-//     },
-//   });
-//   /*
-//     const getUserIdFromJWT = () => {
-//         const token = localStorage.getItem('jwt'); // Assuming the token is stored in localStorage
-//         if (token) {
-//             const decoded = jwtDecode(token);
-//             return decoded.user_id; // This depends on how your JWT is structured
-//         }
-//         return null
-//     };
-//     */
-//   useEffect(()=> {
-//     axios.get("http://127.0.0.1:5000/api/check-session").then((response) => {
-//       const sessiondata = response.data;
-//       theuserid = sessiondata.id;
-//     })
-//   })
-//   // Fetch user data on component mount
-//   useEffect(() => {
-//     // Fetch user information
-//     //const userId = getUserIdFromJWT();
-//     axios
-//       .get("http://127.0.0.1:5000/api/user-get?theuserid")
-//       .then((response) => {
-//         const data = response.data;
-//         console.log("Fetched user data:", data); // Log user data
-
-//         setUserData((prevState) => ({
-//           ...prevState,
-//           id: data.id,
-//           firstName: data.f_name || "", // Ensure it's a string
-//           lastName: data.l_name || "",
-//           phoneNumber: data.phone_num || "",
-//           email: data.email || "",
-//           password: "", // Consider security; don't display password
-//           addressInfo: {
-//             streetAddress: data.street_address || "",
-//             city: data.city || "",
-//             state: data.state || "",
-//             zipCode: data.zip_code || "",
-//           },
-//         }));
-//         setIsOptedInForPromotions(data.promo_sub || false); // Ensure default boolean
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching user data:", error);
-//       });
-
-//     // Fetch card information
-//     axios
-//       .get("http://127.0.0.1:5000/api/cards-get?theuserid")
-//       .then((response) => {
-//         console.log(response.data); // Check what data is returned
-//         const cardData = response.data; // Assuming this is an array of cards
-//         setCards(
-//           cardData.map((card) => ({
-//             id: card.id, // Assuming card_id is present in the response
-//             nameOnCard: card.name_on_card,
-//             cardNumber: card.card_num,
-//             expirationMonth: card.exp_month,
-//             expirationYear: card.exp_year,
-//             cvc: card.cv_num,
-//             streetAddress: card.street_address,
-//             city: card.city,
-//             state: card.state,
-//             zipCode: card.zip_code,
-//           }))
-//         );
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching card data:", error);
-//       });
-//   }, []);
-
-
 
 const EditProfile = () => {
     
@@ -373,12 +257,6 @@ useEffect(() => {
     return cardNumberPattern.test(cardNumber);
   };
 
-  //const validateExpirationDate = (expirationDate) => {
-  // Simple regex for expiration date validation
-  //const expirationDatePattern = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
-  //return expirationDatePattern.test(expirationDate);
-  //};
-
   const validateCVC = (cvc) => {
     //Simple regex for cvc validation
     const cvcPattern = /^[0-9]{3}$/;
@@ -513,14 +391,6 @@ useEffect(() => {
         }
       } catch (e) {
         console.error("Error updating the profile:", e);
-
-        //if (e.response && e.response.data && e.response.data.error) {
-        //const newFormErrors = { ...formErrors };
-        //if (e.response.data.error === "Email already exists.") {
-        //newFormErrors.email = "Email already exists";
-        //}
-        //setErrors(newFormErrors); // Set any server-side validation errors
-        //}
       }
     }
     else {
@@ -566,16 +436,7 @@ useEffect(() => {
         setCards([...cards.filter((card) => card.id !== cardId)]);
         const updatedErrors = errors.filter((_, i) => i !== index);
         setErrors(updatedErrors);
-        // Send a request to the 'edit' endpoint to delete the specific card
-        //   console.log('the right place');
-        //   await axios.post('http://127.0.0.1:5000/api/edit', {
-        //       action: 'delete_card',
-        //       cardId: cardId
-        //   });
         console.log(cardId + "this is in the if statement");
-        // Update the cards state by filtering out the deleted card
-        //   const newCards = cards.filter((_, i) => i !== index);
-        //   setCards(newCards);
       } catch (error) {
         console.error("Error deleting card:", error);
         alert("An error occurred while deleting the card.");
@@ -981,14 +842,7 @@ useEffect(() => {
             Save Changes
           </button>
         </div>
-
-        {/* Success or error messages */}
-        {/* {successMessage && (
-          <div>
-            {setSuccessMessage()}
-            {alert(successMessage)}
-          </div>
-        )} */}
+        
         {successMessage && <p className="success">{successMessage}</p>}
         {errors.api && <p className="error">{errors.api}</p>}
       </div>

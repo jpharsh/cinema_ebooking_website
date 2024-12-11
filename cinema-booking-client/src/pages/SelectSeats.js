@@ -13,8 +13,6 @@ const SelectSeats = () => {
   const navigate = useNavigate();
   const location = useLocation();
  
-//    const { adultCount, childCount, seniorCount } = location.state || {};
-//    const totalTickets = (adultCount || 0) + (childCount || 0) + (seniorCount || 0);
   const seatLayout = [9, 9, 9, 9, 11, 11, 11]; // Number of seats in each row
   const showid = location.state?.showid;
   const date = location.state?.date;
@@ -118,33 +116,6 @@ async function displaySeats(showId) {
 
    const handleConfirmSeats = async () => {
        navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid, userSeats } });
-      
-       // DO THIS AFTER BOOKING IS COMPLETE:
-           // try {
-           //     // Make an API call to update the seat statuses to 2 for the specific show_id
-           //     const response = await fetch('http://127.0.0.1:5000/api/update-seat-status', {
-           //         method: 'POST',
-           //         headers: {
-           //             'Content-Type': 'application/json',
-           //         },
-           //         body: JSON.stringify({
-           //             show_id: showid, // Assuming movie has the show_id
-           //             selectedSeats: userSeats, // An array of selected seat IDs
-           //         }),
-           //     });
-
-
-           //     if (response.ok) {
-           //         // Navigate to select tickets page if the update was successful
-           //         navigate('/select-tickets', { state: { movie, formattedSeats, date, time, showid } });
-           //     } else {
-           //         // Handle failure response
-           //         alert('Error updating seat statuses.');
-           //     }
-           // } catch (error) {
-           //     console.error('Error updating seat statuses:', error);
-           //     alert('Error updating seat statuses.');
-           // }
    };
 
 
@@ -154,7 +125,6 @@ async function displaySeats(showId) {
 
 
   const movie = location.state?.movie;
-//    const totalPrice = location.state?.totalPrice;
   if (!movie) {
    return <p>No movie information available</p>;
   }

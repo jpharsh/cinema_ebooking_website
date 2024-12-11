@@ -593,32 +593,35 @@ const PaymentInfo = () => {
             Cancel
           </button>
           <button
-            className="btn red"
-            disabled={!canProceed} // Disable button if canProceed is false
-            onClick={() => {
-              const salesTax = totalPrice * 0.07; // Calculate sales tax (7%)
-              const onlineFee = 2.0; // Flat online fee
-              const finalTotalPrice = totalPrice + salesTax + onlineFee; // Calculate final total
-              navigate("/order-summary", {
-                state: {
-                  tickets: {
-                    adults: adultCount, // Replace with actual number of adult tickets
-                    children: childCount, // Replace with actual number of child tickets
-                    seniors: seniorCount,
-                  },
-                  totalPrice: finalTotalPrice, // Pass the order total
-                  seats, // Pass the selected seats
-                  date,
-                  time,
-                  movie,
-                  userSeats,
-                  showid,
-                },
-              });
-            }}
-          >
-            Continue To Checkout
-          </button>
+             className="btn red"
+             disabled={!canProceed} // Disable button if canProceed is false
+             onClick={() => {
+               const priceToUse = discountedPrice !== undefined ? discountedPrice : totalPrice; // Use discountedPrice if available, otherwise fall back to totalPrice
+               const salesTax = priceToUse * 0.07; // Calculate sales tax (7%)
+               const onlineFee = 2.0; // Flat online fee
+               const finalTotalPrice = priceToUse + salesTax + onlineFee; // Calculate final total
+
+
+               navigate("/order-summary", {
+                 state: {
+                   tickets: {
+                     adults: adultCount,
+                     children: childCount,
+                     seniors: seniorCount,
+                   },
+                   totalPrice: finalTotalPrice, // Pass the final total price (promo price if applied)
+                   seats, // Pass the selected seats
+                   date,
+                   time,
+                   movie,
+                   userSeats,
+                   showid,
+                 },
+               });
+             }}
+           >
+             Continue To Checkout
+         </button>
         </div>
         {movie.title}
         <div>

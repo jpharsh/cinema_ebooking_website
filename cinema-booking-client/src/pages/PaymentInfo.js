@@ -268,6 +268,19 @@ const PaymentInfo = () => {
     } catch (e) {
       console.error("Error adding card:", e);
     }
+
+    setErrors({}); // Clear errors
+    setCardInfo({
+      nameOnCard: "",
+      cardNumber: "",
+      expirationDate: "",
+      cvc: "",
+      streetAddress: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    }); 
+    window.location.reload();
   };
 
   const handleApplyPromo = async () => {
@@ -625,17 +638,6 @@ const PaymentInfo = () => {
            >
              Continue To Checkout
          </button>
-        </div>
-        {movie.title}
-        <div>
-          <h3>Selected Seats:</h3>
-          <ul>
-            {seats.map((seat, index) => (
-              <li key={index}>{seat}</li> // Each seat is rendered as a list item
-            ))}
-          </ul>
-          <p>Date: {date}</p>
-          <p>Time: {time}</p>
         </div>
       </div>
     </div>

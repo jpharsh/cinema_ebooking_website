@@ -1,0 +1,31 @@
+.general-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ce0000; /* Common background color */
+    color: white;
+    padding: 15px 20px; /* Standard padding */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding-left: 2.0%; /* Shared padding for left */
+}
+
+.general-navbar .logo {
+    cursor: pointer; /* Indicates that the logo is clickable */
+}
+
+.general-navbar .logo h1 {
+    font-size: 24px;
+    margin: 0;
+    margin-left: 80%; /* Common alignment for the logo */
+}
+
+.nav-buttons .btn {
+    padding: 10px 20px; /* Shared button padding */
+    margin-left: 10px; /* Spacing between buttons */
+    border: none;
+    cursor: pointer;
+    background-color: #222; /* Common button background */
+    color: white; /* Button text color */
+}

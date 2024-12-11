@@ -305,13 +305,6 @@ function ManageMovies() {
   return (
     <div>
       <div className="admin-panel">
-        {/* <aside className="sidebar">
-          <ul>
-            <li>Manage Movies</li>
-            <li>Promo Codes</li>
-            <li>Manage Users</li>
-          </ul>
-        </aside> */}
         <nav className="sidebar">
           <ul>
             <li><Link to="/admin-home">Home Page</Link></li>
@@ -476,17 +469,6 @@ function ManageMovies() {
               />
               {errors.synopsis && <p className="error-message">{errors.synopsis}</p>}
 
-              {/* <label>Reviews</label>
-              <input
-                type="text"
-                placeholder="Reviews"
-                value={currentMovie?.reviews || ""}
-                onChange={(e) =>
-                  setCurrentMovie({ ...currentMovie, reviews: e.target.value })
-                }
-              />
-              {errors.reviews && <p className="error-message">{errors.reviews}</p>} */}
-
               <label>Trailer Picture URL</label>
               <input
                 type="text"
@@ -528,42 +510,6 @@ function ManageMovies() {
                 }
               />
               {errors.mpaa_rating && <p className="error-message">{errors.mpaa_rating}</p>}
-              
-              {/* <div className="show-dates">
-                <label>Show Dates:</label>
-                <input
-                  type="date"
-                  value={tempDate}
-                  onChange={(e) => setTempDate(e.target.value)}
-                />
-                <button onClick={handleAddShowDate} className="button">
-                  Add Date
-                </button>
-                <ul>
-                  {currentMovie?.showDates.map((date, index) => (
-                    <li key={index}>{date}</li>
-                  ))}
-                </ul>
-                {errors.showDates && <p className="error-message">{errors.showDates}</p>}
-              </div>*/}
-
-              {/* <div className="show-times">
-                <label>Show Times:</label>
-                <input
-                  type="time"
-                  value={tempTime}
-                  onChange={(e) => setTempTime(e.target.value)}
-                />
-                <button onClick={handleAddShowTime} className="manage-button">
-                  Add Time
-                </button>
-                <ul>
-                  {currentMovie?.showTimes.map((time, index) => (
-                    <li key={index}>{time}</li>
-                  ))}
-                </ul>
-                {errors.showTimes && <p className="error-message">{errors.showTimes}</p>}
-              </div>  */}
 
               <button onClick={handleSave} className="manage-button">
                 {isEditing ? "Save Changes" : "Add Movie"}

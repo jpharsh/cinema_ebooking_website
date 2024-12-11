@@ -422,18 +422,6 @@ const Registration = () => {
 
  return (
 
-   
-        // <div>
-        //   <div className="registration-container">
-        //     <h1>Edit Profile</h1>
-    
-        //     {/* Personal Information */}
-        //     <div className="section">
-        //       <button onClick={toggleRequiredInfo} className="section-toggle">
-        //         <span>Personal Information</span>
-        //         <span>{showRequiredInfo ? "▲" : "▼"}</span>
-        //       </button>
-        //       {showRequiredInfo && (
   <div>
       {/*<Navbar />*/}
       <div className="registration-container">

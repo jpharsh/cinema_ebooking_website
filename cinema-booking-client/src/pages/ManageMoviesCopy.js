@@ -98,21 +98,6 @@ function ManageMovies() {
       console.log("Validation failed");
       return; // Don't proceed if there are validation errors
     }
-
-    // const movieData = {
-    //   title: currentMovie.title,
-    //   mpaa_rating: currentMovie.mpaa_rating,
-    //   category: currentMovie.category,
-    //   movie_cast: currentMovie.movie_cast,
-    //   director: currentMovie.director,
-    //   producer: currentMovie.producer,
-    //   synopsis: currentMovie.synopsis,
-    //   reviews: currentMovie.reviews,
-    //   poster_url: currentMovie.poster_url,
-    //   trailer_url: currentMovie.trailer_url,
-    //   showDates: currentMovie.showDates,
-    //   showTimes: currentMovie.showTimes,
-    // };
     
     if (isEditing) {
       // Update existing movie

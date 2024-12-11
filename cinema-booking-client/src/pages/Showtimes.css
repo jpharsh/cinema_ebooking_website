@@ -11,21 +11,6 @@
     min-height: 100vh;
   }
   
-  /* Header */
-  /* .header {
-    width: 100%;
-    text-align: center;
-    background-color: #E50914;
-    color: white;
-    padding: 20px ;
-    font-size: 24px;
-    margin-bottom: 50px;
-    border-radius: 0px;
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-  } */
   
   /* App Container */
   .app-container {

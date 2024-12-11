@@ -49,8 +49,6 @@ const MovieInformation = () => {
                     <div>Director: { movie.director }</div>
                     <div>Producer: { movie.producer }</div>
                     <div>Synopsis: { movie.synopsis }</div>
-                    {/* <div>Reviews</div> */}
-                    {/* <div>Show dates and times</div> */}
                     <button 
                         className="trailer-link" 
                         onClick={() => watchTrailer(movie.trailer_url)}>  

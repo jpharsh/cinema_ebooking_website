@@ -105,8 +105,14 @@ const Showtimes = () => {
             <h2>Showtimes for:</h2>
             <h2>{movie.title}</h2>
             <div>
-            {Object.entries(groupedShowtimes).map(([date, times]) => (
-                <DaySchedule key={date} date={date} times={times} />
+            {Object.entries(groupedShowtimes)
+                .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB)) // Sort dates
+                .map(([date, times]) => (
+                <DaySchedule
+                    key={date}
+                    date={date}
+                    times={times.sort((timeA, timeB) => new Date(`1970-01-01T${timeA}`) - new Date(`1970-01-01T${timeB}`))} // Sort times
+                />
             ))}
             <button className="cancel-button" style={{ marginRight: '20px' }} onClick={handleBackClick}>
                 Cancel

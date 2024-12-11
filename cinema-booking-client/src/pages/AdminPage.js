@@ -17,16 +17,6 @@ function AdminHomePage() {
   
   return (
     <>
-      {/* Cinema Movies Header */}
-      {/* <header className="header">
-        <div className="header-content">
-          <span className="admin-logo">Admin</span>
-          <span className="logo">Cinema Movies</span>
-          
-        </div>
-      </header>
-      <AdminNavbar />*/}
-
       {/* Main Admin Page Content */}
       <div className="admin-container">
         <h1 className="greeting">Hello Admin!</h1>

@@ -4,31 +4,12 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    /* margin: 20px;
-    padding: 20px;
-    background-color: red;
-    border-radius: 10px; */
 }
-
-/* .poster-section {
-    flex: 1;
-    text-align: center;
-}
-
-.movie-poster {
-    width: 300px;
-    height: auto;
-    border-radius: 10px;
-} */
 
 .ticket-selection-section {
     flex: 2;
     margin-left: 40px;
 }
-
-/* .ticket-selection-section h2 {
-    margin-bottom: 20px;
-} */
 
 .ticket-type {
     display: flex;
@@ -36,33 +17,6 @@
     margin-bottom: 10px;
     justify-content: space-between;
 }
-
-/* .ticket-type label {
-    width: 120px;
-    font-weight: bold;
-}
-
-.ticket-type input {
-    width: 60px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-.purchase-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.purchase-btn:hover {
-    background-color: #0056b3;
-} */
 
 .trailer-link {
     background-color: #353535;

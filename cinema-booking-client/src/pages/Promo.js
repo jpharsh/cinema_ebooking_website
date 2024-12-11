@@ -91,13 +91,6 @@ function AdminPage() {
 
   return (
     <>
-      {/* Header */}
-      {/* <header className="header">
-        <div className="header-content">
-          <span className="admin-logo">Admin</span>
-          <span className="logo">Cinema Movies</span>
-        </div>
-      </header> */}
     <div>
         {/*<AdminNavbar />*/}
     </div>
@@ -137,12 +130,6 @@ function AdminPage() {
               value={newPromo.code}
               onChange={(e) => setNewPromo({ ...newPromo, code: e.target.value })}
             />
-            {/* <input 
-              type="text" 
-              placeholder="Description" 
-              value={newPromo.description}
-              onChange={(e) => setNewPromo({ ...newPromo, description: e.target.value })}
-            /> */}
             <input 
               type="text" 
               placeholder="Discount Amount"

@@ -40,7 +40,7 @@ const ResetPassword = () => {
         <div className="reset-password-container">
             <div className="reset-password-box">
                 <h2 className="reset-password-title">Reset Password</h2>
-                <form onSubmit={handleSubmit}>
+                <form style={{width: '100%'}} onSubmit={handleSubmit}>
                     <div style={{display: 'flex', textAlign: 'left' }}>
                         <label>New Password:</label>
                         <input

@@ -26,6 +26,7 @@ const PaymentInfo = () => {
   const [promoCode, setPromoCode] = useState("");
   const [discountedPrice, setDiscountedPrice] = useState(totalPrice);
   const [promoError, setPromoError] = useState("");
+  const [promoId, setPromoId] = useState("");
 
   const seats = formattedSeats.map((seat) => {
     const rowLetter = String.fromCharCode(65 + seat.row); // Convert row index to letter (A = 65 in ASCII)
@@ -613,6 +614,8 @@ const PaymentInfo = () => {
                   movie,
                   userSeats,
                   showid,
+                  selectedCard,
+                  promoCode
                 },
               });
             }}

@@ -235,6 +235,20 @@ function ManageMovies() {
       return; // Exit if validation fails
     }
 
+    const selectedDate = new Date(scheduleDatetime);
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 30);
+  
+    if (selectedDate > maxDate) {
+      alert("Movies cannot be scheduled more than 30 days in advance.");
+      return;
+    }
+    else if (selectedDate <= today) {
+      alert("Movies must be scheduled at least 2 days in advance.");
+      return;
+    } 
+
     const showtime = `${scheduleDatetime} ${scheduleTime}:00`;
     try {
       const response = await axios.post(

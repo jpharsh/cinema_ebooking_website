@@ -88,11 +88,12 @@ async function getUserEmail() {
            {tickets?.adults > 0 && (
              <div style={{ display: 'flex', flexDirection: 'row' }}>
                <p>
-                 {tickets.adults === 1
+                 {/* {tickets.adults === 1
                    ? "1 Adult Ticket"
-                   : `${tickets.adults} Adult Tickets`}:
+                   : `${tickets.adults} Adult Tickets`}: */}
+                  {tickets.adults} Adult Ticket(s):
                </p>
-               <p style={{ paddingLeft: '20%' }}>
+               <p style={{ paddingLeft: '13.5%' }}>
                  ${(tickets.adults * 11.99).toFixed(2)}
                </p>
              </div>
@@ -103,11 +104,12 @@ async function getUserEmail() {
            {tickets?.children > 0 && (
              <div style={{ display: 'flex', flexDirection: 'row' }}>
                <p>
-                 {tickets.children === 1
+                 {/* {tickets.children === 1
                    ? "1 Child Ticket"
-                   : `${tickets.children} Child Tickets`}:
+                   : `${tickets.children} Child Tickets`}: */}
+                  {tickets.children} Child Ticket(s):
                </p>
-               <p style={{ paddingLeft: '20%' }}>
+               <p style={{ paddingLeft: '13.5%' }}>
                  ${(tickets.children * 9.99).toFixed(2)}
                </p>
              </div>
@@ -118,11 +120,12 @@ async function getUserEmail() {
            {tickets?.seniors > 0 && (
              <div style={{ display: 'flex', flexDirection: 'row' }}>
                <p>
-                 {tickets.seniors === 1
+                 {/* {tickets.seniors === 1
                    ? "1 Senior Ticket"
-                   : `${tickets.seniors} Senior Tickets`}:
+                   : `${tickets.seniors} Senior Tickets`}: */}
+                  {tickets.seniors} Senior Ticket(s):
                </p>
-               <p style={{ paddingLeft: '20%' }}>
+               <p style={{ paddingLeft: '13.5%' }}>
                  ${(tickets.seniors * 10.99).toFixed(2)}
                </p>
              </div>
@@ -140,7 +143,7 @@ async function getUserEmail() {
              <span style={{ alignSelf: 'center' }}>
                <strong>Order Total: </strong>
              </span>
-             <p>${totalPrice.toFixed(2)}</p>
+             <p style={{marginTop: '15px'}}>${totalPrice.toFixed(2)}</p>
              <button
                className="edit-button"
                onClick={() => navigate(-2)}
@@ -161,7 +164,7 @@ async function getUserEmail() {
              <span style={{ alignSelf: 'center' }}>
                <strong>Seats: </strong>
              </span>
-             <p style={{ paddingLeft: '12%' }}>{seats?.join(', ')}</p>
+             <p style={{ paddingLeft: '15%', marginTop: '15px' }}>{seats?.join(', ')}</p>
              <button
                className="edit-button"
                onClick={() => {

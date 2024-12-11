@@ -41,7 +41,7 @@ const ResetPassword = () => {
             <div className="reset-password-box">
                 <h2 className="reset-password-title">Reset Password</h2>
                 <form onSubmit={handleSubmit}>
-                    <div>
+                    <div style={{display: 'flex', textAlign: 'left' }}>
                         <label>New Password:</label>
                         <input
                             className="input-field"
@@ -51,7 +51,7 @@ const ResetPassword = () => {
                             required
                         />
                     </div>
-                    <div>
+                    <div style={{display: 'flex', textAlign: 'left' }}>
                         <label>Confirm Password:</label>
                         <input
                             className="input-field"
@@ -61,8 +61,11 @@ const ResetPassword = () => {
                             required
                         />
                     </div>
-                    {errorMessage && <p className="message">{errorMessage}</p>}
-                    <button type="submit" className="login-btn">Reset Password</button>
+                    <div style={{display: 'flex', alignContent: 'center'}}>
+                        {errorMessage && <p className="message">{errorMessage}</p>}
+                        <button type="submit" className="login-btn">Reset Password</button>
+                    </div>
+                    
                 </form>
             </div>
         </div>

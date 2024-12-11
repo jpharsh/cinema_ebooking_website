@@ -253,6 +253,19 @@ const PaymentInfo = () => {
     } catch (e) {
       console.error("Error adding card:", e);
     }
+
+    setErrors({}); // Clear errors
+    setCardInfo({
+      nameOnCard: "",
+      cardNumber: "",
+      expirationDate: "",
+      cvc: "",
+      streetAddress: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    }); 
+    window.location.reload();
   };
 
   const handleApplyPromo = async () => {

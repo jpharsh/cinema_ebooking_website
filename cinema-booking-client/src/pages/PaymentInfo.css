@@ -106,3 +106,11 @@ label {
     margin-top: -5%;
     padding-left: 5%;
 }
+
+.success-message {
+    color: green;
+    font-size: small;
+    font-style: italic;
+    margin-top: -5%;
+    padding-left: 5%;
+}

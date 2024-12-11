@@ -1169,6 +1169,40 @@ def send_confirmation_email():
        return jsonify({'message': 'Email sent successfully'}), 200
    except Exception as e:
        return jsonify({'error': str(e)}), 500
+   
+@app.route('/api/bookings', methods=['GET'])
+def get_bookings():
+    user_id = request.args.get('user_id')  # Pass the logged-in user's ID
+    conn = connect_db()
+    cursor = conn.cursor(dictionary=True)
+
+    query = '''
+    SELECT 
+        b.id, 
+        b.total,
+        s.showtime,
+        m.title,
+		SUM(CASE WHEN t.ticket_type = '1' THEN 1 ELSE 0 END) AS adults,
+		SUM(CASE WHEN t.ticket_type = '2' THEN 1 ELSE 0 END) AS seniors,
+		SUM(CASE WHEN t.ticket_type = '3' THEN 1 ELSE 0 END) AS children
+    FROM Bookings b
+    JOIN Shows s ON b.show_id = s.id
+    JOIN Movies m ON s.movie_id = m.id
+    JOIN Tickets t ON b.id = t.booking_id
+    WHERE b.customer_id = %s
+    GROUP BY b.id, s.showtime, m.title
+    '''
+    cursor.execute(query, (user_id,))
+    bookings = cursor.fetchall()
+    for booking in bookings:
+        showtime = booking['showtime']
+        booking['formatted_date'] = showtime.strftime('%a, %d %b %Y')
+        booking['formatted_time'] = showtime.strftime('%I:%M %p')
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(bookings)
 
 if __name__ == '__main__':
    app.run(debug=True)

@@ -1,9 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import './GeneralNavbar.css';
+import ProfileIcon from '../images/ProfileIcon.png';
 
 const GeneralNavbar = ({ userRole, onLogout }) => {
     const navigate = useNavigate();
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+    };
 
     const handleLogoClick = () => {
         if (userRole === 'admin') {
@@ -26,10 +32,26 @@ const GeneralNavbar = ({ userRole, onLogout }) => {
             return <button className="btn black" onClick={handleLogout}>Log Out</button>;
         } else if (userRole === 'user') {
             return (
-                <>
-                    <button className="btn black" onClick={handleEditProfile}>Edit Profile</button>
-                    <button className="btn black" onClick={handleLogout}>Log Out</button>
-                </>
+                <div className="profile-dropdown">
+                    <button 
+                    className="profile-icon" 
+                    onClick={toggleDropdown} 
+                    aria-expanded={dropdownOpen}
+                    >
+                    <img 
+                        src={ProfileIcon} 
+                        alt="Profile" 
+                        className="profile-img"
+                    />
+                    </button>
+                    {dropdownOpen && (
+                    <ul className="dropdown-menu">
+                        <li><Link to="/edit-profile">Edit Profile</Link></li>
+                        <li><Link to="/order-history">View Order History</Link></li>
+                        <li onClick={handleLogout}>Logout</li>
+                    </ul>
+                    )}
+                </div>
             );
         } else {
             return (

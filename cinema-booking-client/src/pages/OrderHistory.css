@@ -1,0 +1,103 @@
+/* OrderHistory.css */
+
+
+.order-history-container {
+   max-width: 800px;
+   margin: 0 auto;
+   padding: 20px;
+   border-radius: 8px; /* Rounded corners */
+   font-family: Arial, sans-serif; /* Standard font for consistency */
+}
+
+
+.page-title {
+   text-align: center;
+   font-size: 2rem;
+   color: #ce0000; /* Matches the navbar color */
+   margin-bottom: 20px;
+}
+
+
+.no-orders {
+   text-align: center;
+   font-size: 1.2rem;
+   color: #666; /* Subtle text color for no-orders message */
+}
+
+
+.order-list {
+   display: flex;
+   flex-direction: column;
+   gap: 15px; /* Spacing between order cards */
+}
+
+
+.order-card {
+   padding: 15px;
+   background-color: #2b2b2b; /* White background for each card */
+   border: 1px solid #ddd; /* Light border for separation */
+   border-radius: 6px; /* Rounded corners for cards */
+   box-shadow: 0 2px 4px rgba(255, 0, 0, 0.1); /* Soft shadow for card depth */
+   transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+}
+
+
+.order-card:hover {
+   transform: scale(1.02); /* Slightly enlarges on hover */
+   box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+
+.movie-title {
+   font-size: 1.5rem;
+   color: #ffffff; /* Dark text for movie titles */
+   margin: 0;
+   margin-bottom: 10px;
+}
+
+
+.order-details {
+   font-size: 1rem;
+   color: #ffffff; /* Subtle text for order details */
+   margin: 5px 0;
+}
+
+
+.ticket-info {
+   display: flex;
+   justify-content: space-between;
+   margin: 10px 0;
+   color: #ffffff; /* Standard color for ticket types */
+}
+
+
+.ticket-type {
+   font-size: 1.05rem;
+}
+
+
+.order-total {
+   font-weight: bold;
+   color: #ce0000; /* Matches navbar for consistency */
+   font-size: 1.2rem;
+   text-align: right; /* Aligns total to the right */
+   margin-top: 10px;
+}
+
+
+.page-title {
+   text-align: center;
+   font-size: 2rem;
+   color: #ffffff; /* Matches the navbar color */
+   margin-bottom: 20px; /* Space below the title */
+   margin-top: 10px; /* Reduced space above the title */
+}
+
+.order-history-container {
+   max-width: 800px;
+   margin: 20px auto; /* Center alignment and reduced vertical spacing */
+   padding: 20px;
+   background-color: #333333;
+   border-radius: 8px;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

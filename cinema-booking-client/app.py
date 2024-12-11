@@ -1194,7 +1194,7 @@ def save_order():
         # Ensure all values are integers
         customer_id = int(customer_id)
         show_id = int(show_id)
-        total = int(total)
+        total = float(total)
         card_id = int(card_id)
         promo_id = int(promo_id) if promo_id is not None else None
 

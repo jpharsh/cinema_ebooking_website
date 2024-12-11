@@ -264,8 +264,10 @@ const OrderSummary = () => {
               <button
                 className="edit-button"
                 onClick={() => {
-                  if (window.confirm('Are you sure you want to edit the seats?')) {
-                    navigate('/seat-selection');
+                  if (window.history.length > 1) {
+                    navigate(-3); // Go back one page
+                  } else {
+                    navigate('/select-seats'); // Fallback to direct route if not in history
                   }
                 }}
               >

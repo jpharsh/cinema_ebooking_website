@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import './ResetPassword.css';
 import axios from 'axios';
 
 const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();  // Corrected: call useNavigate as a function
+    const navigate = useNavigate();
     const location = useLocation();
     const query = new URLSearchParams(location.search);
-    const resetToken = query.get('token');  // Extract the reset token from the URL
+    const resetToken = query.get('token');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,39 +28,43 @@ const ResetPassword = () => {
 
             if (response.data.message) {
                 alert('Password reset successful');
-                navigate('/login');  // Corrected: use navigate to redirect
+                navigate('/login');
             }
         } catch (error) {
             setErrorMessage(error.response?.data?.error || 'An error occurred');
-            console.log(resetToken);  // Add this line to check if token is being extracted
+            console.log(resetToken);
         }
     };
 
     return (
-        <div>
-            <h2>Reset Password</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>New Password:</label>
-                    <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Confirm Password:</label>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-                <button type="submit">Reset Password</button>
-            </form>
+        <div className="reset-password-container">
+            <div className="reset-password-box">
+                <h2 className="reset-password-title">Reset Password</h2>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label>New Password:</label>
+                        <input
+                            className="input-field"
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Confirm Password:</label>
+                        <input
+                            className="input-field"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    {errorMessage && <p className="message">{errorMessage}</p>}
+                    <button type="submit" className="login-btn">Reset Password</button>
+                </form>
+            </div>
         </div>
     );
 };

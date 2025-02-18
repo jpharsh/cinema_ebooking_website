@@ -26,26 +26,26 @@ import traceback
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.secret_key = 'supersecretkey'  # Replace with your actual secret key for production
+app.secret_key = '' # DELETED FOR PUBLIC REPO
 app.config['SESSION_TYPE'] = 'filesystem'  # Store session data on the server-side
 Session(app)
 
-JWT_SECRET = 'another_super_secret_key'  # Replace with a production key
-JWT_ALGORITHM = 'HS256'
+JWT_SECRET = ''  # DELETED FOR PUBLIC REPO
+JWT_ALGORITHM = '' # DELETED FOR PUBLIC REPO
 JWT_EXPIRATION_MINUTES = 30
 
 # Database connection parameters
-db_host = 'cinema-ebooking-database.cdm6csm20sfl.us-east-2.rds.amazonaws.com'
-db_user = 'admin'
-db_password = 'kyqtov-narha3-nEcpif'
-db_name = 'mywebsite'
+db_host = '' # DELETED FOR PUBLIC REPO
+db_user = '' # DELETED FOR PUBLIC REPO
+db_password = '' # DELETED FOR PUBLIC REPO
+db_name = '' # DELETED FOR PUBLIC REPO
 
-encryption_key = b'EcxldqJv4puPs5cRA3vv5So_-wcZNquUvohJyplob_M='  # DO NOT PUBLISH THIS KEY !!!!!
+encryption_key = b''  # DO NOT PUBLISH THIS KEY !!!!! DELETED FOR PUBLIC REPO
 cipher_suite = Fernet(encryption_key)
 
 # Google OAuth Configuration
-CLIENT_ID = '543307738148-faodjbvprsud5i9foiun55i9misrm01i.apps.googleusercontent.com'
-CLIENT_SECRET = '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'
+CLIENT_ID = '' # DELETED FOR PUBLIC REPO
+CLIENT_SECRET = '' # DELETED FOR PUBLIC REPO
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Load credentials from token.json
